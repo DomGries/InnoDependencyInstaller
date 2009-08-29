@@ -11,18 +11,22 @@ en.dotnetfx20_size=23 MB
 de.dotnetfx20_size=23 MB
 
 
-[Run]
-Filename: "{ini:{tmp}{\}dep.ini,install,dotnetfx20}"; Description: "{cm:dotnetfx20_title}"; StatusMsg: "{cm:depinstall_status,{cm:dotnetfx20_title}}"; Parameters: "/q:a /t:{tmp}{\}dotnetfx20 /c:""install /qb /l"""; Flags: skipifdoesntexist
-
 [Code]	
 const
 	dotnetfx20_url = 'http://download.microsoft.com/download/5/6/7/567758a3-759e-473e-bf8f-52154438565a/dotnetfx.exe';
+	dotnetfx20_url_x64 = 'http://download.microsoft.com/download/a/3/f/a3f1bf98-18f3-4036-9b68-8e6de530ce0a/NetFx64.exe';
+	dotnetfx20_url_ia64 = 'http://download.microsoft.com/download/f/8/6/f86148a4-e8f7-4d08-a484-b4107f238728/NetFx64.exe';
 
 procedure dotnetfx20();
 var
 	version: cardinal;
 begin
-	RegQueryDWordValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727', 'Install', version)
-	if IntToStr(version) <> '1' then
-		AddProduct('dotnetfx20', 'dotnetfx20.exe', CustomMessage('dotnetfx20_title'), CustomMessage('dotnetfx20_size'), dotnetfx20_url);
+	RegQueryDWordValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727', 'Install', version);
+	if version <> 1 then begin
+		AddProduct('dotnetfx20.exe',
+			'/q:a /t:' + ExpandConstant('{tmp}{\}') + 'dotnetfx20 /c:"install /qb /l"',
+			CustomMessage('dotnetfx20_title'),
+			CustomMessage('dotnetfx20_size'),
+			GetURL(dotnetfx20_url, dotnetfx20_url_x64, dotnetfx20_url_ia64));
+	end;
 end;

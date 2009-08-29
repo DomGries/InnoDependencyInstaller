@@ -10,9 +10,6 @@ en.dotnetfx35sp1_size=3 MB - 232 MB
 de.dotnetfx35sp1_size=3 MB - 232 MB
 
 
-[Run]
-Filename: "{ini:{tmp}{\}dep.ini,install,dotnetfx35sp1}"; Description: "{cm:dotnetfx35sp1_title}"; StatusMsg: "{cm:depinstall_status,{cm:dotnetfx35sp1_title}}"; Parameters: "/lang:enu /qb /norestart"; Flags: skipifdoesntexist
-
 [Code]	
 const
 	dotnetfx35sp1_url = 'http://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe';
@@ -22,6 +19,10 @@ var
 	version: cardinal;
 begin
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v3.5', 'SP', version);
-	if IntToStr(version) < '1' then
-		AddProduct('dotnetfx35sp1', 'dotnetfx35sp1.exe', CustomMessage('dotnetfx35sp1_title'), CustomMessage('dotnetfx35sp1_size'), dotnetfx35sp1_url);
+	if version < 1 then
+		AddProduct('dotnetfx35sp1.exe',
+			'/lang:enu /qb /norestart',
+			CustomMessage('dotnetfx35sp1_title'),
+			CustomMessage('dotnetfx35sp1_size'),
+			dotnetfx35sp1_url);
 end;

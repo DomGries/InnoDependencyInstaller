@@ -9,9 +9,6 @@ en.dotnetfx11_size=23.1 MB
 de.dotnetfx11_size=23,1 MB
 
 
-[Run]
-Filename: "{ini:{tmp}{\}dep.ini,install,dotnetfx11}"; Description: "{cm:dotnetfx11_title}"; StatusMsg: "{cm:depinstall_status,{cm:dotnetfx11_title}}"; Parameters: "/q:a /c:""install /qb /l"""; Flags: skipifdoesntexist
-
 [Code]	
 const
 	dotnetfx11_url = 'http://download.microsoft.com/download/a/a/c/aac39226-8825-44ce-90e3-bf8203e74006/dotnetfx.exe';
@@ -21,6 +18,10 @@ var
 	version: cardinal;
 begin
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v1.1.4322', 'Install', version);
-	if (IntToStr(version) <> '1') then
-		AddProduct('dotnetfx11', 'dotnetfx11.exe', CustomMessage('dotnetfx11_title'), CustomMessage('dotnetfx11_size'), dotnetfx11_url);
+	if version <> 1 then
+		AddProduct('dotnetfx11.exe',
+			'/q:a /c:"install /qb /l"',
+			CustomMessage('dotnetfx11_title'),
+			CustomMessage('dotnetfx11_size'),
+			dotnetfx11_url);
 end;

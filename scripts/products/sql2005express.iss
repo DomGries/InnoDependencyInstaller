@@ -10,9 +10,6 @@ en.sql2005express_size=57.7 MB
 de.sql2005express_size=57,7 MB
 
 
-[Run]
-Filename: "{ini:{tmp}{\}dep.ini,install,sql2005express}"; Description: "{cm:sql2005express_title}"; StatusMsg: "{cm:depinstall_status,{cm:sql2005express_title}}"; Parameters: "/qb"; Flags: skipifdoesntexist
-
 [Code]
 const
 	sql2005express_url = 'http://download.microsoft.com/download/f/1/0/f10c4f60-630e-4153-bd53-c3010e4c513b/SQLEXPR.EXE';
@@ -26,6 +23,10 @@ begin
 	//Service Pack 1: 9.1.2047.00
 	//Service Pack 2: 9.2.3042.00
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\Microsoft SQL Server\90\DTS\Setup', 'Install', version);
-	if (IntToStr(version) <> '1') then
-		AddProduct('sql2005express', 'sql2005express.exe', CustomMessage('sql2005express_title'), CustomMessage('sql2005express_size'), sql2005express_url);
+	if version <> 1 then
+		AddProduct('sql2005express.exe',
+			'/qb',
+			CustomMessage('sql2005express_title'),
+			CustomMessage('sql2005express_size'),
+			sql2005express_url);
 end;

@@ -9,18 +9,21 @@ en.dotnetfx20sp1_size=23.6 MB
 de.dotnetfx20sp1_size=23,6 MB
 
 
-[Run]
-Filename: "{ini:{tmp}{\}dep.ini,install,dotnetfx20sp1}"; Description: "{cm:dotnetfx20sp1_title}"; StatusMsg: "{cm:depinstall_status,{cm:dotnetfx20sp1_title}}"; Parameters: "/q:a /t:{tmp}{\}dotnetfx20sp1 /c:""install /qb /l /msipassthru MSI_PROP_BEGIN"" REBOOT=Suppress ""MSI_PROP_END"""; Flags: skipifdoesntexist
-
 [Code]	
 const
 	dotnetfx20sp1_url = 'http://download.microsoft.com/download/0/8/c/08c19fa4-4c4f-4ffb-9d6c-150906578c9e/NetFx20SP1_x86.exe';
+	dotnetfx20sp1_url_x64 = 'http://download.microsoft.com/download/9/8/6/98610406-c2b7-45a4-bdc3-9db1b1c5f7e2/NetFx20SP1_x64.exe';
+	dotnetfx20sp1_url_ia64 = 'http://download.microsoft.com/download/c/9/7/c97d534b-8a55-495d-ab06-ad56f4b7f155/NetFx20SP1_ia64.exe';
 
 procedure dotnetfx20sp1();
 var
 	version: cardinal;
 begin
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727', 'SP', version);
-	if IntToStr(version) < '1' then
-		AddProduct('dotnetfx20sp1', 'dotnetfx20sp1.exe', CustomMessage('dotnetfx20sp1_title'), CustomMessage('dotnetfx20sp1_size'), dotnetfx20sp1_url);
+	if version < 1 then
+		AddProduct('dotnetfx20sp1.exe',
+			'/q:a /t:' + ExpandConstant('{tmp}{\}') + 'dotnetfx20sp1 /c:"install /qb /l /msipassthru MSI_PROP_BEGIN" REBOOT=Suppress "MSI_PROP_END"',
+			CustomMessage('dotnetfx20sp1_title'),
+			CustomMessage('dotnetfx20sp1_size'),
+			GetURL(dotnetfx20sp1_url, dotnetfx20sp1_url_x64, dotnetfx20sp1_url_ia64));
 end;

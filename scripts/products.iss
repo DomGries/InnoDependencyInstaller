@@ -25,12 +25,23 @@ de.isxdl_langfile=german2.ini
 Source: "scripts\isxdl\german2.ini"; Flags: dontcopy
 
 [Code]
+type
+	TProduct = record
+		File: String;
+		Description: String;
+		Parameters: String;
+	end;
+	
 var
 	installMemo, downloadMemo, downloadMessage: string;
+	products: array of TProduct;
+	DependencyPage: TOutputProgressWizardPage;
 
-procedure AddProduct(PackageName, FileName, Title, Size, URL: string);
+  
+procedure AddProduct(FileName, Parameters, Title, Size, URL: string);
 var
 	path: string;
+	i: Integer;
 begin
 	installMemo := installMemo + '%1' + Title + #13;
 	
@@ -41,59 +52,54 @@ begin
 		isxdl_AddFile(URL, path);
 		
 		downloadMemo := downloadMemo + '%1' + Title + #13;
-		downloadMessage := downloadMessage + Title + ' (' + Size + ')' + #13;
+		downloadMessage := #9 + downloadMessage + Title + ' (' + Size + ')' + #13;
 	end;
 	
-	SetIniString('install', PackageName, path, ExpandConstant('{tmp}{\}dep.ini'));
-end;
-
-function NextButtonClick(CurPage: Integer): Boolean;
-begin
-	Result := true;
-
-	if CurPage = wpReady then begin
-
-		if downloadMemo <> '' then begin
-			// only change isxdl language if it is not english because isxdl default language is already english
-			if ActiveLanguage() <> 'en' then begin
-				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
-				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));
-			end;
-			//isxdl_SetOption('title', FmtMessage(SetupMessage(msgSetupWindowTitle), [CustomMessage('appname')]));
-			
-			if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [downloadMessage]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
-				Result := false
-			else if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
-				Result := false;
-		end;
-	end;
+	i := GetArrayLength(products);
+	SetArrayLength(products, i + 1);
+	products[i].File := path;
+	products[i].Description := FmtMessage(CustomMessage('depinstall_status'), [Title]);
+	products[i].Parameters := Parameters;
 end;
 
 function InstallProducts: Boolean;
 var
-	ResultCode, i: Integer;
+	ResultCode, i, productCount: Integer;
 begin
 	Result := true;
-	
-	//class: filepath, title, parameters
-	for i := 0 to products.Count - 1 do begin
-		//SuppressibleMsgBox(products[i], mbConfirmation, MB_YESNO, IDYES);
-		if not Exec(products[i], '', '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then begin
-			// handle success if necessary; ResultCode contains the exit code
-			if not (ResultCode = 0) then begin
+	productCount := GetArrayLength(products);
+		
+	if productCount > 0 then begin
+		
+		DependencyPage := CreateOutputProgressPage('Personal Information', 'What''s your registration key?');
+		DependencyPage.Show;
+		
+		for i := 0 to productCount - 1 do begin
+			DependencyPage.SetText(products[i].Description, '');
+			DependencyPage.SetProgress(i, productCount);
+			
+			if Exec(products[i].File, products[i].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+				// success; ResultCode contains the exit code
+				if ResultCode <> 0 then begin
+					Result := false;
+				end;
+			end else begin
+				// failure; ResultCode contains the error code
 				Result := false;
 			end;
-		end else begin
-			// handle failure if necessary; ResultCode contains the error code
-			Result := false;
 		end;
+		
+		DependencyPage.Hide;
+		
+		// free memory
+		SetArrayLength(products, 0);
 	end;
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
-	if (CurStep = ssInstall) then begin
-		if (not InstallProducts()) then
+	if CurStep = ssInstall then begin
+		if not InstallProducts() then
 			Abort();
 	end;
 end;
@@ -113,4 +119,49 @@ begin
 		s := s + NewLine + NewLine + MemoTasksInfo;
 
 	Result := s
+end;
+
+function NextButtonClick(CurPageID: Integer): Boolean;
+begin
+	Result := true;
+
+	if CurPageID = wpReady then begin
+
+		if downloadMemo <> '' then begin
+			// change isxdl language only if it is not english because isxdl default language is already english
+			if ActiveLanguage() <> 'en' then begin
+				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
+				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));
+			end;
+			//isxdl_SetOption('title', FmtMessage(SetupMessage(msgSetupWindowTitle), [CustomMessage('appname')]));
+			
+			if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [downloadMessage]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
+				Result := false
+			else if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
+				Result := false;
+		end;
+	end;
+end;
+
+function IsX64: Boolean;
+begin
+  Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
+end;
+
+function IsIA64: Boolean;
+begin
+  Result := Is64BitInstallMode and (ProcessorArchitecture = paIA64);
+end;
+
+function GetURL(x86, x64, ia64: String): String;
+begin
+	if Is64BitInstallMode() then begin
+		if IsX64() and (x64 <> '') then
+			Result := x64;
+		if IsIA64() and (ia64 <> '') then
+			Result := ia64;
+	end;
+	
+	if Result = '' then
+		Result := x86;
 end;

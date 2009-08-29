@@ -11,9 +11,6 @@ en.kb928366_size=8.8 MB
 de.kb928366_size=8,8 MB
 
 
-[Run]
-Filename: "{ini:{tmp}{\}dep.ini,install,kb928366}"; Description: "{cm:kb928366_title}"; StatusMsg: "{cm:depinstall_status,{cm:kb928366_title}}"; Parameters: "/q"; Flags: skipifdoesntexist
-
 [Code]
 const
 	kb928366_url = 'http://download.microsoft.com/download/6/d/0/6d0e5797-91eb-401a-a61f-58b369302018/NDP1.1sp1-KB928366-X86.exe';
@@ -23,9 +20,13 @@ var
 	version: cardinal;
 begin
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v1.1.4322', 'SP', version);
-	if (IntToStr(version) = '1') then begin
+	if version = 1 then begin
 		RegQueryDWordValue(HKLM, 'Software\Microsoft\Updates\.NETFramework\1.1\M928366', 'Installed', version);
-		if (IntToStr(version) <> '1') then
-			AddProduct('kb928366', 'kb928366.exe', CustomMessage('kb928366_title'), CustomMessage('kb928366_size'), kb928366_url);
+		if version <> 1 then
+			AddProduct('kb928366.exe',
+				'/q',
+				CustomMessage('kb928366_title'),
+				CustomMessage('kb928366_size'),
+				kb928366_url);
 	end;
 end;

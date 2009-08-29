@@ -11,9 +11,6 @@ en.kb886903_size=1.5 MB
 de.kb886903_size=1,5 MB
 
 
-[Run]
-Filename: "{ini:{tmp}{\}dep.ini,install,kb886903}"; Description: "{cm:kb886903_title}"; StatusMsg: "{cm:depinstall_status,{cm:kb886903_title}}"; Parameters: "/q"; Flags: skipifdoesntexist
-
 [Code]
 const
 	kb886903_url = 'http://download.microsoft.com/download/e/1/4/e14c0c02-591b-4696-8552-eb710c26a3cd/NDP1.1sp1-KB886903-X86.exe';
@@ -23,9 +20,13 @@ var
 	version: cardinal;
 begin
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v1.1.4322', 'SP', version);
-	if (IntToStr(version) = '1') then begin
+	if version = 1 then begin
 		RegQueryDWordValue(HKLM, 'Software\Microsoft\Updates\.NETFramework\1.1\M886903', 'Installed', version);
-		if (IntToStr(version) <> '1') then
-			AddProduct('kb886903', 'kb886903.exe', CustomMessage('kb886903_title'), CustomMessage('kb886903_size'), kb886903_url);
+		if version) <> 1 then
+			AddProduct('kb886903.exe',
+				'/q',
+				CustomMessage('kb886903_title'),
+				CustomMessage('kb886903_size'),
+				kb886903_url);
 	end;
 end;

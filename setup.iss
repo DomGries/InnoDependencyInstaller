@@ -42,21 +42,21 @@ Uninstallable=true
 DirExistsWarning=no
 CreateAppDir=true
 OutputDir=bin
-OutputBaseFilename=MyProgram-2.1
+OutputBaseFilename=MyProgram-3.0
 SourceDir=.
 AppCopyright=Copyright © stfx 2007-2009
-AppVerName=MyProgram 2.1
+AppVerName=MyProgram 3.0
 
 DefaultGroupName=MyProgram
 AllowNoIcons=yes
 AppPublisher=stfx
-AppVersion=2.1
+AppVersion=3.0
 UninstallDisplayIcon={app}\MyProgram.exe
 UninstallDisplayName=MyProgram
 UsePreviousGroup=yes
 UsePreviousAppDir=yes
 DefaultDirName={pf}\MyProgram
-VersionInfoVersion=2.1
+VersionInfoVersion=3.0
 VersionInfoCompany=stfx
 VersionInfoCopyright=Copyright © stfx 2007-2009
 ShowUndisplayableLanguages=no
@@ -65,10 +65,10 @@ InternalCompressLevel=fast
 SolidCompression=yes
 Compression=lzma/fast
 
-;required by products
 MinVersion=4.1,5.0
 PrivilegesRequired=admin
-ArchitecturesAllowed=x86
+ArchitecturesAllowed=x86 x64 ia64
+ArchitecturesInstallIn64BitMode=x64 ia64
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
@@ -79,7 +79,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "src\MyProgram.exe"; DestDir: {app}
+Source: "src\MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: IsX64
+Source: "src\MyProgram-IA64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: IsIA64
+Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode
 
 [Icons]
 Name: "{group}\MyProgram"; Filename: "{app}\MyProgram"

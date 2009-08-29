@@ -9,9 +9,6 @@ en.ie6_size=1 MB - 77.5 MB
 de.ie6_size=1 MB - 77,5 MB
 
 
-[Run]
-Filename: "{ini:{tmp}{\}dep.ini,install,ie6}"; Description: "{cm:ie6_title}"; StatusMsg: "{cm:depinstall_status,{cm:ie6_title}}"; Parameters: "/q:a /C:""setup /QNT"""; Flags: skipifdoesntexist
-
 [Code]
 const
 	ie6_url = 'http://download.microsoft.com/download/ie6sp1/finrel/6_sp1/W98NT42KMeXP/EN-US/ie6setup.exe';
@@ -21,6 +18,10 @@ var
 	version: string;
 begin
 	RegQueryStringValue(HKLM, 'Software\Microsoft\Internet Explorer', 'Version', version);
-	if (version < MinVersion) then
-		AddProduct('ie6', 'ie6.exe', CustomMessage('ie6_title'), CustomMessage('ie6_size'), ie6_url);
+	if version < MinVersion then
+		AddProduct('ie6.exe',
+			'/q:a /C:"setup /QNT"',
+			CustomMessage('ie6_title'),
+			CustomMessage('ie6_size'),
+			ie6_url);
 end;
