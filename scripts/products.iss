@@ -3,17 +3,23 @@
 [CustomMessages]
 DependenciesDir=MyProgramDependencies
 
-en.depdownload_title=Download dependencies
-de.depdownload_title=Abhängigkeiten downloaden
+en.depdownload_msg=The following applications are required before setup can continue:%n%1%nDownload and install now?
+de.depdownload_msg=Die folgenden Programme werden benötigt bevor das Setup fortfahren kann:%n%1%nJetzt downloaden und installieren?
 
-en.depinstall_title=Install dependencies
-de.depinstall_title=Abhängigkeiten installieren
+en.depdownload_memo_title=Download dependencies
+de.depdownload_memo_title=Abhängigkeiten downloaden
+
+en.depinstall_memo_title=Install dependencies
+de.depinstall_memo_title=Abhängigkeiten installieren
+
+en.depinstall_title=Installing dependencies
+de.depinstall_title=Installiere Abhängigkeiten
+
+en.depinstall_description=Please wait while Setup installs dependencies on your computer.
+de.depinstall_description=Warten Sie bitte während Abhängigkeiten auf Ihrem Computer installiert wird.
 
 en.depinstall_status=Installing %1...
 de.depinstall_status=Installiere %1...
-
-en.depdownload_msg=The following applications are required before setup can continue:%n%1%nDownload and install now?
-de.depdownload_msg=Die folgenden Programme werden benötigt bevor das Setup fortfahren kann:%n%1%nJetzt downloaden und installieren?
 
 en.depinstall_missing=%1 must be installed before setup can continue. Please install %1 and run Setup again.
 de.depinstall_missing=%1 muss installiert werden bevor das Setup fortfahren kann. Bitte installieren Sie %1 und starten Sie das Setup erneut.
@@ -71,7 +77,7 @@ begin
 		
 	if productCount > 0 then begin
 		
-		DependencyPage := CreateOutputProgressPage('Personal Information', 'What''s your registration key?');
+		DependencyPage := CreateOutputProgressPage(CustomMessage('depinstall_title'), CustomMessage('depinstall_description'));
 		DependencyPage.Show;
 		
 		for i := 0 to productCount - 1 do begin
@@ -109,9 +115,9 @@ var
 	s: string;
 begin
 	if downloadMemo <> '' then
-		s := s + CustomMessage('depdownload_title') + ':' + NewLine + FmtMessage(downloadMemo, [Space]) + NewLine;
+		s := s + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMemo, [Space]) + NewLine;
 	if installMemo <> '' then
-		s := s + CustomMessage('depinstall_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
+		s := s + CustomMessage('depinstall_memo_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
 
 	s := s + MemoDirInfo + NewLine + NewLine + MemoGroupInfo
 	
