@@ -21,6 +21,8 @@
 #include "scripts\products\dotnetfx20lp.iss"
 #include "scripts\products\dotnetfx20sp1.iss"
 #include "scripts\products\dotnetfx20sp1lp.iss"
+#include "scripts\products\dotnetfx20sp2.iss"
+#include "scripts\products\dotnetfx20sp2lp.iss"
 
 //#include "scripts\products\dotnetfx35.iss"
 //#include "scripts\products\dotnetfx35lp.iss"
@@ -96,12 +98,15 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,MyProgram}"; Fl
 [Code]
 function InitializeSetup(): Boolean;
 begin
+	//init windows version
+	initwinversion();
+	
 	//check if dotnetfx20 can be installed on this OS
-	if (not minwinspversion(5, 0, 3)) then begin
+	if not minwinspversion(5, 0, 3) then begin
 		MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('win2000sp3_title')]), mbError, MB_OK);
 		exit;
 	end;
-	if (not minwinspversion(5, 1, 2)) then begin
+	if not minwinspversion(5, 1, 2) then begin
 		MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('winxpsp2_title')]), mbError, MB_OK);
 		exit;
 	end;
@@ -117,20 +122,24 @@ begin
 	//dotnetfx11sp1();
 	//kb886903(); //better use windows update
 	//kb928366(); //better use windows update
-	
-	kb835732();
-	
-	if (minwinspversion(5, 0, 4)) then begin
-		dotnetfx20sp1();
-		dotnetfx20sp1lp();
+			
+	if (minwinspversion(5, 1, 2)) then begin
+		dotnetfx20sp2();
+		dotnetfx20sp2lp();
 	end else begin
-		dotnetfx20();
-		dotnetfx20lp();
+		if (minwinspversion(5, 0, 4)) then begin
+			kb835732();
+			dotnetfx20sp1();
+			dotnetfx20sp1lp();
+		end else begin
+			dotnetfx20();
+			dotnetfx20lp();
+		end;
 	end;
 	
 	//dotnetfx35();
 	//dotnetfx35lp();
-	dotnetfx35sp1();
+	//dotnetfx35sp1();
 	//dotnetfx35sp1lp();
 	
 	//mdac28('2.7');

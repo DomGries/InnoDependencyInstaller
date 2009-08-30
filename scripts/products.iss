@@ -3,8 +3,8 @@
 [CustomMessages]
 DependenciesDir=MyProgramDependencies
 
-en.depdownload_msg=The following applications are required before setup can continue:%n%1%nDownload and install now?
-de.depdownload_msg=Die folgenden Programme werden benötigt bevor das Setup fortfahren kann:%n%1%nJetzt downloaden und installieren?
+en.depdownload_msg=The following applications are required before setup can continue:%n%n%1%nDownload and install now?
+de.depdownload_msg=Die folgenden Programme werden benötigt bevor das Setup fortfahren kann:%n%n%1%nJetzt downloaden und installieren?
 
 en.depdownload_memo_title=Download dependencies
 de.depdownload_memo_title=Abhängigkeiten downloaden
@@ -24,6 +24,9 @@ de.depinstall_status=Installiere %1...
 en.depinstall_missing=%1 must be installed before setup can continue. Please install %1 and run Setup again.
 de.depinstall_missing=%1 muss installiert werden bevor das Setup fortfahren kann. Bitte installieren Sie %1 und starten Sie das Setup erneut.
 
+en.depinstall_error=An error occured while installing the dependencies. Please restart the computer and try to run the setup again or install the following dependencies manually:%n
+de.depinstall_error=Ein Fehler ist während der Installation der Abghängigkeiten aufgetreten. Bitte starten Sie den Computer neu und versuchen Sie das Setup erneut auszuführen oder installieren sie die folgenden Abhängigkeiten per Hand:%n
+
 de.isxdl_langfile=german2.ini
 
 
@@ -34,7 +37,7 @@ Source: "scripts\isxdl\german2.ini"; Flags: dontcopy
 type
 	TProduct = record
 		File: String;
-		Description: String;
+		Title: String;
 		Parameters: String;
 	end;
 	
@@ -58,55 +61,69 @@ begin
 		isxdl_AddFile(URL, path);
 		
 		downloadMemo := downloadMemo + '%1' + Title + #13;
-		downloadMessage := #9 + downloadMessage + Title + ' (' + Size + ')' + #13;
+		downloadMessage := downloadMessage + '    ' + Title + ' (' + Size + ')' + #13;
 	end;
 	
 	i := GetArrayLength(products);
 	SetArrayLength(products, i + 1);
 	products[i].File := path;
-	products[i].Description := FmtMessage(CustomMessage('depinstall_status'), [Title]);
+	products[i].Title := Title;
 	products[i].Parameters := Parameters;
 end;
 
 function InstallProducts: Boolean;
 var
-	ResultCode, i, productCount: Integer;
+	ResultCode, i, productCount, finishCount: Integer;
 begin
 	Result := true;
 	productCount := GetArrayLength(products);
 		
 	if productCount > 0 then begin
-		
 		DependencyPage := CreateOutputProgressPage(CustomMessage('depinstall_title'), CustomMessage('depinstall_description'));
 		DependencyPage.Show;
 		
 		for i := 0 to productCount - 1 do begin
-			DependencyPage.SetText(products[i].Description, '');
+			DependencyPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
 			DependencyPage.SetProgress(i, productCount);
 			
 			if Exec(products[i].File, products[i].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
-				// success; ResultCode contains the exit code
-				if ResultCode <> 0 then begin
+				//success; ResultCode contains the exit code
+				if ResultCode = 0 then
+					finishCount := finishCount + 1
+				else begin
 					Result := false;
+					break;
 				end;
 			end else begin
-				// failure; ResultCode contains the error code
+				//failure; ResultCode contains the error code
 				Result := false;
+				break;
 			end;
 		end;
 		
-		DependencyPage.Hide;
+		//only leave not installed products for error message
+		for i := 0 to productCount - finishCount - 1 do begin
+			products[i] := products[i+finishCount];
+		end;
+		SetArrayLength(products, productCount - finishCount);
 		
-		// free memory
-		SetArrayLength(products, 0);
+		DependencyPage.Hide;
 	end;
 end;
 
-procedure CurStepChanged(CurStep: TSetupStep);
+function PrepareToInstall: String;
+var
+	i, productCount: Integer;
+	s: string;
 begin
-	if CurStep = ssInstall then begin
-		if not InstallProducts() then
-			Abort();
+	if not InstallProducts() then begin
+		s := CustomMessage('depinstall_error');
+		
+		for i := 0 to GetArrayLength(products) - 1 do begin
+			s := s + #13 + '    ' + products[i].Title;
+		end;
+		
+		Result := s;
 	end;
 end;
 
@@ -134,7 +151,7 @@ begin
 	if CurPageID = wpReady then begin
 
 		if downloadMemo <> '' then begin
-			// change isxdl language only if it is not english because isxdl default language is already english
+			//change isxdl language only if it is not english because isxdl default language is already english
 			if ActiveLanguage() <> 'en' then begin
 				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
 				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));

@@ -6,7 +6,6 @@ de.dotnetfx20sp1lp_title=.NET Framework 2.0 SP1 Sprachpaket: Deutsch
 de.dotnetfx20sp1lp_size=3,4 MB
 
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-en.dotnetfx20sp1lp_lcid=1033
 de.dotnetfx20sp1lp_lcid=1031
 
 de.dotnetfx20sp1lp_url=http://download.microsoft.com/download/8/a/a/8aab7e6a-5e58-4e83-be99-f5fb49fe811e/NetFx20SP1_x86de.exe
@@ -19,11 +18,14 @@ procedure dotnetfx20sp1lp();
 var
 	version: cardinal;
 begin
-	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727\' + CustomMessage('dotnetfx20sp1lp_lcid'), 'SP', version);
-	if version < 1 then
-		AddProduct(ExpandConstant('dotnetfx20sp1_langpack_{language}.exe'),
-			'/q:a /c:"install /qb /l"',
-			CustomMessage('dotnetfx20sp1lp_title'),
-			CustomMessage('dotnetfx20sp1lp_size'),
-			GetURL(CustomMessage('dotnetfx20sp1lp_url'), CustomMessage('dotnetfx20sp1lp_url_x64'), CustomMessage('dotnetfx20sp1lp_url_ia64')));
+	if ActiveLanguage() <> 'en' then begin
+		RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727\' + CustomMessage('dotnetfx20sp1lp_lcid'), 'SP', version);
+		
+		if version < 1 then
+			AddProduct(ExpandConstant('dotnetfx20sp1_langpack_{language}.exe'),
+				'/q:a /c:"install /qb /l"',
+				CustomMessage('dotnetfx20sp1lp_title'),
+				CustomMessage('dotnetfx20sp1lp_size'),
+				GetURL(CustomMessage('dotnetfx20sp1lp_url'), CustomMessage('dotnetfx20sp1lp_url_x64'), CustomMessage('dotnetfx20sp1lp_url_ia64')));
+	end;
 end;
