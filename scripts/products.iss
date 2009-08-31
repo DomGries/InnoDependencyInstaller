@@ -24,8 +24,8 @@ de.depinstall_status=Installiere %1...
 en.depinstall_missing=%1 must be installed before setup can continue. Please install %1 and run Setup again.
 de.depinstall_missing=%1 muss installiert werden bevor das Setup fortfahren kann. Bitte installieren Sie %1 und starten Sie das Setup erneut.
 
-en.depinstall_error=An error occured while installing the dependencies. Please restart the computer and try to run the setup again or install the following dependencies manually:%n
-de.depinstall_error=Ein Fehler ist während der Installation der Abghängigkeiten aufgetreten. Bitte starten Sie den Computer neu und versuchen Sie das Setup erneut auszuführen oder installieren sie die folgenden Abhängigkeiten per Hand:%n
+en.depinstall_error=An error occured while installing the dependencies. Please restart the computer and run the setup again or install the following dependencies manually:%n
+de.depinstall_error=Ein Fehler ist während der Installation der Abghängigkeiten aufgetreten. Bitte starten Sie den Computer neu und führen Sie das Setup erneut aus oder installieren Sie die folgenden Abhängigkeiten per Hand:%n
 
 de.isxdl_langfile=german2.ini
 
@@ -113,7 +113,7 @@ end;
 
 function PrepareToInstall: String;
 var
-	i, productCount: Integer;
+	i: Integer;
 	s: string;
 begin
 	if not InstallProducts() then begin
@@ -168,22 +168,20 @@ end;
 
 function IsX64: Boolean;
 begin
-  Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
+	Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
 end;
 
 function IsIA64: Boolean;
 begin
-  Result := Is64BitInstallMode and (ProcessorArchitecture = paIA64);
+	Result := Is64BitInstallMode and (ProcessorArchitecture = paIA64);
 end;
 
 function GetURL(x86, x64, ia64: String): String;
 begin
-	if Is64BitInstallMode() then begin
-		if IsX64() and (x64 <> '') then
-			Result := x64;
-		if IsIA64() and (ia64 <> '') then
-			Result := ia64;
-	end;
+	if IsX64() and (x64 <> '') then
+		Result := x64;
+	if IsIA64() and (ia64 <> '') then
+		Result := ia64;
 	
 	if Result = '' then
 		Result := x86;

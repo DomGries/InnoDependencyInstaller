@@ -1,5 +1,5 @@
 [CustomMessages]
-iis_title=Internet Information Services
+iis_title=Internet Information Services (IIS)
 
 
 [Code]

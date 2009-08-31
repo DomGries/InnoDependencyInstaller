@@ -19,7 +19,7 @@ var
 	version: cardinal;
 begin
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v3.5', 'Install', version);
-	if IntToStr(version) <> '1' then
+	if version <> 1 then
 		AddProduct('dotnetfx35.exe',
 			'/lang:enu /qb /norestart',
 			CustomMessage('dotnetfx35_title'),

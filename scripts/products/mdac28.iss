@@ -1,5 +1,5 @@
 [CustomMessages]
-mdac28_title=MDAC 2.8
+mdac28_title=Microsoft Data Access Components 2.8
 
 en.mdac28_size=5.4 MB
 de.mdac28_size=5,4 MB
@@ -13,7 +13,7 @@ procedure mdac28(MinVersion: string);
 var
 	version: string;
 begin
-	// Check for required MDAC installation
+	//check for MDAC installation
 	RegQueryStringValue(HKLM, 'Software\Microsoft\DataAccess', 'FullInstallVer', version);
 	if version < MinVersion then
 		AddProduct('mdac28.exe',

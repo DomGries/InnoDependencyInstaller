@@ -16,8 +16,8 @@ function fileversion(file: string): string;
 var
 	versionMS, versionLS: cardinal;
 begin
-	if (GetVersionNumbers(file, versionMS, versionLS)) then begin
-		Result := GetFullVersion(versionMS, versionLS);
-	end else
+	if GetVersionNumbers(file, versionMS, versionLS) then
+		Result := GetFullVersion(versionMS, versionLS)
+	else
 		Result := '0';
 end;

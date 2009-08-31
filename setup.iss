@@ -26,7 +26,7 @@
 
 //#include "scripts\products\dotnetfx35.iss"
 //#include "scripts\products\dotnetfx35lp.iss"
-#include "scripts\products\dotnetfx35sp1.iss"
+//#include "scripts\products\dotnetfx35sp1.iss"
 //#include "scripts\products\dotnetfx35sp1lp.iss"
 
 //#include "scripts\products\mdac28.iss"
@@ -122,12 +122,13 @@ begin
 	//dotnetfx11sp1();
 	//kb886903(); //better use windows update
 	//kb928366(); //better use windows update
-			
-	if (minwinspversion(5, 1, 2)) then begin
+	
+	//install .netfx 2.0 sp2 if possible; if not sp1 if possible; if not .netfx 2.0
+	if minwinversion(5, 1) then begin
 		dotnetfx20sp2();
 		dotnetfx20sp2lp();
 	end else begin
-		if (minwinspversion(5, 0, 4)) then begin
+		if minwinversion(5, 0) and minwinspversion(5, 0, 4) then begin
 			kb835732();
 			dotnetfx20sp1();
 			dotnetfx20sp1lp();

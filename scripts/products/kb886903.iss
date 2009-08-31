@@ -22,7 +22,7 @@ begin
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v1.1.4322', 'SP', version);
 	if version = 1 then begin
 		RegQueryDWordValue(HKLM, 'Software\Microsoft\Updates\.NETFramework\1.1\M886903', 'Installed', version);
-		if version) <> 1 then
+		if version <> 1 then
 			AddProduct('kb886903.exe',
 				'/q',
 				CustomMessage('kb886903_title'),

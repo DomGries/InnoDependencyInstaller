@@ -18,7 +18,7 @@ begin
 		RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v1.1.4322\' + CustomMessage('dotnetfx11lp_lcid'), 'Install', version);
 		
 		if version <> 1 then
-			AddProduct(ExpandConstant('dotnetfx11_langpack_{language}.exe'),
+			AddProduct(ExpandConstant('dotnetfx11_langpack.exe'),
 				'/q:a /c:"inst.exe /qb /l"',
 				CustomMessage('dotnetfx11lp_title'),
 				CustomMessage('dotnetfx11lp_size'),

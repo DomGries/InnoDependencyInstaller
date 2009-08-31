@@ -22,7 +22,7 @@ begin
 		RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727\' + CustomMessage('dotnetfx20lp_lcid'), 'Install', version);
 		
 		if version <> 1 then
-			AddProduct(ExpandConstant('dotnetfx20_langpack_{language}.exe'),
+			AddProduct(ExpandConstant('dotnetfx20_langpack.exe'),
 				'/q:a /c:"install /qb /l"',
 				CustomMessage('dotnetfx20lp_title'),
 				CustomMessage('dotnetfx20lp_size'),

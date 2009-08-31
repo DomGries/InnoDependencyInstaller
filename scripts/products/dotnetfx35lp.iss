@@ -18,7 +18,7 @@ begin
 		RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v3.5\' + CustomMessage('dotnetfx35lp_lcid'), 'Install', version);
 		
 		if version <> 1 then
-			AddProduct('dotnetfx35lp.exe',
+			AddProduct('dotnetfx35_langpack.exe',
 				'/lang:enu /qb /norestart',
 				CustomMessage('dotnetfx35lp_title'),
 				CustomMessage('dotnetfx35lp_size'),
