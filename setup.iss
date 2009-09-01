@@ -5,28 +5,28 @@
 
 //#include "scripts\products\iis.iss"
 
-#include "scripts\products\kb835732.iss"
+//#include "scripts\products\kb835732.iss"
 //#include "scripts\products\kb886903.iss"
 //#include "scripts\products\kb928366.iss"
 
-#include "scripts\products\msi20.iss"
+//#include "scripts\products\msi20.iss"
 #include "scripts\products\msi31.iss"
-#include "scripts\products\ie6.iss"
+//#include "scripts\products\ie6.iss"
 
 //#include "scripts\products\dotnetfx11.iss"
 //#include "scripts\products\dotnetfx11lp.iss"
 //#include "scripts\products\dotnetfx11sp1.iss"
 
-#include "scripts\products\dotnetfx20.iss"
-#include "scripts\products\dotnetfx20lp.iss"
-#include "scripts\products\dotnetfx20sp1.iss"
-#include "scripts\products\dotnetfx20sp1lp.iss"
-#include "scripts\products\dotnetfx20sp2.iss"
-#include "scripts\products\dotnetfx20sp2lp.iss"
+//#include "scripts\products\dotnetfx20.iss"
+//#include "scripts\products\dotnetfx20lp.iss"
+//#include "scripts\products\dotnetfx20sp1.iss"
+//#include "scripts\products\dotnetfx20sp1lp.iss"
+//#include "scripts\products\dotnetfx20sp2.iss"
+//#include "scripts\products\dotnetfx20sp2lp.iss"
 
 //#include "scripts\products\dotnetfx35.iss"
 //#include "scripts\products\dotnetfx35lp.iss"
-//#include "scripts\products\dotnetfx35sp1.iss"
+#include "scripts\products\dotnetfx35sp1.iss"
 //#include "scripts\products\dotnetfx35sp1lp.iss"
 
 //#include "scripts\products\mdac28.iss"
@@ -54,15 +54,14 @@ DefaultGroupName=MyProgram
 DefaultDirName={pf}\MyProgram
 UninstallDisplayIcon={app}\MyProgram.exe
 UninstallDisplayName=MyProgram
-Uninstallable=true
-DirExistsWarning=no
-CreateAppDir=true
+Uninstallable=yes
+CreateUninstallRegKey=yes
+UpdateUninstallLogAppName=yes
+CreateAppDir=yes
 OutputDir=bin
 SourceDir=.
 AllowNoIcons=yes
-UsePreviousGroup=yes
-UsePreviousAppDir=yes
-ShowUndisplayableLanguages=no
+;SetupIconFile=MyProgramIcon
 LanguageDetectionMethod=uilanguage
 InternalCompressLevel=fast
 SolidCompression=yes
@@ -102,20 +101,20 @@ begin
 	initwinversion();
 	
 	//check if dotnetfx20 can be installed on this OS
-	if not minwinspversion(5, 0, 3) then begin
-		MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('win2000sp3_title')]), mbError, MB_OK);
-		exit;
-	end;
-	if not minwinspversion(5, 1, 2) then begin
-		MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('winxpsp2_title')]), mbError, MB_OK);
-		exit;
-	end;
+	//if not minwinspversion(5, 0, 3) then begin
+	//	MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('win2000sp3_title')]), mbError, MB_OK);
+	//	exit;
+	//end;
+	//if not minwinspversion(5, 1, 2) then begin
+	//	MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('winxpsp2_title')]), mbError, MB_OK);
+	//	exit;
+	//end;
 	
 	//if (not iis()) then exit;
 	
-	msi20('2.0');
-	msi31('3.0');
-	ie6('5.0.2919');
+	//msi20('2.0');
+	msi31('3.1');
+	//ie6('5.0.2919');
 	
 	//dotnetfx11();
 	//dotnetfx11lp();
@@ -124,23 +123,23 @@ begin
 	//kb928366(); //better use windows update
 	
 	//install .netfx 2.0 sp2 if possible; if not sp1 if possible; if not .netfx 2.0
-	if minwinversion(5, 1) then begin
-		dotnetfx20sp2();
-		dotnetfx20sp2lp();
-	end else begin
-		if minwinversion(5, 0) and minwinspversion(5, 0, 4) then begin
-			kb835732();
-			dotnetfx20sp1();
-			dotnetfx20sp1lp();
-		end else begin
-			dotnetfx20();
-			dotnetfx20lp();
-		end;
-	end;
+	//if minwinversion(5, 1) then begin
+	//	dotnetfx20sp2();
+	//	dotnetfx20sp2lp();
+	//end else begin
+	//	if minwinversion(5, 0) and minwinspversion(5, 0, 4) then begin
+	//		kb835732();
+	//		dotnetfx20sp1();
+	//		dotnetfx20sp1lp();
+	//	end else begin
+	//		dotnetfx20();
+	//		dotnetfx20lp();
+	//	end;
+	//end;
 	
 	//dotnetfx35();
 	//dotnetfx35lp();
-	//dotnetfx35sp1();
+	dotnetfx35sp1();
 	//dotnetfx35sp1lp();
 	
 	//mdac28('2.7');
@@ -149,3 +148,5 @@ begin
 	
 	Result := true;
 end;
+
+

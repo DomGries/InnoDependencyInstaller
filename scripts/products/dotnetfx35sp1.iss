@@ -21,7 +21,7 @@ begin
 	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v3.5', 'SP', version);
 	if version < 1 then
 		AddProduct('dotnetfx35sp1.exe',
-			'/lang:enu /qb /norestart',
+			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35sp1_title'),
 			CustomMessage('dotnetfx35sp1_size'),
 			dotnetfx35sp1_url);

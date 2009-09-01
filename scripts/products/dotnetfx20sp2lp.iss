@@ -23,7 +23,7 @@ begin
 		
 		if version < 2 then
 			AddProduct(ExpandConstant('dotnetfx20sp2_langpack.exe'),
-				'/lang:enu /qb /norestart"',
+				'/lang:enu /passive /norestart"',
 				CustomMessage('dotnetfx20sp2lp_title'),
 				CustomMessage('dotnetfx20sp2lp_size'),
 				GetURL(CustomMessage('dotnetfx20sp2lp_url'), CustomMessage('dotnetfx20sp2lp_url_x64'), CustomMessage('dotnetfx20sp2lp_url_ia64')));

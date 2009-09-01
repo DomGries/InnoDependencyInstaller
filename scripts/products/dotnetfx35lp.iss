@@ -19,7 +19,7 @@ begin
 		
 		if version <> 1 then
 			AddProduct('dotnetfx35_langpack.exe',
-				'/lang:enu /qb /norestart',
+				'/lang:enu /passive /norestart',
 				CustomMessage('dotnetfx35lp_title'),
 				CustomMessage('dotnetfx35lp_size'),
 				CustomMessage('dotnetfx35lp_url'));
