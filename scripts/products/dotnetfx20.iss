@@ -20,13 +20,16 @@ const
 procedure dotnetfx20();
 var
 	version: cardinal;
+	regPath: string;
 begin
-	RegQueryDWordValue(HKEY_LOCAL_MACHINE, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727', 'Install', version);
+	regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v2.0.50727';
+	RegQueryDWordValue(HKLM, regPath, 'Install', version);
+	
 	if version <> 1 then begin
-		AddProduct('dotnetfx20.exe',
+		AddProduct(GetString('dotnetfx20.exe','dotnetfx20_x64.exe','dotnetfx20_ia64.exe'),
 			'/q:a /t:' + ExpandConstant('{tmp}{\}') + 'dotnetfx20 /c:"install /qb /l"',
 			CustomMessage('dotnetfx20_title'),
 			CustomMessage('dotnetfx20_size'),
-			GetURL(dotnetfx20_url, dotnetfx20_url_x64, dotnetfx20_url_ia64));
+			GetString(dotnetfx20_url, dotnetfx20_url_x64, dotnetfx20_url_ia64));
 	end;
 end;

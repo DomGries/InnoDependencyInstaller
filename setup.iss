@@ -13,21 +13,21 @@
 #include "scripts\products\msi31.iss"
 //#include "scripts\products\ie6.iss"
 
-//#include "scripts\products\dotnetfx11.iss"
-//#include "scripts\products\dotnetfx11lp.iss"
-//#include "scripts\products\dotnetfx11sp1.iss"
+#include "scripts\products\dotnetfx11.iss"
+#include "scripts\products\dotnetfx11lp.iss"
+#include "scripts\products\dotnetfx11sp1.iss"
 
-//#include "scripts\products\dotnetfx20.iss"
-//#include "scripts\products\dotnetfx20lp.iss"
-//#include "scripts\products\dotnetfx20sp1.iss"
-//#include "scripts\products\dotnetfx20sp1lp.iss"
-//#include "scripts\products\dotnetfx20sp2.iss"
-//#include "scripts\products\dotnetfx20sp2lp.iss"
+#include "scripts\products\dotnetfx20.iss"
+#include "scripts\products\dotnetfx20lp.iss"
+#include "scripts\products\dotnetfx20sp1.iss"
+#include "scripts\products\dotnetfx20sp1lp.iss"
+#include "scripts\products\dotnetfx20sp2.iss"
+#include "scripts\products\dotnetfx20sp2lp.iss"
 
-//#include "scripts\products\dotnetfx35.iss"
-//#include "scripts\products\dotnetfx35lp.iss"
+#include "scripts\products\dotnetfx35.iss"
+#include "scripts\products\dotnetfx35lp.iss"
 #include "scripts\products\dotnetfx35sp1.iss"
-//#include "scripts\products\dotnetfx35sp1lp.iss"
+#include "scripts\products\dotnetfx35sp1lp.iss"
 
 //#include "scripts\products\mdac28.iss"
 //#include "scripts\products\jet4sp8.iss"
@@ -116,31 +116,31 @@ begin
 	msi31('3.1');
 	//ie6('5.0.2919');
 	
-	//dotnetfx11();
-	//dotnetfx11lp();
-	//dotnetfx11sp1();
+	dotnetfx11();
+	dotnetfx11lp();
+	dotnetfx11sp1();
 	//kb886903(); //better use windows update
 	//kb928366(); //better use windows update
 	
 	//install .netfx 2.0 sp2 if possible; if not sp1 if possible; if not .netfx 2.0
 	//if minwinversion(5, 1) then begin
-	//	dotnetfx20sp2();
-	//	dotnetfx20sp2lp();
+		dotnetfx20sp2();
+		dotnetfx20sp2lp();
 	//end else begin
 	//	if minwinversion(5, 0) and minwinspversion(5, 0, 4) then begin
 	//		kb835732();
-	//		dotnetfx20sp1();
-	//		dotnetfx20sp1lp();
+			dotnetfx20sp1();
+			dotnetfx20sp1lp();
 	//	end else begin
-	//		dotnetfx20();
-	//		dotnetfx20lp();
+			dotnetfx20();
+			dotnetfx20lp();
 	//	end;
 	//end;
 	
-	//dotnetfx35();
-	//dotnetfx35lp();
+	dotnetfx35();
+	dotnetfx35lp();
 	dotnetfx35sp1();
-	//dotnetfx35sp1lp();
+  dotnetfx35sp1lp();
 	
 	//mdac28('2.7');
 	//jet4sp8('4.0.8015');

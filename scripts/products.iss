@@ -88,7 +88,8 @@ begin
 			
 			if Exec(products[i].File, products[i].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
 				//success; ResultCode contains the exit code
-				if ResultCode = 0 then
+				//ResultCode 3010 at .NET Framework: A restart is required to complete the installation. This message indicates success.
+				if (ResultCode = 0) or (ResultCode = 3010) then
 					finishCount := finishCount + 1
 				else begin
 					Result := false;
@@ -176,7 +177,7 @@ begin
 	Result := Is64BitInstallMode and (ProcessorArchitecture = paIA64);
 end;
 
-function GetURL(x86, x64, ia64: String): String;
+function GetString(x86, x64, ia64: String): String;
 begin
 	if IsX64() and (x64 <> '') then
 		Result := x64;

@@ -16,10 +16,13 @@ const
 procedure dotnetfx11();
 var
 	version: cardinal;
+	regPath: string;
 begin
-	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v1.1.4322', 'Install', version);
+	regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v1.1.4322';
+	RegQueryDWordValue(HKLM, regPath, 'Install', version);
+	
 	if version <> 1 then
-		AddProduct('dotnetfx11.exe',
+		AddProduct(GetString('dotnetfx11.exe','dotnetfx11_x64.exe','dotnetfx11_ia64.exe'),
 			'/q:a /c:"install /qb /l"',
 			CustomMessage('dotnetfx11_title'),
 			CustomMessage('dotnetfx11_size'),

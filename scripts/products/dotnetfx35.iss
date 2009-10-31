@@ -17,8 +17,11 @@ const
 procedure dotnetfx35();
 var
 	version: cardinal;
+	regPath: string;
 begin
-	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v3.5', 'Install', version);
+	regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v3.5';
+	RegQueryDWordValue(HKLM, regPath, 'Install', version);
+	
 	if version <> 1 then
 		AddProduct('dotnetfx35.exe',
 			'/lang:enu /passive /norestart',

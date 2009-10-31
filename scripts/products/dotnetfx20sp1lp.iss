@@ -17,15 +17,17 @@ de.dotnetfx20sp1lp_url_ia64=http://download.microsoft.com/download/a/0/b/a0bef43
 procedure dotnetfx20sp1lp();
 var
 	version: cardinal;
+	regPath: string;
 begin
 	if ActiveLanguage() <> 'en' then begin
-		RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727\' + CustomMessage('dotnetfx20sp1lp_lcid'), 'SP', version);
+		regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v2.0.50727\' + CustomMessage('dotnetfx20lp_lcid');
+		RegQueryDWordValue(HKLM, regPath, 'Install', version);
 		
 		if version < 1 then
-			AddProduct(ExpandConstant('dotnetfx20sp1_langpack.exe'),
+			AddProduct(GetString('dotnetfx20sp1_' + ActiveLanguage() + '.exe', 'dotnetfx20sp1_x64_' + ActiveLanguage() + '.exe', 'dotnetfx20sp1_ia64_' + ActiveLanguage() + '.exe'),
 				'/q:a /c:"install /qb /l"',
 				CustomMessage('dotnetfx20sp1lp_title'),
 				CustomMessage('dotnetfx20sp1lp_size'),
-				GetURL(CustomMessage('dotnetfx20sp1lp_url'), CustomMessage('dotnetfx20sp1lp_url_x64'), CustomMessage('dotnetfx20sp1lp_url_ia64')));
+				GetString(CustomMessage('dotnetfx20sp1lp_url'), CustomMessage('dotnetfx20sp1lp_url_x64'), CustomMessage('dotnetfx20sp1lp_url_ia64')));
 	end;
 end;

@@ -16,12 +16,15 @@ const
 procedure dotnetfx20sp2();
 var
 	version: cardinal;
+	regPath: string;
 begin
-	RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v2.0.50727', 'SP', version);
+	regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v2.0.50727';
+	RegQueryDWordValue(HKLM, regPath, 'SP', version);
+	
 	if version < 2 then
-		AddProduct('dotnetfx20sp2.exe',
+		AddProduct(GetString('dotnetfx20sp2.exe','dotnetfx20sp2_x64.exe','dotnetfx20sp2_ia64.exe'),
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx20sp2_title'),
 			CustomMessage('dotnetfx20sp2_size'),
-			GetURL(dotnetfx20sp2_url, dotnetfx20sp2_url_x64, dotnetfx20sp2_url_ia64));
+			GetString(dotnetfx20sp2_url, dotnetfx20sp2_url_x64, dotnetfx20sp2_url_ia64));
 end;

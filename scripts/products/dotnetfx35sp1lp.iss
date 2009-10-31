@@ -13,12 +13,14 @@ de.dotnetfx35sp1lp_url=http://download.microsoft.com/download/d/7/2/d728b7b9-454
 procedure dotnetfx35sp1lp();
 var
 	version: cardinal;
+	regPath: string;
 begin
 	if ActiveLanguage() <> 'en' then begin
-		RegQueryDWordValue(HKLM, 'Software\Microsoft\NET Framework Setup\NDP\v3.5\' + CustomMessage('dotnetfx35sp1lp_lcid'), 'SP', version);
+		regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v3.5\' + CustomMessage('dotnetfx35sp1lp_lcid');
+		RegQueryDWordValue(HKLM, regPath, 'SP', version);
 		
 		if version < 1 then
-			AddProduct('dotnetfx35sp1_langpack.exe',
+			AddProduct('dotnetfx35sp1_' + ActiveLanguage() + '.exe',
 				'/lang:enu /passive /norestart',
 				CustomMessage('dotnetfx35sp1lp_title'),
 				CustomMessage('dotnetfx35sp1lp_size'),
