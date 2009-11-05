@@ -23,7 +23,7 @@ begin
 	
 	if version < 2 then
 		AddProduct(GetString('dotnetfx20sp2.exe','dotnetfx20sp2_x64.exe','dotnetfx20sp2_ia64.exe'),
-			'/lang:enu /passive /norestart',
+			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20sp2_title'),
 			CustomMessage('dotnetfx20sp2_size'),
 			GetString(dotnetfx20sp2_url, dotnetfx20sp2_url_x64, dotnetfx20sp2_url_ia64));

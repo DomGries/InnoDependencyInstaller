@@ -25,7 +25,7 @@ begin
 		
 		if version <> 1 then
 			AddProduct(GetString('dotnetfx20_' + ActiveLanguage() + '.exe', 'dotnetfx20_x64_' + ActiveLanguage() + '.exe', 'dotnetfx20_ia64_' + ActiveLanguage() + '.exe'),
-				'/q:a /c:"install /qb /l"',
+				'/passive /norestart /lang:ENU',
 				CustomMessage('dotnetfx20lp_title'),
 				CustomMessage('dotnetfx20lp_size'),
 				GetString(CustomMessage('dotnetfx20lp_url'), CustomMessage('dotnetfx20lp_url_x64'), CustomMessage('dotnetfx20lp_url_ia64')));

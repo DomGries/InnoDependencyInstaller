@@ -25,7 +25,7 @@ begin
 	
 	if version < 1 then
 		AddProduct(GetString('dotnetfx20sp1.exe', 'dotnetfx20sp1_x64.exe', 'dotnetfx20sp1_ia64.exe'),
-			'/q:a /t:' + ExpandConstant('{tmp}{\}') + 'dotnetfx20sp1 /c:"install /qb /l /msipassthru MSI_PROP_BEGIN" REBOOT=Suppress "MSI_PROP_END"',
+			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20sp1_title'),
 			CustomMessage('dotnetfx20sp1_size'),
 			GetString(dotnetfx20sp1_url, dotnetfx20sp1_url_x64, dotnetfx20sp1_url_ia64));
