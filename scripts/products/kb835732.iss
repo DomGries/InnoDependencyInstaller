@@ -16,7 +16,7 @@ const
 
 procedure kb835732();
 begin
-	if (minwinspversion(5, 0, 2) and maxwinspversion(5, 0, 4)) then begin		
+	if exactwinversion(5, 0) and (minwinspversion(5, 0, 2) and maxwinspversion(5, 0, 4)) then begin		
 		if not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Updates\Windows 2000\SP5\KB835732\Filelist') then
 			AddProduct('kb835732.exe',
 				'/q:a /c:"install /q"',
