@@ -44,7 +44,7 @@ begin
 		//only needed on Windows XP SP2 or Windows Server 2003
 		if ((exactwinversion(5, 1) and exactwinspversion(5, 1, 2)) or (exactwinversion(5, 2))) then begin
 			if (not FileExists(GetEnv('windir') + '\system32\windowscodecs.dll')) then
-				AddProduct('wic' + GetArchitectureString(false) + '_' + GetConvertedLanguageID() + '.exe',
+				AddProduct('wic' + GetArchitectureString() + '_' + GetConvertedLanguageID() + '.exe',
 					'/q',
 					CustomMessage('wic_title'),
 					CustomMessage('wic_size'),

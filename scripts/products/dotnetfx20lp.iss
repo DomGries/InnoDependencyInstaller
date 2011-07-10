@@ -18,11 +18,11 @@ procedure dotnetfx20lp();
 begin
 	if (ActiveLanguage() <> 'en') then begin
 		if (not netfxinstalled(NetFx20, CustomMessage('dotnetfx20lp_lcid'))) then
-			AddProduct('dotnetfx20' + GetArchitectureString(true) + '_' + ActiveLanguage() + '.exe',
+			AddProduct('dotnetfx20' + GetArchitectureString() + '_' + ActiveLanguage() + '.exe',
 				'/passive /norestart /lang:ENU',
 				CustomMessage('dotnetfx20lp_title'),
 				CustomMessage('dotnetfx20lp_size'),
-				CustomMessage('dotnetfx20lp_url' + GetArchitectureString(true)),
+				CustomMessage('dotnetfx20lp_url' + GetArchitectureString()),
 				false, false);
 	end;
 end;

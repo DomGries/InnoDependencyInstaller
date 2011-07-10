@@ -29,12 +29,6 @@
 #define use_sql2005express
 #define use_sql2008express
 
-
-// Enable the required define(s) below if a local event function (prepended with Local) is used
-//#define haveLocalPrepareToInstall
-//#define haveLocalNeedRestart
-//#define haveLocalNextButtonClick
-
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '4.0'
 

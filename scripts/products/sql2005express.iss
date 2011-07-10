@@ -32,10 +32,10 @@ begin
 	RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLEXPRESS\MSSQLServer\CurrentVersion', 'CurrentVersion', version);
 	if (version < '9.00.4035') then begin
 		if (not isIA64()) then
-			AddProduct('sql2005express' + GetArchitectureString(false) + '.exe',
+			AddProduct('sql2005express' + GetArchitectureString() + '.exe',
 				'/qb ADDLOCAL=ALL INSTANCENAME=SQLEXPRESS',
 				CustomMessage('sql2005express_title'),
-				CustomMessage('sql2005express_size' + GetArchitectureString(false)),
+				CustomMessage('sql2005express_size' + GetArchitectureString()),
 				GetString(sql2005express_url, sql2005express_url_x64, ''),
 				false, false);
 	end;

@@ -29,10 +29,10 @@ begin
 	RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLEXPRESS\MSSQLServer\CurrentVersion', 'CurrentVersion', version);
 	if (compareversion(version, '10.5') < 0) then begin
 		if (not isIA64()) then
-			AddProduct('sql2008expressr2' + GetArchitectureString(false) + '.exe',
+			AddProduct('sql2008expressr2' + GetArchitectureString() + '.exe',
 				'/QS  /IACCEPTSQLSERVERLICENSETERMS /ACTION=Install /FEATURES=All /INSTANCENAME=SQLEXPRESS /SQLSVCACCOUNT="NT AUTHORITY\Network Service" /SQLSYSADMINACCOUNTS="builtin\administrators"',
 				CustomMessage('sql2008expressr2_title'),
-				CustomMessage('sql2008expressr2_size' + GetArchitectureString(false)),
+				CustomMessage('sql2008expressr2_size' + GetArchitectureString()),
 				GetString(sql2008expressr2_url, sql2008expressr2_url_x64, ''),
 				false, false);
 	end;

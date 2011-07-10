@@ -18,11 +18,11 @@ procedure dotnetfx20sp2lp();
 begin
 	if (ActiveLanguage() <> 'en') then begin
 		if (netfxspversion(NetFx20, CustomMessage('dotnetfx20sp2lp_lcid')) < 2) then
-			AddProduct('dotnetfx20sp2' + GetArchitectureString(true) + '_' + ActiveLanguage() + '.exe',
+			AddProduct('dotnetfx20sp2' + GetArchitectureString() + '_' + ActiveLanguage() + '.exe',
 				'/lang:enu /passive /norestart"',
 				CustomMessage('dotnetfx20sp2lp_title'),
 				CustomMessage('dotnetfx20sp2lp_size'),
-				CustomMessage('dotnetfx20sp2lp_url' + GetArchitectureString(true)),
+				CustomMessage('dotnetfx20sp2lp_url' + GetArchitectureString()),
 				false, false);
 	end;
 end;

@@ -16,7 +16,7 @@ const
 procedure dotnetfx20sp2();
 begin
 	if (netfxspversion(NetFx20, '') < 2) then
-		AddProduct('dotnetfx20sp2' + GetArchitectureString(true) + '.exe',
+		AddProduct('dotnetfx20sp2' + GetArchitectureString() + '.exe',
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20sp2_title'),
 			CustomMessage('dotnetfx20sp2_size'),

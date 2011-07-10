@@ -42,18 +42,15 @@ type
 		Parameters: String;
 		InstallClean : boolean;
 		MustRebootAfter : boolean;
-		RequestRestart : boolean;
 	end;
 
-	InstallType = (Successful, RebootRequired2, InstallError);
+	InstallResult = (InstallSuccessful, InstallRebootRequired, InstallError);
 
 var
 	installMemo, downloadMemo, downloadMessage: string;
 	products: array of TProduct;
 	DependencyPage: TOutputProgressWizardPage;
 
-	rebootRequired : boolean;
-	rebootMessage : string;
 
 procedure AddProduct(FileName, Parameters, Title, Size, URL: string; InstallClean : boolean; MustRebootAfter : boolean);
 var
@@ -79,12 +76,6 @@ begin
 	products[i].Parameters := Parameters;
 	products[i].InstallClean := InstallClean;
 	products[i].MustRebootAfter := MustRebootAfter;
-	products[i].RequestRestart := false;
-end;
-
-function GetProductcount: integer;
-begin
-	Result := GetArrayLength(products);
 end;
 
 function SmartExec(prod : TProduct; var ResultCode : Integer) : boolean;
@@ -94,30 +85,25 @@ begin
 	end else begin
 		Result := ShellExec('', prod.File, prod.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
 	end;
-	// MSI Deferred boot code 3010 is a success
-	if (ResultCode = 3010) then begin
-		prod.RequestRestart := true;
-		ResultCode := 0;
-	end;
 end;
 
 function PendingReboot : boolean;
-var	Names: String;
+var	names: String;
 begin
-	if (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', Names)) then begin
+	if (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', names)) then begin
 		Result := true;
-	end else if ((RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', Names)) and (Names <> ''))  then begin
+	end else if ((RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', names)) and (names <> ''))  then begin
 		Result := true;
 	end else begin
 		Result := false;
 	end;
 end;
 
-function InstallProducts: boolean;
+function InstallProducts: InstallResult;
 var
 	ResultCode, i, productCount, finishCount: Integer;
 begin
-	Result := true;
+	Result := InstallSuccessful;
 	productCount := GetArrayLength(products);
 
 	if productCount > 0 then begin
@@ -125,30 +111,28 @@ begin
 		DependencyPage.Show;
 
 		for i := 0 to productCount - 1 do begin
-			if ((products[i].InstallClean) and PendingReboot) then begin
-				rebootRequired := true;
-				rebootmessage := products[i].Title;
-				exit;
+			if (products[i].InstallClean and PendingReboot()) then begin
+				Result := InstallRebootRequired;
+				break;
 			end;
 
 			DependencyPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
 			DependencyPage.SetProgress(i, productCount);
 
 			if SmartExec(products[i], ResultCode) then begin
-				//success; ResultCode contains the exit code
-				if ResultCode = 0 then
+				//setup executed; ResultCode contains the exit code
+				if (ResultCode = 0) then begin
 					finishCount := finishCount + 1;
-				if (products[i].MustRebootAfter) then begin
-					rebootRequired := true;
-					rebootmessage := products[i].Title;
-					if not PendingReboot then begin
-  						RegWriteMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', '');
-					end;
-					exit;
+				end else if ((ResultCode = 3010) or products[i].MustRebootAfter) then begin
+					//ResultCode 3010: A restart is required to complete the installation. This message indicates success.
+					Result := InstallRebootRequired;
+					break;
+				end else begin
+					Result := InstallError;
+					break;
 				end;
 			end else begin
-				//failure; ResultCode contains the error code
-				Result := false;
+				Result := InstallError;
 				break;
 			end;
 		end;
@@ -163,47 +147,29 @@ begin
 	end;
 end;
 
-#ifdef haveLocalPrepareToInstall
-function LocalPrepareToInstall(var NeedsRestart: boolean): String; forward;
-#endif
-
 function PrepareToInstall(var NeedsRestart: boolean): String;
 var
 	i: Integer;
 	s: string;
 begin
-	if not InstallProducts() then begin
-		s := CustomMessage('depinstall_error');
+	case InstallProducts() of
+		InstallError: begin
+			s := CustomMessage('depinstall_error');
 
-		for i := 0 to GetArrayLength(products) - 1 do begin
-			s := s + #13 + '	' + products[i].Title;
+			for i := 0 to GetArrayLength(products) - 1 do begin
+				s := s + #13 + '	' + products[i].Title;
+			end;
+
+			Result := s;
 		end;
+		InstallRebootRequired: begin
+			Result := products[0].Title;
+			NeedsRestart := true;
 
-		Result := s;
-	end else if (rebootrequired) then
-	begin
-		Result := RebootMessage;
-		NeedsRestart := true;
-		RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
+			//write into the registry that the installer needs to be executed again after restart
+			//RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
+		end;
 	end;
-#ifdef haveLocalPrepareToInstall
-	Result := Result + LocalPrepareToInstall(NeedsRestart);
-#endif
-end;
-
-#ifdef haveLocalNeedRestart
-function LocalNeedRestart : boolean; forward;
-#endif
-
-function NeedRestart : boolean;
-var i: integer;
-begin
-	result := false;
-	for i := 0 to GetArrayLength(products) - 1 do
-		result := result or products[i].RequestRestart;
-#ifdef haveLocalNeedRestart
-	result := result or LocalNeedRestart();
-#endif
 end;
 
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
@@ -222,10 +188,6 @@ begin
 
 	Result := s
 end;
-
-#ifdef haveLocalNextButtonClick
-function localNextButtonClick(CurPageID: Integer) : boolean; forward;
-#endif
 
 function NextButtonClick(CurPageID: Integer): boolean;
 begin
@@ -246,10 +208,6 @@ begin
 				Result := false;
 		end;
 	end;
-#ifdef haveLocalNextButtonClick
-	if Result then
-		Result := LocalNextButtonClick(CurPageID);
-#endif
 end;
 
 function IsX86: boolean;
@@ -278,11 +236,11 @@ begin
 	end;
 end;
 
-function GetArchitectureString(includeIA: boolean): String;
+function GetArchitectureString(): String;
 begin
 	if IsX64() then begin
 		Result := '_x64';
-	end else if IsIA64() and includeIA then begin
+	end else if IsIA64() then begin
 		Result := '_ia64';
 	end else begin
 		Result := '';
