@@ -27,6 +27,7 @@ de.depinstall_missing=%1 muss installiert werden bevor das Setup fortfahren kann
 en.depinstall_error=An error occured while installing the dependencies. Please restart the computer and run the setup again or install the following dependencies manually:%n
 de.depinstall_error=Ein Fehler ist während der Installation der Abghängigkeiten aufgetreten. Bitte starten Sie den Computer neu und führen Sie das Setup erneut aus oder installieren Sie die folgenden Abhängigkeiten per Hand:%n
 
+en.isxdl_langfile=
 de.isxdl_langfile=german2.ini
 
 
@@ -39,61 +40,111 @@ type
 		File: String;
 		Title: String;
 		Parameters: String;
+		InstallClean : boolean;
+		MustRebootAfter : boolean;
+		RequestRestart : boolean;
 	end;
-	
+
+	InstallType = (Successful, RebootRequired2, InstallError);
+
 var
 	installMemo, downloadMemo, downloadMessage: string;
 	products: array of TProduct;
 	DependencyPage: TOutputProgressWizardPage;
 
-  
-procedure AddProduct(FileName, Parameters, Title, Size, URL: string);
+	rebootRequired : boolean;
+	rebootMessage : string;
+
+procedure AddProduct(FileName, Parameters, Title, Size, URL: string; InstallClean : boolean; MustRebootAfter : boolean);
 var
 	path: string;
 	i: Integer;
 begin
 	installMemo := installMemo + '%1' + Title + #13;
-	
+
 	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + FileName;
 	if not FileExists(path) then begin
 		path := ExpandConstant('{tmp}{\}') + FileName;
-		
+
 		isxdl_AddFile(URL, path);
-		
+
 		downloadMemo := downloadMemo + '%1' + Title + #13;
-		downloadMessage := downloadMessage + '    ' + Title + ' (' + Size + ')' + #13;
+		downloadMessage := downloadMessage + '	' + Title + ' (' + Size + ')' + #13;
 	end;
-	
+
 	i := GetArrayLength(products);
 	SetArrayLength(products, i + 1);
 	products[i].File := path;
 	products[i].Title := Title;
 	products[i].Parameters := Parameters;
+	products[i].InstallClean := InstallClean;
+	products[i].MustRebootAfter := MustRebootAfter;
+	products[i].RequestRestart := false;
 end;
 
-function InstallProducts: Boolean;
+function GetProductcount: integer;
+begin
+	Result := GetArrayLength(products);
+end;
+
+function SmartExec(prod : TProduct; var ResultCode : Integer) : boolean;
+begin
+	if (LowerCase(Copy(prod.File,Length(prod.File)-2,3)) = 'exe') then begin
+		Result := Exec(prod.File, prod.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
+	end else begin
+		Result := ShellExec('', prod.File, prod.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
+	end;
+	// MSI Deferred boot code 3010 is a success
+	if (ResultCode = 3010) then begin
+		prod.RequestRestart := true;
+		ResultCode := 0;
+	end;
+end;
+
+function PendingReboot : boolean;
+var	Names: String;
+begin
+	if (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', Names)) then begin
+		Result := true;
+	end else if ((RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', Names)) and (Names <> ''))  then begin
+		Result := true;
+	end else begin
+		Result := false;
+	end;
+end;
+
+function InstallProducts: boolean;
 var
 	ResultCode, i, productCount, finishCount: Integer;
 begin
 	Result := true;
 	productCount := GetArrayLength(products);
-		
+
 	if productCount > 0 then begin
 		DependencyPage := CreateOutputProgressPage(CustomMessage('depinstall_title'), CustomMessage('depinstall_description'));
 		DependencyPage.Show;
-		
+
 		for i := 0 to productCount - 1 do begin
+			if ((products[i].InstallClean) and PendingReboot) then begin
+				rebootRequired := true;
+				rebootmessage := products[i].Title;
+				exit;
+			end;
+
 			DependencyPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
 			DependencyPage.SetProgress(i, productCount);
-			
-			if Exec(products[i].File, products[i].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+
+			if SmartExec(products[i], ResultCode) then begin
 				//success; ResultCode contains the exit code
-				//ResultCode 3010 at .NET Framework: A restart is required to complete the installation. This message indicates success.
-				if (ResultCode = 0) or (ResultCode = 3010) then
-					finishCount := finishCount + 1
-				else begin
-					Result := false;
-					break;
+				if ResultCode = 0 then
+					finishCount := finishCount + 1;
+				if (products[i].MustRebootAfter) then begin
+					rebootRequired := true;
+					rebootmessage := products[i].Title;
+					if not PendingReboot then begin
+  						RegWriteMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', '');
+					end;
+					exit;
 				end;
 			end else begin
 				//failure; ResultCode contains the error code
@@ -101,31 +152,58 @@ begin
 				break;
 			end;
 		end;
-		
+
 		//only leave not installed products for error message
 		for i := 0 to productCount - finishCount - 1 do begin
 			products[i] := products[i+finishCount];
 		end;
 		SetArrayLength(products, productCount - finishCount);
-		
+
 		DependencyPage.Hide;
 	end;
 end;
 
-function PrepareToInstall: String;
+#ifdef haveLocalPrepareToInstall
+function LocalPrepareToInstall(var NeedsRestart: boolean): String; forward;
+#endif
+
+function PrepareToInstall(var NeedsRestart: boolean): String;
 var
 	i: Integer;
 	s: string;
 begin
 	if not InstallProducts() then begin
 		s := CustomMessage('depinstall_error');
-		
+
 		for i := 0 to GetArrayLength(products) - 1 do begin
-			s := s + #13 + '    ' + products[i].Title;
+			s := s + #13 + '	' + products[i].Title;
 		end;
-		
+
 		Result := s;
+	end else if (rebootrequired) then
+	begin
+		Result := RebootMessage;
+		NeedsRestart := true;
+		RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
 	end;
+#ifdef haveLocalPrepareToInstall
+	Result := Result + LocalPrepareToInstall(NeedsRestart);
+#endif
+end;
+
+#ifdef haveLocalNeedRestart
+function LocalNeedRestart : boolean; forward;
+#endif
+
+function NeedRestart : boolean;
+var i: integer;
+begin
+	result := false;
+	for i := 0 to GetArrayLength(products) - 1 do
+		result := result or products[i].RequestRestart;
+#ifdef haveLocalNeedRestart
+	result := result or LocalNeedRestart();
+#endif
 end;
 
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
@@ -138,52 +216,75 @@ begin
 		s := s + CustomMessage('depinstall_memo_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
 
 	s := s + MemoDirInfo + NewLine + NewLine + MemoGroupInfo
-	
+
 	if MemoTasksInfo <> '' then
 		s := s + NewLine + NewLine + MemoTasksInfo;
 
 	Result := s
 end;
 
-function NextButtonClick(CurPageID: Integer): Boolean;
+#ifdef haveLocalNextButtonClick
+function localNextButtonClick(CurPageID: Integer) : boolean; forward;
+#endif
+
+function NextButtonClick(CurPageID: Integer): boolean;
 begin
 	Result := true;
 
 	if CurPageID = wpReady then begin
-
 		if downloadMemo <> '' then begin
 			//change isxdl language only if it is not english because isxdl default language is already english
-			if ActiveLanguage() <> 'en' then begin
+			if (ActiveLanguage() <> 'en') then begin
 				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
 				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));
 			end;
 			//isxdl_SetOption('title', FmtMessage(SetupMessage(msgSetupWindowTitle), [CustomMessage('appname')]));
-			
+
 			if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [downloadMessage]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
 				Result := false
 			else if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
 				Result := false;
 		end;
 	end;
+#ifdef haveLocalNextButtonClick
+	if Result then
+		Result := LocalNextButtonClick(CurPageID);
+#endif
 end;
 
-function IsX64: Boolean;
+function IsX86: boolean;
+begin
+	Result := (ProcessorArchitecture = paX86) or (ProcessorArchitecture = paUnknown);
+end;
+
+function IsX64: boolean;
 begin
 	Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
 end;
 
-function IsIA64: Boolean;
+function IsIA64: boolean;
 begin
 	Result := Is64BitInstallMode and (ProcessorArchitecture = paIA64);
 end;
 
 function GetString(x86, x64, ia64: String): String;
 begin
-	if IsX64() and (x64 <> '') then
+	if IsX64() and (x64 <> '') then begin
 		Result := x64;
-	if IsIA64() and (ia64 <> '') then
+	end else if IsIA64() and (ia64 <> '') then begin
 		Result := ia64;
-	
-	if Result = '' then
+	end else begin
 		Result := x86;
+	end;
+end;
+
+function GetArchitectureString(includeIA: boolean): String;
+begin
+	if IsX64() then begin
+		Result := '_x64';
+	end else if IsIA64() and includeIA then begin
+		Result := '_ia64';
+	end else begin
+		Result := '';
+	end;
 end;

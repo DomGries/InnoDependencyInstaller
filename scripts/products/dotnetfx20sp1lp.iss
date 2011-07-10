@@ -15,19 +15,14 @@ de.dotnetfx20sp1lp_url_ia64=http://download.microsoft.com/download/a/0/b/a0bef43
 
 [Code]
 procedure dotnetfx20sp1lp();
-var
-	version: cardinal;
-	regPath: string;
 begin
-	if ActiveLanguage() <> 'en' then begin
-		regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v2.0.50727\' + CustomMessage('dotnetfx20lp_lcid');
-		RegQueryDWordValue(HKLM, regPath, 'Install', version);
-		
-		if version < 1 then
-			AddProduct(GetString('dotnetfx20sp1_' + ActiveLanguage() + '.exe', 'dotnetfx20sp1_x64_' + ActiveLanguage() + '.exe', 'dotnetfx20sp1_ia64_' + ActiveLanguage() + '.exe'),
+	if (ActiveLanguage() <> 'en') then begin
+		if (netfxspversion(NetFx20, CustomMessage('dotnetfx20sp1lp_lcid')) < 1) then
+			AddProduct('dotnetfx20sp1' + GetArchitectureString(true) + '_' + ActiveLanguage() + '.exe',
 				'/passive /norestart /lang:ENU',
 				CustomMessage('dotnetfx20sp1lp_title'),
 				CustomMessage('dotnetfx20sp1lp_size'),
-				GetString(CustomMessage('dotnetfx20sp1lp_url'), CustomMessage('dotnetfx20sp1lp_url_x64'), CustomMessage('dotnetfx20sp1lp_url_ia64')));
+				CustomMessage('dotnetfx20sp1lp_url' + GetArchitectureString(true)),
+				false, false);
 	end;
 end;

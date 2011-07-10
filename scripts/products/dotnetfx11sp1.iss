@@ -9,22 +9,17 @@ en.dotnetfx11sp1_size=10.5 MB
 de.dotnetfx11sp1_size=10,5 MB
 
 
-[Code]	
+[Code]
 const
 	dotnetfx11sp1_url = 'http://download.microsoft.com/download/8/b/4/8b4addd8-e957-4dea-bdb8-c4e00af5b94b/NDP1.1sp1-KB867460-X86.exe';
 
 procedure dotnetfx11sp1();
-var
-	version: cardinal;
-	regPath: string;
 begin
-	regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v1.1.4322';
-	RegQueryDWordValue(HKLM, regPath, 'SP', version);
-	
-	if version < 1 then
-		AddProduct(GetString('dotnetfx11sp1_' + ActiveLanguage() + '.exe', 'dotnetfx11sp1_x64_' + ActiveLanguage() + '.exe', 'dotnetfx11sp1_ia64_' + ActiveLanguage() + '.exe'),
+	if (IsX86() and (netfxspversion(NetFx11, '') < 1)) then
+		AddProduct('dotnetfx11sp1.exe',
 			'/q',
 			CustomMessage('dotnetfx11sp1_title'),
 			CustomMessage('dotnetfx11sp1_size'),
-			dotnetfx11sp1_url);
+			dotnetfx11sp1_url,
+			false, false);
 end;

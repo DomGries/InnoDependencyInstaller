@@ -11,19 +11,14 @@ de.dotnetfx11lp_url=http://download.microsoft.com/download/6/8/2/6821e687-526a-4
 
 [Code]
 procedure dotnetfx11lp();
-var
-	version: cardinal;
-	regPath: string;
 begin
-	if ActiveLanguage() <> 'en' then begin
-		regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v1.1.4322\' + CustomMessage('dotnetfx11lp_lcid');
-		RegQueryDWordValue(HKLM, regPath, 'Install', version);
-		
-		if version <> 1 then
-			AddProduct(GetString('dotnetfx11_' + ActiveLanguage() + '.exe', 'dotnetfx11_x64_' + ActiveLanguage() + '.exe', 'dotnetfx11_ia64_' + ActiveLanguage() + '.exe'),
+	if (ActiveLanguage() <> 'en') then begin
+		if (IsX86() and not netfxinstalled(NetFx11, CustomMessage('dotnetfx11lp_lcid'))) then
+			AddProduct('dotnetfx11.exe',
 				'/q:a /c:"inst.exe /qb /l"',
 				CustomMessage('dotnetfx11lp_title'),
 				CustomMessage('dotnetfx11lp_size'),
-				CustomMessage('dotnetfx11lp_url'));
+				CustomMessage('dotnetfx11lp_url'),
+				false, false);
 	end;
 end;

@@ -12,10 +12,11 @@ const
 procedure msi20(MinVersion: string);
 begin
 	// Check for required Windows Installer 2.0 on Windows 98 and ME
-	if maxwinversion(4, 9) and (fileversion(ExpandConstant('{sys}{\}msi.dll')) < MinVersion) then
+	if (IsX86() and maxwinversion(4, 9) and (fileversion(ExpandConstant('{sys}{\}msi.dll')) < MinVersion)) then
 		AddProduct('msi20.exe',
 			'/q:a /c:"msiinst /delayrebootq"',
 			CustomMessage('msi20_title'),
 			CustomMessage('msi20_size'),
-			msi20_url);
+			msi20_url,
+			false, false);
 end;

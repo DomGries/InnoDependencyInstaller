@@ -9,24 +9,19 @@ en.dotnetfx20sp1_size=23.6 MB
 de.dotnetfx20sp1_size=23,6 MB
 
 
-[Code]	
+[Code]
 const
 	dotnetfx20sp1_url = 'http://download.microsoft.com/download/0/8/c/08c19fa4-4c4f-4ffb-9d6c-150906578c9e/NetFx20SP1_x86.exe';
 	dotnetfx20sp1_url_x64 = 'http://download.microsoft.com/download/9/8/6/98610406-c2b7-45a4-bdc3-9db1b1c5f7e2/NetFx20SP1_x64.exe';
 	dotnetfx20sp1_url_ia64 = 'http://download.microsoft.com/download/c/9/7/c97d534b-8a55-495d-ab06-ad56f4b7f155/NetFx20SP1_ia64.exe';
 
 procedure dotnetfx20sp1();
-var
-	version: cardinal;
-	regPath: string;
 begin
-	regPath := GetString('Software', 'Software\Wow6432Node', 'Software\Wow6432Node') + '\Microsoft\NET Framework Setup\NDP\v2.0.50727';
-	RegQueryDWordValue(HKLM, regPath, 'SP', version);
-	
-	if version < 1 then
-		AddProduct(GetString('dotnetfx20sp1.exe', 'dotnetfx20sp1_x64.exe', 'dotnetfx20sp1_ia64.exe'),
+	if (netfxspversion(NetFx20, '') < 1) then
+		AddProduct('dotnetfx20sp1' + GetArchitectureString(true) + '.exe',
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20sp1_title'),
 			CustomMessage('dotnetfx20sp1_size'),
-			GetString(dotnetfx20sp1_url, dotnetfx20sp1_url_x64, dotnetfx20sp1_url_ia64));
+			GetString(dotnetfx20sp1_url, dotnetfx20sp1_url_x64, dotnetfx20sp1_url_ia64),
+			false, false);
 end;
