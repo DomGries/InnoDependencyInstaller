@@ -17,6 +17,7 @@
 #define use_dotnetfx35lp
 
 #define use_dotnetfx40
+#define use_wic
 
 #define use_vc2010
 
@@ -150,6 +151,10 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,MyProgram}"; Fl
 #include "scripts\products\dotnetfx40full.iss"
 #endif
 
+#ifdef use_wic
+#include "scripts\products\wic.iss"
+#endif
+
 #ifdef use_vc2010
 #include "scripts\products\vcredist2010.iss"
 #endif
@@ -257,6 +262,10 @@ begin
 #ifdef use_dotnetfx40
 	if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
 		dotnetfx40client();
+#endif
+
+#ifdef use_wic
+	wic();
 #endif
 
 #ifdef use_vc2010
