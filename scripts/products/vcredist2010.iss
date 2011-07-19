@@ -33,7 +33,7 @@ begin
 	RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\' + GetString('x86', 'x64', 'ia64'), 'Install', version);
 
 	if (version <> 1) then
-		AddProduct('vcredist' + GetArchitectureString() + '.exe',
+		AddProduct('vcredist2010' + GetArchitectureString() + '.exe',
 			CustomMessage('vcredist2010_lcid') + '/passive /norestart',
 			CustomMessage('vcredist2010_title'),
 			CustomMessage('vcredist2010_size' + GetArchitectureString()),

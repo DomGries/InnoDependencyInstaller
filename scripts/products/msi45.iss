@@ -1,9 +1,14 @@
 [CustomMessages]
 msi45_title=Windows Installer 4.5
 
-msi45win60_size=1.7 MB
-msi45win52_size=3.0 MB
-msi45win51_size=3.2 MB
+en.msi45win60_size=1.7 MB
+de.msi45win60_size=1,7 MB
+
+en.msi45win52_size=3.0 MB
+de.msi45win52_size=3,0 MB
+
+en.msi45win51_size=3.2 MB
+de.msi45win51_size=3,2 MB
 
 
 [Code]
@@ -14,23 +19,23 @@ const
 
 procedure msi45(MinVersion: string);
 begin
-	if (IsX86() and (fileversion(ExpandConstant('{sys}{\}msi.dll')) < MinVersion)) then begin
+	if (IsX86() and (compareversion(fileversion(ExpandConstant('{sys}{\}msi.dll')), MinVersion) < 0)) then begin
 		if minwinversion(6, 0) then
-			AddProduct('msi45win60.msu',
+			AddProduct('msi45_60.msu',
 				'/quiet /norestart',
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win60_size'),
 				msi45win60_url,
 				false, false)
 		else if minwinversion(5, 2) then
-			AddProduct('msi45win52.exe',
+			AddProduct('msi45_52.exe',
 				'/quiet /norestart',
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win52_size'),
 				msi45win52_url,
 				false, false)
 		else if minwinversion(5, 1) then
-			AddProduct('msi45win51.exe',
+			AddProduct('msi45_51.exe',
 				'/quiet /norestart',
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win51_size'),

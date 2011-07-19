@@ -1,7 +1,8 @@
 [CustomMessages]
 ssceruntime_title=SQL Server Compact 3.5 Service Pack 2
 
-ssceruntime_size=5.3 MB
+en.ssceruntime_size=5.3 MB
+de.ssceruntime_size=5,3 MB
 
 
 [Code]
