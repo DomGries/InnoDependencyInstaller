@@ -121,6 +121,7 @@ begin
 
 			if SmartExec(products[i], ResultCode) then begin
 				//setup executed; ResultCode contains the exit code
+				//MsgBox(products[i].Title + ' install executed. Result Code: ' + IntToStr(ResultCode), mbInformation, MB_OK);
 				if (ResultCode = 0) then begin
 					finishCount := finishCount + 1;
 				end else if ((ResultCode = 3010) or products[i].MustRebootAfter) then begin
@@ -132,6 +133,7 @@ begin
 					break;
 				end;
 			end else begin
+				//MsgBox(products[i].Title + ' install failed. Result Code: ' + IntToStr(ResultCode), mbInformation, MB_OK);
 				Result := InstallError;
 				break;
 			end;
