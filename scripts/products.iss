@@ -49,6 +49,7 @@ type
 var
 	installMemo, downloadMemo, downloadMessage: string;
 	products: array of TProduct;
+	delayedReboot: boolean;
 	DependencyPage: TOutputProgressWizardPage;
 
 
@@ -122,12 +123,15 @@ begin
 			if SmartExec(products[i], ResultCode) then begin
 				//setup executed; ResultCode contains the exit code
 				//MsgBox(products[i].Title + ' install executed. Result Code: ' + IntToStr(ResultCode), mbInformation, MB_OK);
-				if (ResultCode = 0) then begin
-					finishCount := finishCount + 1;
-				end else if ((ResultCode = 3010) or products[i].MustRebootAfter) then begin
-					//ResultCode 3010: A restart is required to complete the installation. This message indicates success.
+				if (products[i].MustRebootAfter) then begin
 					Result := InstallRebootRequired;
 					break;
+				end else if (ResultCode = 0) then begin
+					finishCount := finishCount + 1;
+				end else if (ResultCode = 3010) then begin
+					//ResultCode 3010: A restart is required to complete the installation. This message indicates success.
+					delayedReboot := true;
+					finishCount := finishCount + 1;
 				end else begin
 					Result := InstallError;
 					break;
@@ -154,6 +158,8 @@ var
 	i: Integer;
 	s: string;
 begin
+	delayedReboot := false;
+
 	case InstallProducts() of
 		InstallError: begin
 			s := CustomMessage('depinstall_error');
@@ -163,15 +169,20 @@ begin
 			end;
 
 			Result := s;
-		end;
+			end;
 		InstallRebootRequired: begin
 			Result := products[0].Title;
 			NeedsRestart := true;
 
 			//write into the registry that the installer needs to be executed again after restart
 			//RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
-		end;
+			end;
 	end;
+end;
+
+function NeedRestart : boolean;
+begin
+	Result := delayedReboot;
 end;
 
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
