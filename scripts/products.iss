@@ -182,7 +182,8 @@ end;
 
 function NeedRestart : boolean;
 begin
-	Result := delayedReboot;
+	if (delayedReboot) then
+		Result := true;
 end;
 
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
