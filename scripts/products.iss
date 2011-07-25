@@ -175,7 +175,7 @@ begin
 			NeedsRestart := true;
 
 			//write into the registry that the installer needs to be executed again after restart
-			//RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
+			RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
 			end;
 	end;
 end;
