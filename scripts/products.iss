@@ -171,6 +171,12 @@ begin
 			Result := s;
 			end;
 		InstallRebootRequired: begin
+			//delay reboot after install if we installed the last dependency anyways
+			if (GetArrayLength(products) = 1) then begin
+				delayedReboot := true;
+				exit;
+			end;
+
 			Result := products[0].Title;
 			NeedsRestart := true;
 
