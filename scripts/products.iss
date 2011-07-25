@@ -124,7 +124,12 @@ begin
 				//setup executed; ResultCode contains the exit code
 				//MsgBox(products[i].Title + ' install executed. Result Code: ' + IntToStr(ResultCode), mbInformation, MB_OK);
 				if (products[i].MustRebootAfter) then begin
-					Result := InstallRebootRequired;
+					//delay reboot after install if we installed the last dependency anyways
+					if (i = productCount - 1) then begin
+						delayedReboot := true;
+					end else begin
+						Result := InstallRebootRequired;
+					end;
 					break;
 				end else if (ResultCode = 0) then begin
 					finishCount := finishCount + 1;
@@ -171,12 +176,6 @@ begin
 			Result := s;
 			end;
 		InstallRebootRequired: begin
-			//delay reboot after install if we installed the last dependency anyways
-			if (GetArrayLength(products) = 1) then begin
-				delayedReboot := true;
-				exit;
-			end;
-
 			Result := products[0].Title;
 			NeedsRestart := true;
 
