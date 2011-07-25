@@ -112,7 +112,7 @@ begin
 		DependencyPage.Show;
 
 		for i := 0 to productCount - 1 do begin
-			if (products[i].InstallClean and PendingReboot()) then begin
+			if (products[i].InstallClean and (delayedReboot or PendingReboot())) then begin
 				Result := InstallRebootRequired;
 				break;
 			end;
