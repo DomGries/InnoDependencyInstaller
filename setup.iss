@@ -1,4 +1,4 @@
-#define use_iis
+;#define use_iis
 #define use_kb835732
 
 #define use_msi20
@@ -130,12 +130,10 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,MyProgram}"; Fl
 #endif
 
 #ifdef use_dotnetfx35
-#include "scripts\products\dotnetfx35.iss"
-#ifdef use_dotnetfx35lp
-#include "scripts\products\dotnetfx35lp.iss"
-#endif
+//#include "scripts\products\dotnetfx35.iss"
 #include "scripts\products\dotnetfx35sp1.iss"
 #ifdef use_dotnetfx35lp
+//#include "scripts\products\dotnetfx35lp.iss"
 #include "scripts\products\dotnetfx35sp1lp.iss"
 #endif
 #endif
@@ -172,8 +170,7 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,MyProgram}"; Fl
 #endif
 
 [CustomMessages]
-win2000sp3_title=Windows 2000 Service Pack 3
-winxpsp2_title=Windows XP Service Pack 2
+win_sp_title=Windows %1 Service Pack %2
 
 
 [Code]
@@ -181,16 +178,6 @@ function InitializeSetup(): boolean;
 begin
 	//init windows version
 	initwinversion();
-
-	//check if dotnetfx20 can be installed on this OS
-	//if not minwinspversion(5, 0, 3) then begin
-	//	MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('win2000sp3_title')]), mbError, MB_OK);
-	//	exit;
-	//end;
-	//if not minwinspversion(5, 1, 2) then begin
-	//	MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [CustomMessage('winxpsp2_title')]), mbError, MB_OK);
-	//	exit;
-	//end;
 
 #ifdef use_iis
 	if (not iis()) then exit;
@@ -219,6 +206,16 @@ begin
 
 	//install .netfx 2.0 sp2 if possible; if not sp1 if possible; if not .netfx 2.0
 #ifdef use_dotnetfx20
+	//check if .netfx 2.0 can be installed on this OS
+	if not minwinspversion(5, 0, 3) then begin
+		msgbox(fmtmessage(custommessage('depinstall_missing'), [fmtmessage(custommessage('win_sp_title'), ['2000', '3'])]), mberror, mb_ok);
+		exit;
+	end;
+	if not minwinspversion(5, 1, 2) then begin
+		msgbox(fmtmessage(custommessage('depinstall_missing'), [fmtmessage(custommessage('win_sp_title'), ['XP', '2'])]), mberror, mb_ok);
+		exit;
+	end;
+
 	if minwinversion(5, 1) then begin
 		dotnetfx20sp2();
 #ifdef use_dotnetfx20lp
