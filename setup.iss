@@ -24,7 +24,7 @@
 #define use_mdac28
 #define use_jet4sp8
 
-#define use_scceruntime
+#define use_sqlcompact35sp2
 
 #define use_sql2005express
 #define use_sql2008express
@@ -158,8 +158,8 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,MyProgram}"; Fl
 #include "scripts\products\jet4sp8.iss"
 #endif
 
-#ifdef use_scceruntime
-#include "scripts\products\scceruntime.iss"
+#ifdef use_sqlcompact35sp2
+#include "scripts\products\sqlcompact35sp2.iss"
 #endif
 
 #ifdef use_sql2005express
@@ -269,8 +269,8 @@ begin
 	jet4sp8('4.0.8015');
 #endif
 
-#ifdef use_ssceruntime
-	ssceruntime();
+#ifdef use_sqlcompact35sp2
+	sqlcompact35sp2();
 #endif
 
 #ifdef use_sql2005express
