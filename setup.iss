@@ -248,14 +248,14 @@ begin
 #endif
 #endif
 
+#ifdef use_wic
+	wic();
+#endif
+
 	// if no .netfx 4.0 is found, install the client (smallest)
 #ifdef use_dotnetfx40
 	if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
 		dotnetfx40client();
-#endif
-
-#ifdef use_wic
-	wic();
 #endif
 
 #ifdef use_vc2010
