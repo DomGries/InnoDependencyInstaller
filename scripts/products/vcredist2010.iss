@@ -30,7 +30,7 @@ procedure vcredist2010();
 var
 	version: cardinal;
 begin
-	RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\' + GetString('x86', 'x64', 'ia64'), 'Install', version);
+	RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\VisualStudio\10.0\VC\VCRedist\' + GetString('x86', 'x64', 'ia64'), 'Installed', version);
 
 	if (version <> 1) then
 		AddProduct('vcredist2010' + GetArchitectureString() + '.exe',
