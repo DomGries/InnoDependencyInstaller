@@ -1,3 +1,6 @@
+;contribute on github.com/stfx/innodependencyinstaller or codeproject.com/Articles/20868/NET-Framework-1-1-2-0-3-5-Installer-for-InnoSetup
+
+;comment out product defines to disable installing them
 ;#define use_iis
 #define use_kb835732
 
@@ -19,6 +22,8 @@
 #define use_dotnetfx40
 #define use_wic
 
+#define use_dotnetfx45
+
 #define use_vc2010
 
 #define use_mdac28
@@ -30,13 +35,13 @@
 #define use_sql2008express
 
 #define MyAppSetupName 'MyProgram'
-#define MyAppVersion '4.0'
+#define MyAppVersion '5.0'
 
 [Setup]
 AppName={#MyAppSetupName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright=Copyright © stfx 2007-2011
+AppCopyright=Copyright © stfx 2007-2014
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany=stfx
 AppPublisher=stfx
@@ -141,6 +146,10 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,MyProgram}"; Fl
 #ifdef use_dotnetfx40
 #include "scripts\products\dotnetfx40client.iss"
 #include "scripts\products\dotnetfx40full.iss"
+#endif
+
+#ifdef use_dotnetfx45
+#include "scripts\products\dotnetfx45.iss"
 #endif
 
 #ifdef use_wic
@@ -256,6 +265,11 @@ begin
 #ifdef use_dotnetfx40
 	if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
 		dotnetfx40client();
+#endif
+
+#ifdef use_dotnetfx45
+    //dotnetfx45(2); // min allowed version is .netfx 4.5.2
+    dotnetfx45(0); // min allowed version is .netfx 4.5.0
 #endif
 
 #ifdef use_vc2010

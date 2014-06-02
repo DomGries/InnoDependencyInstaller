@@ -11,12 +11,13 @@ dependencies:
 |   dotnetfx20sp1[*1]_[*2].exe
 |   dotnetfx20sp2[*1].exe
 |   dotnetfx20sp2[*1]_[*2].exe
-|   dotnetfx35[*1].exe
-|   dotnetfx35[*1]_[*2].exe
-|   dotnetfx35sp1[*1].exe
-|   dotnetfx35sp1[*1]_[*2].exe
+|   dotnetfx35.exe
+|   dotnetfx35_[*2].exe
+|   dotnetfx35sp1.exe
+|   dotnetfx35sp1_[*2].exe
 |   dotNetFx40_Client_setup.exe
 |   dotNetFx40_Full_setup.exe
+|   dotnetfx45.exe
 |   msi20.exe
 |   msi31.exe
 |   msi45_[*3]
