@@ -10,8 +10,8 @@ dotnetfx40full_title=.NET Framework 4.0 Full
 dotnetfx40full_size=3 MB - 197 MB
 
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-en.dotnetfx40full_lcid=''
-de.dotnetfx40full_lcid='/lcid 1031 '
+en.dotnetfx40full_lcid=
+de.dotnetfx40full_lcid=/lcid 1031 
 
 
 [Code]

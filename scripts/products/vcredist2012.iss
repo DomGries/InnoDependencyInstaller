@@ -11,8 +11,8 @@ en.vcredist2012_size_x64=6.4 MB
 de.vcredist2012_size_x64=6,4 MB
 
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-en.vcredist2012_lcid=''
-de.vcredist2012_lcid='/lcid 1031 '
+en.vcredist2012_lcid=
+de.vcredist2012_lcid=/lcid 1031 
 
 
 [Code]

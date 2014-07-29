@@ -16,8 +16,8 @@ en.vcredist2010_size_ia64=2.2 MB
 de.vcredist2010_size_ia64=2,2 MB
 
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
-en.vcredist2010_lcid=''
-de.vcredist2010_lcid='/lcid 1031 '
+en.vcredist2010_lcid=
+de.vcredist2010_lcid=/lcid 1031 
 
 
 [Code]
