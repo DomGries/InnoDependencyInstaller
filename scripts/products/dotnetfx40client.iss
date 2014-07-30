@@ -22,7 +22,7 @@ procedure dotnetfx40client();
 begin
 	if (not netfxinstalled(NetFx40Client, '')) then
 		AddProduct('dotNetFx40_Client_setup.exe',
-			CustomMessage('dotnetfx40client_lcid') + '/passive /norestart',
+			CustomMessage('dotnetfx40client_lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx40client_title'),
 			CustomMessage('dotnetfx40client_size'),
 			dotnetfx40client_url,

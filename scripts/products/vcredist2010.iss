@@ -34,7 +34,7 @@ begin
 
 	if (version <> 1) then
 		AddProduct('vcredist2010' + GetArchitectureString() + '.exe',
-			CustomMessage('vcredist2010_lcid') + '/passive /norestart',
+			CustomMessage('vcredist2010_lcid') + ' /passive /norestart',
 			CustomMessage('vcredist2010_title'),
 			CustomMessage('vcredist2010_size' + GetArchitectureString()),
 			GetString(vcredist2010_url, vcredist2010_url_x64, vcredist2010_url_ia64),
