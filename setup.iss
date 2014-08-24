@@ -64,6 +64,10 @@ PrivilegesRequired=admin
 ArchitecturesAllowed=x86 x64 ia64
 ArchitecturesInstallIn64BitMode=x64 ia64
 
+;Downloading and installing dependencies will only work if the memo/ready page is enabled (default behaviour)
+DisableReadyPage=no
+DisableReadyMemo=no
+
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "de"; MessagesFile: "compiler:Languages\German.isl"
