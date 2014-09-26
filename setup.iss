@@ -25,6 +25,8 @@
 #define use_dotnetfx45
 
 #define use_vc2010
+#define use_vc2012
+#define use_vc2013
 
 #define use_mdac28
 #define use_jet4sp8
@@ -163,6 +165,12 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupNam
 #ifdef use_vc2010
 #include "scripts\products\vcredist2010.iss"
 #endif
+#ifdef use_vc2012
+#include "scripts\products\vcredist2012.iss"
+#endif
+#ifdef use_vc2013
+#include "scripts\products\vcredist2013.iss"
+#endif
 
 #ifdef use_mdac28
 #include "scripts\products\mdac28.iss"
@@ -278,6 +286,12 @@ begin
 
 #ifdef use_vc2010
 	vcredist2010();
+#endif
+#ifdef use_vc2012
+	vcredist2012();
+#endif
+#ifdef use_vc2013
+	vcredist2013();
 #endif
 
 #ifdef use_mdac28
