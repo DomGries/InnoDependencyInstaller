@@ -82,13 +82,13 @@ Source: "src\MyProgram-IA64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; C
 Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode
 
 [Icons]
-Name: "{group}\MyProgram"; Filename: "{app}\MyProgram"
-Name: "{group}\{cm:UninstallProgram,MyProgram}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\MyProgram"; Filename: "{app}\MyProgram.exe"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\MyProgram"; Filename: "{app}\MyProgram.exe"; Tasks: quicklaunchicon
+Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"
+Name: "{group}\{cm:UninstallProgram,{#MyAppSetupName}}"; Filename: "{uninstallexe}"
+Name: "{commondesktop}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"; Tasks: quicklaunchicon
 
 [Run]
-Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,MyProgram}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
 
 #include "scripts\products.iss"
 
