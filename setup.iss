@@ -24,6 +24,9 @@
 
 #define use_dotnetfx45
 
+#define use_msiproduct
+#define use_vc2005
+#define use_vc2008
 #define use_vc2010
 #define use_vc2012
 #define use_vc2013
@@ -162,6 +165,15 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupNam
 #include "scripts\products\wic.iss"
 #endif
 
+#ifdef use_msiproduct
+#include "scripts\products\msiproduct.iss"
+#endif
+#ifdef use_vc2005
+#include "scripts\products\vcredist2005.iss"
+#endif
+#ifdef use_vc2008
+#include "scripts\products\vcredist2008.iss"
+#endif
 #ifdef use_vc2010
 #include "scripts\products\vcredist2010.iss"
 #endif
@@ -284,6 +296,12 @@ begin
     dotnetfx45(0); // min allowed version is .netfx 4.5.0
 #endif
 
+#ifdef use_vc2005
+	vcredist2005();
+#endif
+#ifdef use_vc2008
+	vcredist2008();
+#endif
 #ifdef use_vc2010
 	vcredist2010();
 #endif

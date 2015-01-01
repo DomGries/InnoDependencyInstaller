@@ -1,8 +1,10 @@
+// NOTE: Uses outdated and possibly unrealiable detection method
 // requires Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP
 // http://www.microsoft.com/en-us/download/details.aspx?id=30679
 
 [CustomMessages]
 vcredist2012_title=Visual C++ 2012 Redistributable
+vcredist2012_title_x64=Visual C++ 2012 64-Bit Redistributable
 
 en.vcredist2012_size=6.3 MB
 de.vcredist2012_size=6,3 MB
@@ -26,7 +28,7 @@ begin
 		if (version <> 1) then
 			AddProduct('vcredist2012' + GetArchitectureString() + '.exe',
 				' /passive /norestart',
-				CustomMessage('vcredist2012_title'),
+				CustomMessage('vcredist2012_title' + GetArchitectureString()),
 				CustomMessage('vcredist2012_size' + GetArchitectureString()),
 				GetString(vcredist2012_url, vcredist2012_url_x64, ''),
 				false, false);

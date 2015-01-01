@@ -3,6 +3,7 @@
 
 [CustomMessages]
 vcredist2013_title=Visual C++ 2013 Redistributable
+vcredist2013_title_x64=Visual C++ 2013 64-Bit Redistributable
 
 en.vcredist2013_size=6.2 MB
 de.vcredist2013_size=6,2 MB
@@ -16,17 +17,16 @@ const
 	vcredist2013_url = 'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe';
 	vcredist2013_url_x64 = 'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe';
 
-procedure vcredist2013();
-var
-	version: cardinal;
-begin
-	RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum', 'Install', version);
+	vcredist2013_productcode = '{13A4EE12-23EA-3371-91EE-EFB36DDFFF3E}';
+	vcredist2013_productcode_x64 = '{A749D8E6-B613-3BE3-8F5F-045C84EBA29B}';
 
+procedure vcredist2013();
+begin
 	if (not IsIA64()) then begin
-		if (version <> 1) then
+		if (not msiproduct(GetString(vcredist2013_productcode, vcredist2013_productcode_x64, ''))) then
 			AddProduct('vcredist2013' + GetArchitectureString() + '.exe',
 				' /passive /norestart',
-				CustomMessage('vcredist2013_title'),
+				CustomMessage('vcredist2013_title' + GetArchitectureString()),
 				CustomMessage('vcredist2013_size' + GetArchitectureString()),
 				GetString(vcredist2013_url, vcredist2013_url_x64, ''),
 				false, false);
