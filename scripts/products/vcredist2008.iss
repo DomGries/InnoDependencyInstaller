@@ -31,7 +31,7 @@ procedure vcredist2008();
 begin
 	if (not msiproduct(GetString(vcredist2008_productcode, vcredist2008_productcode_x64, vcredist2008_productcode_ia64))) then
 		AddProduct('vcredist2008' + GetArchitectureString() + '.exe',
-			' /passive /norestart',
+			'/q',
 			CustomMessage('vcredist2008_title' + GetArchitectureString()),
 			CustomMessage('vcredist2008_size' + GetArchitectureString()),
 			GetString(vcredist2008_url, vcredist2008_url_x64, vcredist2008_url_ia64),

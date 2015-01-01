@@ -27,7 +27,7 @@ begin
 	if (not IsIA64()) then begin
 		if (version <> 1) then
 			AddProduct('vcredist2012' + GetArchitectureString() + '.exe',
-				' /passive /norestart',
+				'/passive /norestart',
 				CustomMessage('vcredist2012_title' + GetArchitectureString()),
 				CustomMessage('vcredist2012_size' + GetArchitectureString()),
 				GetString(vcredist2012_url, vcredist2012_url_x64, ''),

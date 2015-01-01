@@ -25,7 +25,7 @@ begin
 	if (not IsIA64()) then begin
 		if (not msiproduct(GetString(vcredist2013_productcode, vcredist2013_productcode_x64, ''))) then
 			AddProduct('vcredist2013' + GetArchitectureString() + '.exe',
-				' /passive /norestart',
+				'/passive /norestart',
 				CustomMessage('vcredist2013_title' + GetArchitectureString()),
 				CustomMessage('vcredist2013_size' + GetArchitectureString()),
 				GetString(vcredist2013_url, vcredist2013_url_x64, ''),
