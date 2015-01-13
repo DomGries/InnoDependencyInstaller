@@ -1,4 +1,3 @@
-// NOTE: Uses outdated and possibly unrealiable detection method
 // requires Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP
 // http://www.microsoft.com/en-us/download/details.aspx?id=30679
 
@@ -18,14 +17,13 @@ const
 	vcredist2012_url = 'http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x84.exe';
 	vcredist2012_url_x64 = 'http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe';
 
-procedure vcredist2012();
-var
-	version: cardinal;
-begin
-	RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\DevDiv\vc\Servicing\11.0\RuntimeMinimum', 'Install', version);
+	vcredist2012_productcode = '{BD95A8CD-1D9F-35AD-981A-3E7925026EBB}';
+	vcredist2012_productcode_x64 = '{CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}';
 
+procedure vcredist2012();
+begin
 	if (not IsIA64()) then begin
-		if (version <> 1) then
+		if (not msiproduct(GetString(vcredist2012_productcode, vcredist2012_productcode_x64, ''))) then
 			AddProduct('vcredist2012' + GetArchitectureString() + '.exe',
 				'/passive /norestart',
 				CustomMessage('vcredist2012_title' + GetArchitectureString()),

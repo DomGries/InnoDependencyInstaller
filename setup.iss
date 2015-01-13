@@ -40,13 +40,13 @@
 #define use_sql2008express
 
 #define MyAppSetupName 'MyProgram'
-#define MyAppVersion '5.0'
+#define MyAppVersion '6.0'
 
 [Setup]
 AppName={#MyAppSetupName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright=Copyright © stfx 2007-2014
+AppCopyright=Copyright © 2007-2015 stfx
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany=stfx
 AppPublisher=stfx
@@ -217,16 +217,16 @@ begin
 #endif
 
 #ifdef use_msi20
-	msi20('2.0');
+	msi20('2.0'); // min allowed version is 2.0
 #endif
 #ifdef use_msi31
-	msi31('3.1');
+	msi31('3.1'); // min allowed version is 3.1
 #endif
 #ifdef use_msi45
-	msi45('4.5');
+	msi45('4.5'); // min allowed version is 4.5
 #endif
 #ifdef use_ie6
-	ie6('5.0.2919');
+	ie6('5.0.2919'); // min allowed version is 5.0.2919
 #endif
 
 #ifdef use_dotnetfx11
@@ -292,8 +292,8 @@ begin
 #endif
 
 #ifdef use_dotnetfx45
-    //dotnetfx45(2); // min allowed version is .netfx 4.5.2
-    dotnetfx45(0); // min allowed version is .netfx 4.5.0
+    //dotnetfx45(2); // min allowed version is 4.5.2
+    dotnetfx45(0); // min allowed version is 4.5.0
 #endif
 
 #ifdef use_vc2005
@@ -313,10 +313,10 @@ begin
 #endif
 
 #ifdef use_mdac28
-	mdac28('2.7');
+	mdac28('2.7'); // min allowed version is 2.7
 #endif
 #ifdef use_jet4sp8
-	jet4sp8('4.0.8015');
+	jet4sp8('4.0.8015'); // min allowed version is 4.0.8015
 #endif
 
 #ifdef use_sqlcompact35sp2
