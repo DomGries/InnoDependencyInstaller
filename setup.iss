@@ -95,13 +95,20 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppSetupName}"
 [Run]
 Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
 
-#include "scripts\products.iss"
+[CustomMessages]
+win_sp_title=Windows %1 Service Pack %2
 
+
+[Code]
+// shared code for installing the products
+#include "scripts\products.iss"
+// helper functions
 #include "scripts\products\stringversion.iss"
 #include "scripts\products\winversion.iss"
 #include "scripts\products\fileversion.iss"
 #include "scripts\products\dotnetfxversion.iss"
 
+// actual products
 #ifdef use_iis
 #include "scripts\products\iis.iss"
 #endif
@@ -202,14 +209,10 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupNam
 #include "scripts\products\sql2008express.iss"
 #endif
 
-[CustomMessages]
-win_sp_title=Windows %1 Service Pack %2
 
-
-[Code]
 function InitializeSetup(): boolean;
 begin
-	//init windows version
+	// initialize windows version
 	initwinversion();
 
 #ifdef use_iis
@@ -237,9 +240,9 @@ begin
 	dotnetfx11sp1();
 #endif
 
-	//install .netfx 2.0 sp2 if possible; if not sp1 if possible; if not .netfx 2.0
+	// install .netfx 2.0 sp2 if possible; if not sp1 if possible; if not .netfx 2.0
 #ifdef use_dotnetfx20
-	//check if .netfx 2.0 can be installed on this OS
+	// check if .netfx 2.0 can be installed on this OS
 	if not minwinspversion(5, 0, 3) then begin
 		msgbox(fmtmessage(custommessage('depinstall_missing'), [fmtmessage(custommessage('win_sp_title'), ['2000', '3'])]), mberror, mb_ok);
 		exit;
