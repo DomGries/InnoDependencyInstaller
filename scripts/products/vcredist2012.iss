@@ -14,7 +14,7 @@ de.vcredist2012_size_x64=6,4 MB
 
 [Code]
 const
-	vcredist2012_url = 'http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x84.exe';
+	vcredist2012_url = 'http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe';
 	vcredist2012_url_x64 = 'http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe';
 
 	vcredist2012_productcode = '{BD95A8CD-1D9F-35AD-981A-3E7925026EBB}';
