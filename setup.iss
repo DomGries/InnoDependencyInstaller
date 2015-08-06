@@ -30,6 +30,7 @@
 #define use_vc2010
 #define use_vc2012
 #define use_vc2013
+#define use_vc2015
 
 #define use_mdac28
 #define use_jet4sp8
@@ -190,6 +191,9 @@ win_sp_title=Windows %1 Service Pack %2
 #ifdef use_vc2013
 #include "scripts\products\vcredist2013.iss"
 #endif
+#ifdef use_vc2015
+#include "scripts\products\vcredist2015.iss"
+#endif
 
 #ifdef use_mdac28
 #include "scripts\products\mdac28.iss"
@@ -313,6 +317,9 @@ begin
 #endif
 #ifdef use_vc2013
 	vcredist2013();
+#endif
+#ifdef use_vc2015
+	vcredist2015();
 #endif
 
 #ifdef use_mdac28
