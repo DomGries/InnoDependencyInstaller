@@ -17,7 +17,7 @@ Supported dependency names:
 |   dotnetfx35sp1_[*2].exe
 |   dotNetFx40_Client_setup.exe
 |   dotNetFx40_Full_setup.exe
-|   dotnetfx45.exe
+|   dotnetfx4x.exe
 |   ie6.exe
 |   jet4sp8.exe
 |   kb835732.exe
