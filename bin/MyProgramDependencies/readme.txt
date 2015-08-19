@@ -17,7 +17,7 @@ Supported dependency names:
 |   dotnetfx35sp1_[*2].exe
 |   dotNetFx40_Client_setup.exe
 |   dotNetFx40_Full_setup.exe
-|   dotnetfx45.exe
+|   dotnetfx46.exe
 |   ie6.exe
 |   jet4sp8.exe
 |   kb835732.exe
@@ -33,6 +33,7 @@ Supported dependency names:
 |   vcredist2010[*1].exe
 |   vcredist2012[*1].exe
 |   vcredist2013[*1].exe
+|   vcredist2015[*1].exe
 |   wic[*1]_[*3].exe
 
 

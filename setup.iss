@@ -22,7 +22,7 @@
 #define use_dotnetfx40
 #define use_wic
 
-#define use_dotnetfx45
+#define use_dotnetfx46
 
 #define use_msiproduct
 #define use_vc2005
@@ -165,8 +165,8 @@ win_sp_title=Windows %1 Service Pack %2
 #include "scripts\products\dotnetfx40full.iss"
 #endif
 
-#ifdef use_dotnetfx45
-#include "scripts\products\dotnetfx45.iss"
+#ifdef use_dotnetfx46
+#include "scripts\products\dotnetfx46.iss"
 #endif
 
 #ifdef use_wic
@@ -298,9 +298,8 @@ begin
 		dotnetfx40client();
 #endif
 
-#ifdef use_dotnetfx45
-    //dotnetfx45(2); // min allowed version is 4.5.2
-    dotnetfx45(0); // min allowed version is 4.5.0
+#ifdef use_dotnetfx46
+    dotnetfx46(50); // min allowed version is 4.5.0
 #endif
 
 #ifdef use_vc2005
