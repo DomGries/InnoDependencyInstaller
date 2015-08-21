@@ -315,7 +315,9 @@ begin
 	vcredist2012();
 #endif
 #ifdef use_vc2013
+	//SetForceX86(true); // force 32-bit install of next products
 	vcredist2013();
+	//SetForceX86(false); // disable forced 32-bit install again
 #endif
 #ifdef use_vc2015
 	vcredist2015();

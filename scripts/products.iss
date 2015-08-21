@@ -49,7 +49,7 @@ type
 var
 	installMemo, downloadMemo, downloadMessage: string;
 	products: array of TProduct;
-	delayedReboot: boolean;
+	delayedReboot, isForcedX86: boolean;
 	DependencyPage: TOutputProgressWizardPage;
 
 
@@ -231,17 +231,17 @@ end;
 
 function IsX86: boolean;
 begin
-	Result := (ProcessorArchitecture = paX86) or (ProcessorArchitecture = paUnknown);
+	Result := isForcedX86 or (ProcessorArchitecture = paX86) or (ProcessorArchitecture = paUnknown);
 end;
 
 function IsX64: boolean;
 begin
-	Result := Is64BitInstallMode and (ProcessorArchitecture = paX64);
+	Result := (not isForcedX86) and Is64BitInstallMode and (ProcessorArchitecture = paX64);
 end;
 
 function IsIA64: boolean;
 begin
-	Result := Is64BitInstallMode and (ProcessorArchitecture = paIA64);
+	Result := (not isForcedX86) and Is64BitInstallMode and (ProcessorArchitecture = paIA64);
 end;
 
 function GetString(x86, x64, ia64: String): String;
@@ -264,4 +264,9 @@ begin
 	end else begin
 		Result := '';
 	end;
+end;
+
+procedure SetForceX86(value: boolean);
+begin
+	isForcedX86 := value;
 end;
