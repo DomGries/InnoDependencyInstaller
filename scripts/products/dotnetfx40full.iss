@@ -22,7 +22,7 @@ procedure dotnetfx40full();
 begin
 	if (not netfxinstalled(NetFx40Full, '')) then
 		AddProduct('dotNetFx40_Full_setup.exe',
-			CustomMessage('dotnetfx40full_lcid') + ' /q /passive /norestart',
+			CustomMessage('dotnetfx40full_lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx40full_title'),
 			CustomMessage('dotnetfx40full_size'),
 			dotnetfx40full_url,
