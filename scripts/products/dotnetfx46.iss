@@ -20,7 +20,7 @@ procedure dotnetfx46(MinVersion: integer);
 begin
 	if (not netfxinstalled(NetFx4x, '') or (netfxspversion(NetFx4x, '') < MinVersion)) then
 		AddProduct('dotnetfx46.exe',
-			CustomMessage('dotnetfx46_lcid') + ' /q /passive /norestart',
+			CustomMessage('dotnetfx46_lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx46_title'),
 			CustomMessage('dotnetfx46_size'),
 			dotnetfx46_url,
