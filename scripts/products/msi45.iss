@@ -17,29 +17,29 @@ const
 	msi45win52_url = 'http://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/WindowsServer2003-KB942288-v4-x86.exe';
 	msi45win51_url = 'http://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/WindowsXP-KB942288-v3-x86.exe';
 
-procedure msi45(MinVersion: string);
+procedure msi45(minVersion: string);
 begin
-	if (IsX86() and (compareversion(fileversion(ExpandConstant('{sys}{\}msi.dll')), MinVersion) < 0)) then begin
+	if (IsX86() and (compareversion(fileversion(ExpandConstant('{sys}{\}msi.dll')), minVersion) < 0)) then begin
 		if minwinversion(6, 0) then
 			AddProduct('msi45_60.msu',
 				'/quiet /norestart',
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win60_size'),
 				msi45win60_url,
-				false, false)
+				false, false, false)
 		else if minwinversion(5, 2) then
 			AddProduct('msi45_52.exe',
 				'/quiet /norestart',
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win52_size'),
 				msi45win52_url,
-				false, false)
+				false, false, false)
 		else if minwinversion(5, 1) then
 			AddProduct('msi45_51.exe',
 				'/quiet /norestart',
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win51_size'),
 				msi45win51_url,
-				false, false);
+				false, false, false);
 	end;
 end;

@@ -49,7 +49,7 @@ begin
 					CustomMessage('wic_title'),
 					CustomMessage('wic_size'),
 					GetString(wic_url, wic_url_x64, '') + GetConvertedLanguageID() + '.exe',
-					false, false);
+					false, false, false);
 		end;
 	end;
 end;

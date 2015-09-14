@@ -37,6 +37,6 @@ begin
 				CustomMessage('sql2005express_title'),
 				CustomMessage('sql2005express_size' + GetArchitectureString()),
 				GetString(sql2005express_url, sql2005express_url_x64, ''),
-				false, false);
+				false, false, false);
 	end;
 end;

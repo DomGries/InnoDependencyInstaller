@@ -17,5 +17,5 @@ begin
 			CustomMessage('sqlcompact35sp2_title'),
 			CustomMessage('sqlcompact35sp2_size'),
 			sqlcompact35sp2_url,
-			false, false);
+			false, false, false);
 end;

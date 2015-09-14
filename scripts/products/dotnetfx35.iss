@@ -21,5 +21,5 @@ begin
 			CustomMessage('dotnetfx35_title'),
 			CustomMessage('dotnetfx35_size'),
 			dotnetfx35_url,
-			false, false);
+			false, false, false);
 end;

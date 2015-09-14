@@ -23,5 +23,5 @@ begin
 			CustomMessage('dotnetfx20sp1_title'),
 			CustomMessage('dotnetfx20sp1_size'),
 			GetString(dotnetfx20sp1_url, dotnetfx20sp1_url_x64, dotnetfx20sp1_url_ia64),
-			false, false);
+			false, false, false);
 end;

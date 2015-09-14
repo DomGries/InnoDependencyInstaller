@@ -13,16 +13,16 @@ de.ie6_size=1 MB - 77,5 MB
 const
 	ie6_url = 'http://download.microsoft.com/download/ie6sp1/finrel/6_sp1/W98NT42KMeXP/EN-US/ie6setup.exe';
 
-procedure ie6(MinVersion: string);
+procedure ie6(minVersion: string);
 var
 	version: string;
 begin
 	RegQueryStringValue(HKLM, 'Software\Microsoft\Internet Explorer', 'Version', version);
-	if (compareversion(version, MinVersion) < 0) then
+	if (compareversion(version, minVersion) < 0) then
 		AddProduct('ie6.exe',
 			'/q:a /C:"setup /QNT"',
 			CustomMessage('ie6_title'),
 			CustomMessage('ie6_size'),
 			ie6_url,
-			false, false);
+			false, false, false);
 end;

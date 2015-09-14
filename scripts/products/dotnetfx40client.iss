@@ -26,5 +26,5 @@ begin
 			CustomMessage('dotnetfx40client_title'),
 			CustomMessage('dotnetfx40client_size'),
 			dotnetfx40client_url,
-			false, false);
+			false, false, false);
 end;

@@ -16,13 +16,13 @@ de.dotnetfx46_lcid=/lcid 1031
 const
 	dotnetfx46_url = 'http://download.microsoft.com/download/1/4/A/14A6C422-0D3C-4811-A31F-5EF91A83C368/NDP46-KB3045560-Web.exe';
 
-procedure dotnetfx46(MinVersion: integer);
+procedure dotnetfx46(minVersion: integer);
 begin
-	if (not netfxinstalled(NetFx4x, '') or (netfxspversion(NetFx4x, '') < MinVersion)) then
+	if (not netfxinstalled(NetFx4x, '') or (netfxspversion(NetFx4x, '') < minVersion)) then
 		AddProduct('dotnetfx46.exe',
 			CustomMessage('dotnetfx46_lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx46_title'),
 			CustomMessage('dotnetfx46_size'),
 			dotnetfx46_url,
-			false, false);
+			false, false, false);
 end;

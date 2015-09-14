@@ -23,6 +23,6 @@ begin
 				CustomMessage('kb835732_title'),
 				CustomMessage('kb835732_size'),
 				kb835732_url,
-				false, false);
+				false, false, false);
 	end;
 end;

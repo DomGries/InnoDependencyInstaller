@@ -40,6 +40,7 @@ type
 		File: String;
 		Title: String;
 		Parameters: String;
+		ForceSuccess : boolean;
 		InstallClean : boolean;
 		MustRebootAfter : boolean;
 	end;
@@ -53,44 +54,45 @@ var
 	DependencyPage: TOutputProgressWizardPage;
 
 
-procedure AddProduct(FileName, Parameters, Title, Size, URL: string; InstallClean : boolean; MustRebootAfter : boolean);
+procedure AddProduct(filename, parameters, title, size, url: string; forceSuccess, installClean, mustRebootAfter : boolean);
 var
 	path: string;
 	i: Integer;
 begin
-	installMemo := installMemo + '%1' + Title + #13;
+	installMemo := installMemo + '%1' + title + #13;
 
-	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + FileName;
+	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + filename;
 	if not FileExists(path) then begin
-		path := ExpandConstant('{tmp}{\}') + FileName;
+		path := ExpandConstant('{tmp}{\}') + filename;
 
 		if not FileExists(path) then begin
-			isxdl_AddFile(URL, path);
+			isxdl_AddFile(url, path);
 
-			downloadMemo := downloadMemo + '%1' + Title + #13;
-			downloadMessage := downloadMessage + '	' + Title + ' (' + Size + ')' + #13;
+			downloadMemo := downloadMemo + '%1' + title + #13;
+			downloadMessage := downloadMessage + '	' + title + ' (' + size + ')' + #13;
 		end;
 	end;
 
 	i := GetArrayLength(products);
 	SetArrayLength(products, i + 1);
 	products[i].File := path;
-	products[i].Title := Title;
-	products[i].Parameters := Parameters;
-	products[i].InstallClean := InstallClean;
-	products[i].MustRebootAfter := MustRebootAfter;
+	products[i].Title := title;
+	products[i].Parameters := parameters;
+	products[i].ForceSuccess := forceSuccess;
+	products[i].InstallClean := installClean;
+	products[i].MustRebootAfter := mustRebootAfter;
 end;
 
-function SmartExec(prod : TProduct; var ResultCode : Integer) : boolean;
+function SmartExec(product : TProduct; var resultcode : Integer): boolean;
 begin
-	if (LowerCase(Copy(prod.File,Length(prod.File)-2,3)) = 'exe') then begin
-		Result := Exec(prod.File, prod.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
+	if (LowerCase(Copy(product.File, Length(product.File) - 2, 3)) = 'exe') then begin
+		Result := Exec(product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultcode);
 	end else begin
-		Result := ShellExec('', prod.File, prod.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
+		Result := ShellExec('', product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultcode);
 	end;
 end;
 
-function PendingReboot : boolean;
+function PendingReboot: boolean;
 var	names: String;
 begin
 	if (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', names)) then begin
@@ -104,7 +106,7 @@ end;
 
 function InstallProducts: InstallResult;
 var
-	ResultCode, i, productCount, finishCount: Integer;
+	resultCode, i, productCount, finishCount: Integer;
 begin
 	Result := InstallSuccessful;
 	productCount := GetArrayLength(products);
@@ -122,9 +124,8 @@ begin
 			DependencyPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
 			DependencyPage.SetProgress(i, productCount);
 
-			if SmartExec(products[i], ResultCode) then begin
-				//setup executed; ResultCode contains the exit code
-				//MsgBox(products[i].Title + ' install executed. Result Code: ' + IntToStr(ResultCode), mbInformation, MB_OK);
+			if SmartExec(products[i], resultCode) then begin
+				//setup executed; resultCode contains the exit code
 				if (products[i].MustRebootAfter) then begin
 					//delay reboot after install if we installed the last dependency anyways
 					if (i = productCount - 1) then begin
@@ -133,10 +134,10 @@ begin
 						Result := InstallRebootRequired;
 					end;
 					break;
-				end else if (ResultCode = 0) then begin
+				end else if (resultCode = 0) or (products[i].ForceSuccess) then begin
 					finishCount := finishCount + 1;
-				end else if (ResultCode = 3010) then begin
-					//ResultCode 3010: A restart is required to complete the installation. This message indicates success.
+				end else if (resultCode = 3010) then begin
+					//Windows Installer resultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
 					delayedReboot := true;
 					finishCount := finishCount + 1;
 				end else begin
@@ -144,7 +145,6 @@ begin
 					break;
 				end;
 			end else begin
-				//MsgBox(products[i].Title + ' install failed. Result Code: ' + IntToStr(ResultCode), mbInformation, MB_OK);
 				Result := InstallError;
 				break;
 			end;
@@ -189,8 +189,7 @@ end;
 
 function NeedRestart : boolean;
 begin
-	if (delayedReboot) then
-		Result := true;
+	Result := delayedReboot;
 end;
 
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;

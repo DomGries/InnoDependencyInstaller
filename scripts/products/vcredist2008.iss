@@ -35,5 +35,5 @@ begin
 			CustomMessage('vcredist2008_title' + GetArchitectureString()),
 			CustomMessage('vcredist2008_size' + GetArchitectureString()),
 			GetString(vcredist2008_url, vcredist2008_url_x64, vcredist2008_url_ia64),
-			false, false);
+			false, false, false);
 end;

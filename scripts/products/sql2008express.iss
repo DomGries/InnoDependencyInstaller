@@ -34,6 +34,6 @@ begin
 				CustomMessage('sql2008expressr2_title'),
 				CustomMessage('sql2008expressr2_size' + GetArchitectureString()),
 				GetString(sql2008expressr2_url, sql2008expressr2_url_x64, ''),
-				false, false);
+				false, false, false);
 	end;
 end;
