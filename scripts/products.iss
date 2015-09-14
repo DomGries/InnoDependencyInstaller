@@ -64,10 +64,12 @@ begin
 	if not FileExists(path) then begin
 		path := ExpandConstant('{tmp}{\}') + FileName;
 
-		isxdl_AddFile(URL, path);
+		if not FileExists(path) then begin
+			isxdl_AddFile(URL, path);
 
-		downloadMemo := downloadMemo + '%1' + Title + #13;
-		downloadMessage := downloadMessage + '	' + Title + ' (' + Size + ')' + #13;
+			downloadMemo := downloadMemo + '%1' + Title + #13;
+			downloadMessage := downloadMessage + '	' + Title + ' (' + Size + ')' + #13;
+		end;
 	end;
 
 	i := GetArrayLength(products);

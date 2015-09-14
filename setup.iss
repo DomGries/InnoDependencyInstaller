@@ -1,4 +1,4 @@
-;contribute on github.com/stfx/innodependencyinstaller or codeproject.com/Articles/20868/NET-Framework-1-1-2-0-3-5-Installer-for-InnoSetup
+;contribute on http://github.com/stfx/innodependencyinstaller or http://codeproject.com/Articles/20868/NET-Framework-1-1-2-0-3-5-Installer-for-InnoSetup
 
 ;comment out product defines to disable installing them
 ;#define use_iis
@@ -31,6 +31,9 @@
 #define use_vc2012
 #define use_vc2013
 #define use_vc2015
+
+;requires dxwebsetup.exe in src dir
+;#define use_directxruntime
 
 #define use_mdac28
 #define use_jet4sp8
@@ -195,6 +198,10 @@ win_sp_title=Windows %1 Service Pack %2
 #include "scripts\products\vcredist2015.iss"
 #endif
 
+#ifdef use_directxruntime
+#include "scripts\products\directxruntime.iss"
+#endif
+
 #ifdef use_mdac28
 #include "scripts\products\mdac28.iss"
 #endif
@@ -321,6 +328,12 @@ begin
 #endif
 #ifdef use_vc2015
 	vcredist2015();
+#endif
+
+#ifdef use_directxruntime
+	// extracts included setup file to temp folder so that we don't need to download it
+	// and always runs directxruntime installer as we don't know how to check if it is required
+	directxruntime();
 #endif
 
 #ifdef use_mdac28
