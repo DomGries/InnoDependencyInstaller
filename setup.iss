@@ -43,6 +43,8 @@
 #define use_sql2005express
 #define use_sql2008express
 
+#define use_directx
+
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '6.0'
 
@@ -220,6 +222,10 @@ win_sp_title=Windows %1 Service Pack %2
 #include "scripts\products\sql2008express.iss"
 #endif
 
+#ifdef use_directx
+#include "scripts\products\directx.iss"
+#endif
+
 
 function InitializeSetup(): boolean;
 begin
@@ -352,6 +358,10 @@ begin
 #endif
 #ifdef use_sql2008express
 	sql2008express();
+#endif
+
+#ifdef use_directx
+    directx(); //Always downloads
 #endif
 
 	Result := true;
