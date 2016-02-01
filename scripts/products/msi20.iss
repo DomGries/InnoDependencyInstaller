@@ -4,7 +4,6 @@ msi20_title=Windows Installer 2.0
 en.msi20_size=1.7 MB
 de.msi20_size=1,7 MB
 
-
 [Code]
 const
 	msi20_url = 'http://download.microsoft.com/download/WindowsInstaller/Install/2.0/W9XMe/EN-US/InstMsiA.exe';
@@ -20,3 +19,5 @@ begin
 			msi20_url,
 			false, false, false);
 end;
+
+[Setup]

@@ -30,7 +30,6 @@ de.depinstall_error=Ein Fehler ist während der Installation der Abghängigkeiten 
 en.isxdl_langfile=
 de.isxdl_langfile=german2.ini
 
-
 [Files]
 Source: "scripts\isxdl\german2.ini"; Flags: dontcopy
 
@@ -271,3 +270,5 @@ procedure SetForceX86(value: boolean);
 begin
 	isForcedX86 := value;
 end;
+
+[Setup]

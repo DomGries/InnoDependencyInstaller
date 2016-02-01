@@ -86,3 +86,5 @@ begin
 	end;
 	Result := regVersion;
 end;
+
+[Setup]

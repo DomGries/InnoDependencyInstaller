@@ -1,5 +1,5 @@
-// requires Windows 7, Windows Server 2003 R2 (32-Bit x86), Windows Server 2003 Service Pack 2, Windows Server 2008 R2, Windows Server 2008 Service Pack 2, Windows Vista Service Pack 2, Windows XP Service Pack 3
-// http://www.microsoft.com/en-us/download/details.aspx?id=5555
+; requires Windows 7, Windows Server 2003 R2 (32-Bit x86), Windows Server 2003 Service Pack 2, Windows Server 2008 R2, Windows Server 2008 Service Pack 2, Windows Vista Service Pack 2, Windows XP Service Pack 3
+; http://www.microsoft.com/en-us/download/details.aspx?id=5555
 
 [CustomMessages]
 vcredist2010_title=Visual C++ 2010 Redistributable
@@ -14,7 +14,6 @@ de.vcredist2010_size_x64=5,5 MB
 
 en.vcredist2010_size_ia64=2.2 MB
 de.vcredist2010_size_ia64=2,2 MB
-
 
 [Code]
 const
@@ -36,3 +35,5 @@ begin
 			GetString(vcredist2010_url, vcredist2010_url_x64, vcredist2010_url_ia64),
 			false, false, false);
 end;
+
+[Setup]

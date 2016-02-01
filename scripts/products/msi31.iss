@@ -4,7 +4,6 @@ msi31_title=Windows Installer 3.1
 en.msi31_size=2.5 MB
 de.msi31_size=2,5 MB
 
-
 [Code]
 const
 	msi31_url = 'http://download.microsoft.com/download/1/4/7/147ded26-931c-4daf-9095-ec7baf996f46/WindowsInstaller-KB893803-v2-x86.exe';
@@ -20,3 +19,5 @@ begin
 			msi31_url,
 			false, false, false);
 end;
+
+[Setup]

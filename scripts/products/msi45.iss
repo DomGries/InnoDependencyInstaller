@@ -10,7 +10,6 @@ de.msi45win52_size=3,0 MB
 en.msi45win51_size=3.2 MB
 de.msi45win51_size=3,2 MB
 
-
 [Code]
 const
 	msi45win60_url = 'http://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/Windows6.0-KB942288-v2-x86.msu';
@@ -43,3 +42,5 @@ begin
 				false, false, false);
 	end;
 end;
+
+[Setup]

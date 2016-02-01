@@ -1,11 +1,10 @@
-//requires Windows Server 2003, Windows Server 2003 R2 Datacenter Edition (32-Bit x86), Windows Server 2003 R2 Enterprise Edition (32-Bit x86), Windows Server 2003 R2 Standard Edition (32-bit x86), Windows XP Service Pack 2
+; requires Windows Server 2003, Windows Server 2003 R2 Datacenter Edition (32-Bit x86), Windows Server 2003 R2 Enterprise Edition (32-Bit x86), Windows Server 2003 R2 Standard Edition (32-bit x86), Windows XP Service Pack 2
 
 [CustomMessages]
 wic_title=Windows Imaging Component
  
 en.wic_size=1.2 MB
 de.wic_size=1,2 MB
- 
 
 [Code]
 const
@@ -53,3 +52,5 @@ begin
 		end;
 	end;
 end;
+
+[Setup]

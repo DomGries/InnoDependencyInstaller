@@ -1,11 +1,10 @@
-// http://support.microsoft.com/kb/239114
+; http://support.microsoft.com/kb/239114
 
 [CustomMessages]
 jet4sp8_title=Jet 4
 
 en.jet4sp8_size=3.7 MB
 de.jet4sp8_size=3,7 MB
-
 
 [Code]
 const
@@ -22,3 +21,5 @@ begin
 			jet4sp8_url,
 			false, false, false);
 end;
+
+[Setup]

@@ -21,3 +21,5 @@ function msiproduct(const ProductID: string): boolean;
 begin
     Result := MsiQueryProductState(ProductID) = INSTALLSTATE_DEFAULT;
 end;
+
+[Setup]
