@@ -1,6 +1,6 @@
-// requires Windows 2000 Service Pack 3, Windows 98, Windows 98 Second Edition, Windows ME, Windows Server 2003, Windows XP Service Pack 2
-// requires Windows Installer 3.0
-// http://www.microsoft.com/en-us/download/details.aspx?id=3387
+; requires Windows 2000 Service Pack 3, Windows 98, Windows 98 Second Edition, Windows ME, Windows Server 2003, Windows XP Service Pack 2
+; requires Windows Installer 3.0
+; http://www.microsoft.com/en-us/download/details.aspx?id=3387
 
 [CustomMessages]
 vcredist2005_title=Visual C++ 2005 Redistributable
@@ -15,7 +15,6 @@ de.vcredist2005_size_x64=4,1 MB
 
 en.vcredist2005_size_ia64=8.8 MB
 de.vcredist2005_size_ia64=8,8 MB
-
 
 [Code]
 const
@@ -37,3 +36,5 @@ begin
 			GetString(vcredist2005_url, vcredist2005_url_x64, vcredist2005_url_ia64),
 			false, false, false);
 end;
+
+[Setup]

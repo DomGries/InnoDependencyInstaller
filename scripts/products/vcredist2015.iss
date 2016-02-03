@@ -1,5 +1,5 @@
-// requires Windows 10, Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003 Service Pack 2, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP Service Pack 3
-// http://www.microsoft.com/en-US/download/details.aspx?id=48145
+; requires Windows 10, Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003 Service Pack 2, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP Service Pack 3
+; http://www.microsoft.com/en-US/download/details.aspx?id=48145
 
 [CustomMessages]
 vcredist2015_title=Visual C++ 2015 Redistributable
@@ -10,7 +10,6 @@ de.vcredist2015_size=12,8 MB
 
 en.vcredist2015_size_x64=13.9 MB
 de.vcredist2015_size_x64=13,9 MB
-
 
 [Code]
 const
@@ -32,3 +31,5 @@ begin
 				false, false, false);
 	end;
 end;
+
+[Setup]
