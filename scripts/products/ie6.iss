@@ -10,7 +10,7 @@ de.ie6_size=1 MB - 77,5 MB
 
 [Code]
 const
-	ie6_url = 'http://download.microsoft.com/download/ie6sp1/finrel/6_sp1/W98NT42KMeXP/EN-US/ie6setup.exe';
+	ie6_url = 'https://download.microsoft.com/download/ie6sp1/finrel/6_sp1/W98NT42KMeXP/EN-US/ie6setup.exe';
 
 procedure ie6(minVersion: string);
 var

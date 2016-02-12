@@ -8,9 +8,9 @@ de.dotnetfx20lp_size=1,8 MB
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 de.dotnetfx20lp_lcid=1031
 
-de.dotnetfx20lp_url=http://download.microsoft.com/download/2/9/7/29768238-56c3-4ea6-abba-4c5246f2bc81/langpack.exe
-de.dotnetfx20lp_url_x64=http://download.microsoft.com/download/2/e/f/2ef250ba-a868-4074-a4c9-249004866f87/langpack.exe
-de.dotnetfx20lp_url_ia64=http://download.microsoft.com/download/8/9/8/898c5670-5e74-41c4-82fc-68dd837af627/langpack.exe
+de.dotnetfx20lp_url=https://download.microsoft.com/download/2/9/7/29768238-56c3-4ea6-abba-4c5246f2bc81/langpack.exe
+de.dotnetfx20lp_url_x64=https://download.microsoft.com/download/2/e/f/2ef250ba-a868-4074-a4c9-249004866f87/langpack.exe
+de.dotnetfx20lp_url_ia64=https://download.microsoft.com/download/8/9/8/898c5670-5e74-41c4-82fc-68dd837af627/langpack.exe
 
 [Code]
 procedure dotnetfx20lp();

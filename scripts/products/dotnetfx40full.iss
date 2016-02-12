@@ -15,7 +15,7 @@ de.dotnetfx40full_lcid=/lcid 1031
 
 [Code]
 const
-	dotnetfx40full_url = 'http://download.microsoft.com/download/1/B/E/1BE39E79-7E39-46A3-96FF-047F95396215/dotNetFx40_Full_setup.exe';
+	dotnetfx40full_url = 'https://download.microsoft.com/download/1/B/E/1BE39E79-7E39-46A3-96FF-047F95396215/dotNetFx40_Full_setup.exe';
 
 procedure dotnetfx40full();
 begin

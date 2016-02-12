@@ -13,8 +13,8 @@ de.vcredist2013_size_x64=6,9 MB
 
 [Code]
 const
-	vcredist2013_url = 'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe';
-	vcredist2013_url_x64 = 'http://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe';
+	vcredist2013_url = 'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe';
+	vcredist2013_url_x64 = 'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe';
 
 	vcredist2013_productcode = '{13A4EE12-23EA-3371-91EE-EFB36DDFFF3E}';
 	vcredist2013_productcode_x64 = '{A749D8E6-B613-3BE3-8F5F-045C84EBA29B}';

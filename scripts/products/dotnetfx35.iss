@@ -10,7 +10,7 @@ dotnetfx35_size=3 MB - 197 MB
 
 [Code]
 const
-	dotnetfx35_url = 'http://download.microsoft.com/download/7/0/3/703455ee-a747-4cc8-bd3e-98a615c3aedb/dotNetFx35setup.exe';
+	dotnetfx35_url = 'https://download.microsoft.com/download/7/0/3/703455ee-a747-4cc8-bd3e-98a615c3aedb/dotNetFx35setup.exe';
 
 procedure dotnetfx35();
 begin
