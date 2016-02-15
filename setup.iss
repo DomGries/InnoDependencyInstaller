@@ -103,16 +103,15 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupNam
 win_sp_title=Windows %1 Service Pack %2
 
 
-[Code]
-// shared code for installing the products
+; shared code for installing the products
 #include "scripts\products.iss"
-// helper functions
+; helper functions
 #include "scripts\products\stringversion.iss"
 #include "scripts\products\winversion.iss"
 #include "scripts\products\fileversion.iss"
 #include "scripts\products\dotnetfxversion.iss"
 
-// actual products
+; actual products
 #ifdef use_iis
 #include "scripts\products\iis.iss"
 #endif
@@ -155,10 +154,10 @@ win_sp_title=Windows %1 Service Pack %2
 #endif
 
 #ifdef use_dotnetfx35
-//#include "scripts\products\dotnetfx35.iss"
+;#include "scripts\products\dotnetfx35.iss"
 #include "scripts\products\dotnetfx35sp1.iss"
 #ifdef use_dotnetfx35lp
-//#include "scripts\products\dotnetfx35lp.iss"
+;#include "scripts\products\dotnetfx35lp.iss"
 #include "scripts\products\dotnetfx35sp1lp.iss"
 #endif
 #endif
@@ -220,7 +219,7 @@ win_sp_title=Windows %1 Service Pack %2
 #include "scripts\products\sql2008express.iss"
 #endif
 
-
+[Code]
 function InitializeSetup(): boolean;
 begin
 	// initialize windows version

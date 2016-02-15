@@ -8,7 +8,7 @@ de.jet4sp8_size=3,7 MB
 
 [Code]
 const
-	jet4sp8_url = 'http://download.microsoft.com/download/4/3/9/4393c9ac-e69e-458d-9f6d-2fe191c51469/Jet40SP8_9xNT.exe';
+	jet4sp8_url = 'https://download.microsoft.com/download/4/3/9/4393c9ac-e69e-458d-9f6d-2fe191c51469/Jet40SP8_9xNT.exe';
 
 procedure jet4sp8(minVersion: string);
 begin

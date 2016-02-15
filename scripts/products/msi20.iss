@@ -6,7 +6,7 @@ de.msi20_size=1,7 MB
 
 [Code]
 const
-	msi20_url = 'http://download.microsoft.com/download/WindowsInstaller/Install/2.0/W9XMe/EN-US/InstMsiA.exe';
+	msi20_url = 'https://download.microsoft.com/download/WindowsInstaller/Install/2.0/W9XMe/EN-US/InstMsiA.exe';
 
 procedure msi20(minVersion: string);
 begin
