@@ -6,7 +6,7 @@ de.mdac28_size=5,4 MB
 
 [Code]
 const
-	mdac28_url = 'https://download.microsoft.com/download/c/d/f/cdfd58f1-3973-4c51-8851-49ae3777586f/MDAC_TYP.EXE';
+	mdac28_url = 'http://download.microsoft.com/download/c/d/f/cdfd58f1-3973-4c51-8851-49ae3777586f/MDAC_TYP.EXE';
 
 procedure mdac28(minVersion: string);
 var

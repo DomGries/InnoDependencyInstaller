@@ -15,7 +15,7 @@ de.dotnetfx40client_lcid=/lcid 1031
 
 [Code]
 const
-	dotnetfx40client_url = 'https://download.microsoft.com/download/7/B/6/7B629E05-399A-4A92-B5BC-484C74B5124B/dotNetFx40_Client_setup.exe';
+	dotnetfx40client_url = 'http://download.microsoft.com/download/7/B/6/7B629E05-399A-4A92-B5BC-484C74B5124B/dotNetFx40_Client_setup.exe';
 
 procedure dotnetfx40client();
 begin

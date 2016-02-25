@@ -14,8 +14,8 @@ de.sql2005express_size_x64=58,1 MB
 
 [Code]
 const
-	sql2005express_url = 'https://download.microsoft.com/download/4/B/E/4BED5810-C8C0-4697-BDC3-DBC114B8FF6D/SQLEXPR32_NLA.EXE';
-	sql2005express_url_x64 = 'https://download.microsoft.com/download/4/B/E/4BED5810-C8C0-4697-BDC3-DBC114B8FF6D/SQLEXPR_NLA.EXE';
+	sql2005express_url = 'http://download.microsoft.com/download/4/B/E/4BED5810-C8C0-4697-BDC3-DBC114B8FF6D/SQLEXPR32_NLA.EXE';
+	sql2005express_url_x64 = 'http://download.microsoft.com/download/4/B/E/4BED5810-C8C0-4697-BDC3-DBC114B8FF6D/SQLEXPR_NLA.EXE';
 
 procedure sql2005express();
 var

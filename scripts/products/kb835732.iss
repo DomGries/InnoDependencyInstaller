@@ -11,7 +11,7 @@ de.kb835732_size=6,8 MB
 
 [Code]
 const
-	kb835732_url = 'https://download.microsoft.com/download/f/a/a/faa796aa-399d-437a-9284-c3536e9f2e6e/Windows2000-KB835732-x86-ENU.EXE';
+	kb835732_url = 'http://download.microsoft.com/download/f/a/a/faa796aa-399d-437a-9284-c3536e9f2e6e/Windows2000-KB835732-x86-ENU.EXE';
 
 procedure kb835732();
 begin

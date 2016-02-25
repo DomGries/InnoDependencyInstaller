@@ -13,7 +13,7 @@ de.dotnetfx46_lcid=/lcid 1031
 
 [Code]
 const
-	dotnetfx46_url = 'https://download.microsoft.com/download/1/4/A/14A6C422-0D3C-4811-A31F-5EF91A83C368/NDP46-KB3045560-Web.exe';
+	dotnetfx46_url = 'http://download.microsoft.com/download/1/4/A/14A6C422-0D3C-4811-A31F-5EF91A83C368/NDP46-KB3045560-Web.exe';
 
 procedure dotnetfx46(minVersion: integer);
 begin

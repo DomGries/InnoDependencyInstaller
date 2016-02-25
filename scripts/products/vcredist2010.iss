@@ -17,9 +17,9 @@ de.vcredist2010_size_ia64=2,2 MB
 
 [Code]
 const
-	vcredist2010_url = 'https://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe';
-	vcredist2010_url_x64 = 'https://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5/vcredist_x64.exe';
-	vcredist2010_url_ia64 = 'https://download.microsoft.com/download/3/3/A/33A75193-2CBC-424E-A886-287551FF1EB5/vcredist_IA64.exe';
+	vcredist2010_url = 'http://download.microsoft.com/download/5/B/C/5BC5DBB3-652D-4DCE-B14A-475AB85EEF6E/vcredist_x86.exe';
+	vcredist2010_url_x64 = 'http://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5/vcredist_x64.exe';
+	vcredist2010_url_ia64 = 'http://download.microsoft.com/download/3/3/A/33A75193-2CBC-424E-A886-287551FF1EB5/vcredist_IA64.exe';
 
 	vcredist2010_productcode = '{196BB40D-1578-3D01-B289-BEFC77A11A1E}';
 	vcredist2010_productcode_x64 = '{DA5E371C-6333-3D8A-93A4-6FD5B20BCC6E}';

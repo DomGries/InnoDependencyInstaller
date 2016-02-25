@@ -16,8 +16,8 @@ de.sql2008expressr2_size_x64=74,1 MB
 
 [Code]
 const
-	sql2008expressr2_url = 'https://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR32_x86_ENU.exe';
-	sql2008expressr2_url_x64 = 'https://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR_x64_ENU.exe';
+	sql2008expressr2_url = 'http://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR32_x86_ENU.exe';
+	sql2008expressr2_url_x64 = 'http://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR_x64_ENU.exe';
 
 procedure sql2008express();
 var
