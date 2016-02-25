@@ -1,6 +1,6 @@
 ; Requires Windows 7, Windows Server 2003 R2 (32-bit x86), Windows Server 2003 Service Pack 2, Windows Server 2008 R2, Windows Server 2008 Service Pack 2, Windows Vista Service Pack 2, Windows XP Service Pack 3
 ; x86 download page: https://www.microsoft.com/en-us/download/details.aspx?id=8328
-; x64 download page: https://www.microsoft.com/de-de/download/details.aspx?id=13523
+; x64 download page: https://www.microsoft.com/en-us/download/details.aspx?id=13523
 ; IA64 download page: https://www.microsoft.com/en-us/download/details.aspx?id=21051
 
 [CustomMessages]
