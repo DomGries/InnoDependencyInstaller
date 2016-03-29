@@ -27,7 +27,6 @@
 #define use_msiproduct
 #define use_vc2005
 #define use_vc2008
-;#define use_vc2010
 #define use_vc2010sp1
 #define use_vc2012
 #define use_vc2013
@@ -185,9 +184,6 @@ win_sp_title=Windows %1 Service Pack %2
 #ifdef use_vc2008
 #include "scripts\products\vcredist2008.iss"
 #endif
-#ifdef use_vc2010
-#include "scripts\products\vcredist2010.iss"
-#endif
 #ifdef use_vc2010sp1
 #include "scripts\products\vcredist2010sp1.iss"
 #endif
@@ -317,9 +313,6 @@ begin
 #endif
 #ifdef use_vc2008
 	vcredist2008();
-#endif
-#ifdef use_vc2010
-	vcredist2010();
 #endif
 #ifdef use_vc2010sp1
 	vcredist2010sp1();
