@@ -208,10 +208,12 @@ begin
 	if installMemo <> '' then
 		s := s + CustomMessage('depinstall_memo_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
 
-	s := s + MemoDirInfo + NewLine + NewLine + MemoGroupInfo
-
+	if MemoDirInfo <> '' then
+		s := s + MemoDirInfo + NewLine + NewLine;
+	if MemoGroupInfo <> '' then
+		s := s + MemoGroupInfo + NewLine + NewLine;
 	if MemoTasksInfo <> '' then
-		s := s + NewLine + NewLine + MemoTasksInfo;
+		s := s + MemoTasksInfo;
 
 	Result := s
 end;
