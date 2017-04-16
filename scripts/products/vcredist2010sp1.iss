@@ -27,7 +27,7 @@ const
 	vcredist2010_productcode_x64 = '{1D8E6291-B0D5-35EC-8441-6616F567A0F7}';
 	vcredist2010_productcode_ia64 = '{88C73C1C-2DE5-3B01-AFB8-B46EF4AB41CD}';
 
-procedure vcredist2010();
+procedure vcredist2010sp1();
 begin
 	if (not msiproduct(GetString(vcredist2010_productcode_x86, vcredist2010_productcode_x64, vcredist2010_productcode_ia64))) then
 		AddProduct('vcredist2010' + GetArchitectureString() + '.exe',
