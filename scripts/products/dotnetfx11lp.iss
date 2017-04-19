@@ -1,7 +1,7 @@
 [CustomMessages]
 de.dotnetfx11lp_title=.NET Framework 1.1 Sprachpaket: Deutsch
 
-dotnetfx11lp_size=1,4 MB
+dotnetfx11lp_size=1.4 MB
 
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 de.dotnetfx11lp_lcid=1031

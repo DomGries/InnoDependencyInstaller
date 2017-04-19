@@ -3,7 +3,7 @@
 [CustomMessages]
 de.dotnetfx20lp_title=.NET Framework 2.0 Sprachpaket: Deutsch
 
-dotnetfx20lp_size=1,8 MB
+dotnetfx20lp_size=1.8 MB
 
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 de.dotnetfx20lp_lcid=1031
