@@ -8,14 +8,9 @@ vcredist2010_title=Visual C++ 2010 SP1 Redistributable
 vcredist2010_title_x64=Visual C++ 2010 SP1 64-Bit Redistributable
 vcredist2010_title_ia64=Visual C++ 2010 SP1 Itanium Redistributable
 
-en.vcredist2010_size=4.8 MB
-de.vcredist2010_size=4,8 MB
-
-en.vcredist2010_size_x64=5.4 MB
-de.vcredist2010_size_x64=5,4 MB
-
-en.vcredist2010_size_ia64=2.2 MB
-de.vcredist2010_size_ia64=2,2 MB
+vcredist2010_size=4.8 MB
+vcredist2010_size_x64=5.4 MB
+vcredist2010_size_ia64=2.2 MB
 
 [Code]
 const

@@ -5,11 +5,8 @@
 vcredist2015_title=Visual C++ 2015 Redistributable
 vcredist2015_title_x64=Visual C++ 2015 64-Bit Redistributable
 
-en.vcredist2015_size=12.8 MB
-de.vcredist2015_size=12,8 MB
-
-en.vcredist2015_size_x64=13.9 MB
-de.vcredist2015_size_x64=13,9 MB
+vcredist2015_size=12.8 MB
+vcredist2015_size_x64=13.9 MB
 
 [Code]
 const
