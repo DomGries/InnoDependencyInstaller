@@ -9,6 +9,7 @@ DependenciesDir=MyProgramDependencies
 #include "lang\italian.iss"
 #include "lang\dutch.iss"
 #include "lang\polish.iss"
+#include "lang\russian.iss"
 
 [Code]
 #include "code.pas"
