@@ -1,6 +1,8 @@
 ; Polish localization of Inno Setup 'Ready for Install' step.
 
 [CustomMessages]
+;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
+pl.lcid=1045
 pl.depdownload_msg=Poni?sze aplikacje s? wymagane przed instalacj? aby moc kontynuowa?:%n%n%1%nCzy pobra? je i zainstalowa? teraz?
 pl.depdownload_memo_title=Pobierz zale?no?ci
 pl.depinstall_memo_title=Zainstaluj zale?no?ci

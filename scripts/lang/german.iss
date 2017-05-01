@@ -1,6 +1,8 @@
 ; German localization of Inno Setup 'Ready for Install' step.
 
 [CustomMessages]
+;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
+de.lcid=1031
 de.depdownload_msg=Die folgenden Programme werden benotigt bevor das Setup fortfahren kann:%n%n%1%nJetzt downloaden und installieren?
 de.depdownload_memo_title=Abhangigkeiten downloaden
 de.depinstall_memo_title=Abhangigkeiten installieren
