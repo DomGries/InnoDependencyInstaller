@@ -31,7 +31,7 @@
 #define use_vc2010sp1
 #define use_vc2012
 #define use_vc2013
-;#define use_vc2015
+#define use_vc2015
 #define use_vc2017
 
 ;requires dxwebsetup.exe in src dir
@@ -52,7 +52,7 @@
 AppName={#MyAppSetupName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright=Copyright ?2007-2015 stfx
+AppCopyright=Copyright © 2007-2015 stfx
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany=stfx
 AppPublisher=stfx
