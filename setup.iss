@@ -32,6 +32,7 @@
 #define use_vc2012
 #define use_vc2013
 #define use_vc2015
+#define use_vc2017
 
 ;requires dxwebsetup.exe in src dir
 ;#define use_directxruntime
@@ -51,7 +52,7 @@
 AppName={#MyAppSetupName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright=Copyright © 2007-2015 stfx
+AppCopyright=Copyright Â© 2007-2017 stfx
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany=stfx
 AppPublisher=stfx
@@ -205,6 +206,9 @@ win_sp_title=Windows %1 Service Pack %2
 #ifdef use_vc2015
 #include "scripts\products\vcredist2015.iss"
 #endif
+#ifdef use_vc2017
+#include "scripts\products\vcredist2017.iss"
+#endif
 
 #ifdef use_directxruntime
 #include "scripts\products\directxruntime.iss"
@@ -339,6 +343,9 @@ begin
 #endif
 #ifdef use_vc2015
 	vcredist2015();
+#endif
+#ifdef use_vc2017
+	vcredist2017();
 #endif
 
 #ifdef use_directxruntime
