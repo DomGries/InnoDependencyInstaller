@@ -9,7 +9,7 @@ dotnetfx46_size=1 MB - 65 MB
 
 [Code]
 const
-	dotnetfx461_url = 'http://download.microsoft.com/download/3/5/9/35980F81-60F4-4DE3-88FC-8F962B97253B/NDP461-KB3102438-Web.exe';
+	dotnetfx46_url = 'http://download.microsoft.com/download/3/5/9/35980F81-60F4-4DE3-88FC-8F962B97253B/NDP461-KB3102438-Web.exe';
 
 procedure dotnetfx46(minVersion: integer);
 begin
@@ -18,7 +18,7 @@ begin
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx46_title'),
 			CustomMessage('dotnetfx46_size'),
-			dotnetfx461_url,
+			dotnetfx46_url,
 			false, false, false);
 end;
 
