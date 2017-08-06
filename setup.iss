@@ -1,4 +1,5 @@
-;contribute on http://github.com/stfx/innodependencyinstaller or http://codeproject.com/Articles/20868/NET-Framework-1-1-2-0-3-5-Installer-for-InnoSetup
+;contribute: http://github.com/stfx/innodependencyinstaller
+;original article: http://codeproject.com/Articles/20868/NET-Framework-1-1-2-0-3-5-Installer-for-InnoSetup
 
 ;comment out product defines to disable installing them
 ;#define use_iis
@@ -29,8 +30,7 @@
 #define use_msiproduct
 #define use_vc2005
 #define use_vc2008
-;#define use_vc2010
-#define use_vc2010sp1
+#define use_vc2010
 #define use_vc2012
 #define use_vc2013
 #define use_vc2015
@@ -204,9 +204,6 @@ win_sp_title=Windows %1 Service Pack %2
 #ifdef use_vc2010
 #include "scripts\products\vcredist2010.iss"
 #endif
-#ifdef use_vc2010sp1
-#include "scripts\products\vcredist2010sp1.iss"
-#endif
 #ifdef use_vc2012
 #include "scripts\products\vcredist2012.iss"
 #endif
@@ -340,30 +337,27 @@ begin
 #endif
 
 #ifdef use_vc2005
-	vcredist2005();
+	vcredist2005('6'); // min allowed version is 6.0
 #endif
 #ifdef use_vc2008
-	vcredist2008();
+	vcredist2008('9'); // min allowed version is 9.0
 #endif
 #ifdef use_vc2010
-	vcredist2010();
-#endif
-#ifdef use_vc2010sp1
-	vcredist2010sp1();
+	vcredist2010('10'); // min allowed version is 10.0
 #endif
 #ifdef use_vc2012
-	vcredist2012();
+	vcredist2012('11'); // min allowed version is 11.0
 #endif
 #ifdef use_vc2013
 	//SetForceX86(true); // force 32-bit install of next products
-	vcredist2013();
+	vcredist2013('12'); // min allowed version is 12.0
 	//SetForceX86(false); // disable forced 32-bit install again
 #endif
 #ifdef use_vc2015
-	vcredist2015();
+	vcredist2015('14'); // min allowed version is 14.0
 #endif
 #ifdef use_vc2017
-	vcredist2017();
+	vcredist2017('14'); // min allowed version is 14.0
 #endif
 
 #ifdef use_directxruntime
