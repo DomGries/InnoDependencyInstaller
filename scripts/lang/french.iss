@@ -1,5 +1,3 @@
-; French localization of Inno Setup 'Ready for Install' step.
-
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 fr.lcid=1036

@@ -1,5 +1,3 @@
-; Polish localization of Inno Setup 'Ready for Install' step.
-
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 pl.lcid=1045

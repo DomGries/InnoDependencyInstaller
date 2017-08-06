@@ -1,5 +1,3 @@
-; English localization of Inno Setup 'Ready for Install' step.
-
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 en.lcid=1033
