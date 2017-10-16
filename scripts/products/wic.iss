@@ -12,9 +12,8 @@ const
 
 function GetConvertedLanguageID(): string;
 begin
+	Result := 'enu';
 	case ActiveLanguage() of
-		'en': // English
-			Result := 'enu';
 		'zh': // Chinese
 			Result := 'chs';
 		'de': // German
