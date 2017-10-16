@@ -14,7 +14,7 @@ type
 	InstallResult = (InstallSuccessful, InstallRebootRequired, InstallError);
 
 var
-	installMemo, downloadMemo, downloadMessage: string;
+	installMemo, downloadMessage: string;
 	products: array of TProduct;
 	delayedReboot, isForcedX86: boolean;
 	DependencyPage: TOutputProgressWizardPage;
@@ -45,8 +45,7 @@ begin
 		if not FileExists(path) then begin
 			isxdl_AddFile(url, path);
 
-			downloadMemo := downloadMemo + '%1' + title + #13;
-			downloadMessage := downloadMessage + '	' + title + ' (' + size + ')' + #13;
+			downloadMessage := downloadMessage + '%1' + title + ' (' + size + ')' + #13;
 		end;
 	end;
 
@@ -217,8 +216,8 @@ function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoType
 var
 	s: string;
 begin
-	if downloadMemo <> '' then
-		s := s + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMemo, [Space]) + NewLine;
+	if downloadMessage <> '' then
+		s := s + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMessage, [Space]) + NewLine;
 	if installMemo <> '' then
 		s := s + CustomMessage('depinstall_memo_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
 
@@ -241,7 +240,7 @@ begin
 	Result := true;
 
 	if CurPageID = wpReady then begin
-		if downloadMemo <> '' then begin
+		if downloadMessage <> '' then begin
 			// change isxdl language only if it is not english because isxdl default language is already english
 			if (ActiveLanguage() <> 'en') then begin
 				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
@@ -249,9 +248,10 @@ begin
 			end;
 			//isxdl_SetOption('title', FmtMessage(SetupMessage(msgSetupWindowTitle), [CustomMessage('appname')]));
 
-			if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [downloadMessage]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
-				Result := false
-			else if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
+			//if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [FmtMessage(downloadMessage, [''])]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
+			//	Result := false
+			//else if
+			if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
 				Result := false;
 		end;
 	end;
