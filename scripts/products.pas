@@ -113,28 +113,42 @@ begin
 			DependencyPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
 			DependencyPage.SetProgress(i, productCount);
 
-			if SmartExec(products[i], resultCode) then begin
-				//setup executed; resultCode contains the exit code
-				if (products[i].MustRebootAfter) then begin
-					//delay reboot after install if we installed the last dependency anyways
-					if (i = productCount - 1) then begin
+			while true do begin
+				// set 0 as used code for shown error if SmartExec fails
+				resultCode := 0;
+				if SmartExec(products[i], resultCode) then begin
+					//setup executed; resultCode contains the exit code
+					if (products[i].MustRebootAfter) then begin
+						//delay reboot after install if we installed the last dependency anyways
+						if (i = productCount - 1) then begin
+							delayedReboot := true;
+						end else begin
+							Result := InstallRebootRequired;
+						end;
+						break;
+					end else if (resultCode = 0) or (products[i].ForceSuccess) then begin
+						finishCount := finishCount + 1;
+						break;
+					end else if (resultCode = 3010) then begin
+						//Windows Installer resultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
 						delayedReboot := true;
-					end else begin
-						Result := InstallRebootRequired;
+						finishCount := finishCount + 1;
+						break;
 					end;
-					break;
-				end else if (resultCode = 0) or (products[i].ForceSuccess) then begin
-					finishCount := finishCount + 1;
-				end else if (resultCode = 3010) then begin
-					//Windows Installer resultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
-					delayedReboot := true;
-					finishCount := finishCount + 1;
-				end else begin
-					Result := InstallError;
-					break;
 				end;
-			end else begin
-				Result := InstallError;
+
+				case MsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [products[i].Title, IntToStr(resultCode)]), mbError, MB_ABORTRETRYIGNORE) of
+					IDABORT: begin
+						Result := InstallError;
+						break;
+					end;
+					IDIGNORE: begin
+						break;
+					end;
+				end;
+			end;
+
+			if Result <> InstallSuccessful then begin
 				break;
 			end;
 		end;
