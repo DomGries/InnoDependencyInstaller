@@ -1,9 +1,9 @@
 [Code]
-#IFDEF UNICODE
-	#DEFINE AW "W"
-#ELSE
-	#DEFINE AW "A"
-#ENDIF
+#ifdef UNICODE
+	#define AW "W"
+#else
+	#define AW "A"
+#endif
 
 type
 	INSTALLSTATE = Longint;
