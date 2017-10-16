@@ -117,9 +117,9 @@ begin
 				// set 0 as used code for shown error if SmartExec fails
 				resultCode := 0;
 				if SmartExec(products[i], resultCode) then begin
-					//setup executed; resultCode contains the exit code
+					// setup executed; resultCode contains the exit code
 					if (products[i].MustRebootAfter) then begin
-						//delay reboot after install if we installed the last dependency anyways
+						// delay reboot after install if we installed the last dependency anyways
 						if (i = productCount - 1) then begin
 							delayedReboot := true;
 						end else begin
@@ -130,7 +130,7 @@ begin
 						finishCount := finishCount + 1;
 						break;
 					end else if (resultCode = 3010) then begin
-						//Windows Installer resultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
+						// Windows Installer resultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
 						delayedReboot := true;
 						finishCount := finishCount + 1;
 						break;
@@ -153,7 +153,7 @@ begin
 			end;
 		end;
 
-		//only leave not installed products for error message
+		// only leave not installed products for error message
 		for i := 0 to productCount - finishCount - 1 do begin
 			products[i] := products[i+finishCount];
 		end;
@@ -194,7 +194,7 @@ begin
 			Result := products[0].Title;
 			NeedsRestart := true;
 
-			//write into the registry that the installer needs to be executed again after restart
+			// write into the registry that the installer needs to be executed again after restart
 			RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
 			end;
 	end;
@@ -242,7 +242,7 @@ begin
 
 	if CurPageID = wpReady then begin
 		if downloadMemo <> '' then begin
-			//change isxdl language only if it is not english because isxdl default language is already english
+			// change isxdl language only if it is not english because isxdl default language is already english
 			if (ActiveLanguage() <> 'en') then begin
 				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
 				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));

@@ -50,7 +50,7 @@ begin
 
 	case version of
 		NetFx10:
-			//not supported
+			// not supported
 			regVersion := -1;
 		NetFx11:
 			if (not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v1.1.4322' + lcid, 'SP', regVersion)) then

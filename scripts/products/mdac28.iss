@@ -11,7 +11,7 @@ procedure mdac28(minVersion: string);
 var
 	version: string;
 begin
-	//check for MDAC installation
+	// check for MDAC installation
 	RegQueryStringValue(HKLM, 'Software\Microsoft\DataAccess', 'FullInstallVer', version);
 	if (compareversion(version, minVersion) < 0) then
 		AddProduct('mdac28.exe',
