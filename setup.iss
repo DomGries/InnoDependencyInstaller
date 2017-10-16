@@ -330,15 +330,15 @@ begin
 #endif
 
 #ifdef use_dotnetfx45
-    dotnetfx45(50); // min allowed version is 4.5.0
+	dotnetfx45(50); // min allowed version is 4.5.0
 #endif
 
 #ifdef use_dotnetfx46
-    dotnetfx46(50); // min allowed version is 4.5.0
+	dotnetfx46(50); // min allowed version is 4.5.0
 #endif
 
 #ifdef use_dotnetfx47
-    dotnetfx47(50); // min allowed version is 4.5.0
+	dotnetfx47(50); // min allowed version is 4.5.0
 #endif
 
 #ifdef use_vc2005
