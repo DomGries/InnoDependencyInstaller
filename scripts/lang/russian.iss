@@ -1,3 +1,6 @@
+[Languages]
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
+
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 ru.lcid=1049

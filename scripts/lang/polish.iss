@@ -1,3 +1,6 @@
+[Languages]
+Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
+
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 pl.lcid=1045

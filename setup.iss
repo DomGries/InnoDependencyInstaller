@@ -77,18 +77,18 @@ PrivilegesRequired=admin
 ArchitecturesAllowed=x86 x64 ia64
 ArchitecturesInstallIn64BitMode=x64 ia64
 
-;Downloading and installing dependencies will only work if the memo/ready page is enabled (default behaviour)
+; downloading and installing dependencies will only work if the memo/ready page is enabled (default and current behaviour)
 DisableReadyPage=no
 DisableReadyMemo=no
 
-[Languages]
-Name: "en"; MessagesFile: "compiler:Default.isl"
-Name: "de"; MessagesFile: "compiler:Languages\German.isl"
-Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
-Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
-Name: "nl"; MessagesFile: "compiler:Languages\Dutch.isl"
-Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
-Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
+; supported languages
+#include "scripts\lang\english.iss"
+#include "scripts\lang\german.iss"
+#include "scripts\lang\french.iss"
+#include "scripts\lang\italian.iss"
+#include "scripts\lang\dutch.iss"
+#include "scripts\lang\polish.iss"
+#include "scripts\lang\russian.iss"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
@@ -109,11 +109,12 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppSetupName}"
 Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
 
 [CustomMessages]
-win_sp_title=Windows %1 Service Pack %2
-
+DependenciesDir=MyProgramDependencies
+WindowsServicePack=Windows %1 Service Pack %2
 
 ; shared code for installing the products
 #include "scripts\products.iss"
+
 ; helper functions
 #include "scripts\products\stringversion.iss"
 #include "scripts\products\winversion.iss"
@@ -274,11 +275,11 @@ begin
 #ifdef use_dotnetfx20
 	// check if .netfx 2.0 can be installed on this OS
 	if not minwinspversion(5, 0, 3) then begin
-		msgbox(fmtmessage(custommessage('depinstall_missing'), [fmtmessage(custommessage('win_sp_title'), ['2000', '3'])]), mberror, mb_ok);
+		msgbox(fmtmessage(custommessage('depinstall_missing'), [fmtmessage(custommessage('WindowsServicePack'), ['2000', '3'])]), mberror, mb_ok);
 		exit;
 	end;
 	if not minwinspversion(5, 1, 2) then begin
-		msgbox(fmtmessage(custommessage('depinstall_missing'), [fmtmessage(custommessage('win_sp_title'), ['XP', '2'])]), mberror, mb_ok);
+		msgbox(fmtmessage(custommessage('depinstall_missing'), [fmtmessage(custommessage('WindowsServicePack'), ['XP', '2'])]), mberror, mb_ok);
 		exit;
 	end;
 

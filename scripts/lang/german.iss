@@ -1,3 +1,6 @@
+[Languages]
+Name: "de"; MessagesFile: "compiler:Languages\German.isl"
+
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 de.lcid=1031

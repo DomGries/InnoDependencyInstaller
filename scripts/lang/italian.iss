@@ -1,3 +1,6 @@
+[Languages]
+Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
+
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 it.lcid=1040

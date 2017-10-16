@@ -1,3 +1,6 @@
+[Languages]
+Name: "nl"; MessagesFile: "compiler:Languages\Dutch.isl"
+
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 nl.lcid=1043

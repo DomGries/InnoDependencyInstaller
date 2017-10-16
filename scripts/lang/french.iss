@@ -1,3 +1,6 @@
+[Languages]
+Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
+
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 fr.lcid=1036
