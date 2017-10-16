@@ -89,6 +89,7 @@ DisableReadyMemo=no
 #include "scripts\lang\dutch.iss"
 #include "scripts\lang\polish.iss"
 #include "scripts\lang\russian.iss"
+#include "scripts\lang\japanese.iss"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
