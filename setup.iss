@@ -89,6 +89,7 @@ DisableReadyMemo=no
 #include "scripts\lang\dutch.iss"
 
 #ifdef UNICODE
+#include "scripts\lang\chinese.iss"
 #include "scripts\lang\polish.iss"
 #include "scripts\lang\russian.iss"
 #include "scripts\lang\japanese.iss"
