@@ -26,6 +26,7 @@
 #define use_dotnetfx45
 #define use_dotnetfx46
 #define use_dotnetfx47
+#define use_dotnetfx48
 
 #define use_msiproduct
 #define use_vc2005
@@ -194,6 +195,10 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\dotnetfx47.iss"
 #endif
 
+#ifdef use_dotnetfx48
+#include "scripts\products\dotnetfx48.iss"
+#endif
+
 #ifdef use_wic
 #include "scripts\products\wic.iss"
 #endif
@@ -340,6 +345,10 @@ begin
 
 #ifdef use_dotnetfx47
 	dotnetfx47(50); // min allowed version is 4.5.0
+#endif
+
+#ifdef use_dotnetfx48
+	dotnetfx48(72); // min allowed version is 4.7.2
 #endif
 
 #ifdef use_vc2005
