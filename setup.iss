@@ -348,7 +348,7 @@ begin
 #endif
 
 #ifdef use_dotnetfx48
-	dotnetfx48(72); // min allowed version is 4.7.2
+	dotnetfx48(50); // min allowed version is 4.5.0
 #endif
 
 #ifdef use_vc2005
