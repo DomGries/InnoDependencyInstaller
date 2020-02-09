@@ -70,7 +70,6 @@ OutputDir=bin
 SourceDir=.
 AllowNoIcons=yes
 ;SetupIconFile=MyProgramIcon
-SolidCompression=yes
 
 ;MinVersion default value: "0,5.0 (Windows 2000+) if Unicode Inno Setup, else 4.0,4.0 (Windows 95+)"
 ;MinVersion=0,5.0
