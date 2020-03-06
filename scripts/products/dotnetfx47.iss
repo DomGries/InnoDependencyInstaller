@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx47(minVersion: integer);
 begin
-	if (not netfxinstalled(NetFx4x, '') or (netfxspversion(NetFx4x, '') < minVersion)) then
+	if (netfxspversion(NetFx4x, '') < minVersion) then
 		AddProduct('dotnetfx47.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx47_title'),
