@@ -25,6 +25,11 @@
 #define use_dotnetfx47
 #define use_dotnetfx48
 
+#define use_netcore22
+#define use_netcore22
+#define use_netcore30
+#define use_netcore31
+
 #define use_msiproduct
 #define use_vc2005
 #define use_vc2008
@@ -122,6 +127,7 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\winversion.iss"
 #include "scripts\products\fileversion.iss"
 #include "scripts\products\dotnetfxversion.iss"
+#include "scripts\products\netcoreversion.iss"
 
 ; actual products
 #ifdef use_iis
@@ -193,6 +199,19 @@ WindowsServicePack=Windows %1 Service Pack %2
 
 #ifdef use_dotnetfx48
 #include "scripts\products\dotnetfx48.iss"
+#endif
+
+#ifdef use_netcore21
+#include "scripts\products\netcore21.iss"
+#endif
+#ifdef use_netcore22
+#include "scripts\products\netcore22.iss"
+#endif
+#ifdef use_netcore30
+#include "scripts\products\netcore30.iss"
+#endif
+#ifdef use_netcore31
+#include "scripts\products\netcore31.iss"
 #endif
 
 #ifdef use_wic
@@ -343,6 +362,19 @@ begin
 #endif
 #ifdef use_dotnetfx48
 	dotnetfx48(80); // install if version < 4.8.0
+#endif
+
+#ifdef use_netcore21
+	netcore21(); // install if 
+#endif
+#ifdef use_netcore22
+	netcore22(); // install if 
+#endif
+#ifdef use_netcore30
+	netcore30(); // install if 
+#endif
+#ifdef use_netcore31
+	netcore31(); // install if 
 #endif
 
 #ifdef use_vc2005
