@@ -34,7 +34,7 @@ begin
 
             for i := 0 to GetArrayLength(names)-1 do
                 begin
-                    if pos(regVersion, names[i]) > 0 then
+                    if pos(regVersion, names[i]) == 0 then
                         begin
                             Result := true;
                             break;
