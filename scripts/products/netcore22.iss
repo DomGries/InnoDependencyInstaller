@@ -7,8 +7,8 @@ netcore22_size=1 MB - 24 MB
 
 [Code]
 const
-	netcore22_url_x64 = 'https://download.visualstudio.microsoft.com/download/pr/4e14a32d-cf57-42ce-964f-fa40c7d11dde/95cf2d91312fc495bc25ad9137d42698/dotnet-runtime-2.2.8-win-x64.exe';
-	netcore22_url_x86 = 'https://download.visualstudio.microsoft.com/download/pr/930685bc-ac92-4149-b4f0-b0b26d480418/c03bbed24f87e66281b5ff99ceecbb0b/dotnet-runtime-2.2.8-win-x86.exe';
+	netcore22_url_x64 = 'http://download.visualstudio.microsoft.com/download/pr/4e14a32d-cf57-42ce-964f-fa40c7d11dde/95cf2d91312fc495bc25ad9137d42698/dotnet-runtime-2.2.8-win-x64.exe';
+	netcore22_url_x86 = 'http://download.visualstudio.microsoft.com/download/pr/930685bc-ac92-4149-b4f0-b0b26d480418/c03bbed24f87e66281b5ff99ceecbb0b/dotnet-runtime-2.2.8-win-x86.exe';
 
 procedure netcore22();
 var

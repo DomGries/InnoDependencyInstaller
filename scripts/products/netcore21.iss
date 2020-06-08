@@ -7,8 +7,8 @@ netcore21_size=1 MB - 25 MB
 
 [Code]
 const
-	netcore21_url_x64 = 'https://download.visualstudio.microsoft.com/download/pr/53d3ad06-172f-4848-abc1-c70003de009e/1f45c5c98848c284c90b888933298f94/dotnet-runtime-2.1.18-win-x64.exe';
-	netcore21_url_x86 = 'https://download.visualstudio.microsoft.com/download/pr/b90bbf7b-8739-4326-8e55-431a65dba1ba/8bfe25d90f428124ff42d63004fb0430/dotnet-runtime-2.1.18-win-x86.exe';
+	netcore21_url_x64 = 'http://download.visualstudio.microsoft.com/download/pr/53d3ad06-172f-4848-abc1-c70003de009e/1f45c5c98848c284c90b888933298f94/dotnet-runtime-2.1.18-win-x64.exe';
+	netcore21_url_x86 = 'http://download.visualstudio.microsoft.com/download/pr/b90bbf7b-8739-4326-8e55-431a65dba1ba/8bfe25d90f428124ff42d63004fb0430/dotnet-runtime-2.1.18-win-x86.exe';
 
 procedure netcore21();
 var

@@ -7,8 +7,8 @@ netcore30_size=1 MB - 28 MB
 
 [Code]
 const
-	netcore30_url_x64 = 'https://download.visualstudio.microsoft.com/download/pr/c525a2bb-6e98-4e6e-849e-45241d0db71c/d21612f02b9cae52fa50eb54de905986/windowsdesktop-runtime-3.0.3-win-x64.exe';
-	netcore30_url_x86 = 'https://download.visualstudio.microsoft.com/download/pr/e312618d-85c4-4cad-b660-569b5522eca9/e951e76ebe011b5d3ea1289ef68e8281/windowsdesktop-runtime-3.0.3-win-x86.exe';
+	netcore30_url_x64 = 'http://download.visualstudio.microsoft.com/download/pr/c525a2bb-6e98-4e6e-849e-45241d0db71c/d21612f02b9cae52fa50eb54de905986/windowsdesktop-runtime-3.0.3-win-x64.exe';
+	netcore30_url_x86 = 'http://download.visualstudio.microsoft.com/download/pr/e312618d-85c4-4cad-b660-569b5522eca9/e951e76ebe011b5d3ea1289ef68e8281/windowsdesktop-runtime-3.0.3-win-x86.exe';
 
 procedure netcore30();
 var

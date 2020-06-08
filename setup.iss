@@ -25,7 +25,7 @@
 #define use_dotnetfx47
 #define use_dotnetfx48
 
-#define use_netcore22
+#define use_netcore21
 #define use_netcore22
 #define use_netcore30
 #define use_netcore31
