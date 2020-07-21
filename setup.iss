@@ -3,52 +3,51 @@
 
 ;comment out product defines to disable installing them
 ;#define use_iis
-#define use_kb835732
+; #define use_kb835732
 
-#define use_msi20
-#define use_msi31
-#define use_msi45
+; #define use_msi20
+; #define use_msi31
+; #define use_msi45
 
-#define use_ie6
+; #define use_ie6
 
-#define use_dotnetfx11
-#define use_dotnetfx11lp
-#define use_dotnetfx20
-#define use_dotnetfx20lp
-#define use_dotnetfx35
-#define use_dotnetfx35lp
+; #define use_dotnetfx11
+; #define use_dotnetfx11lp
+; #define use_dotnetfx20
+; #define use_dotnetfx20lp
+; #define use_dotnetfx35
+; #define use_dotnetfx35lp
 
-#define use_wic
-#define use_dotnetfx40
-#define use_dotnetfx45
-#define use_dotnetfx46
-#define use_dotnetfx47
-#define use_dotnetfx48
+; #define use_wic
+; #define use_dotnetfx40
+; #define use_dotnetfx45
+; #define use_dotnetfx46
+; #define use_dotnetfx47
+; #define use_dotnetfx48
 
-#define use_netcore21
-#define use_netcore22
-#define use_netcore30
 #define use_netcore31
+; #define use_netcore31asp
+; #define use_netcore31desktop
 
-#define use_msiproduct
-#define use_vc2005
-#define use_vc2008
-#define use_vc2010
-#define use_vc2012
-#define use_vc2013
-#define use_vc2015
-#define use_vc2017
+; #define use_msiproduct
+; #define use_vc2005
+; #define use_vc2008
+; #define use_vc2010
+; #define use_vc2012
+; #define use_vc2013
+; #define use_vc2015
+; #define use_vc2017
 
 ;requires dxwebsetup.exe in src dir
 ;#define use_directxruntime
 
-#define use_mdac28
-#define use_jet4sp8
+; #define use_mdac28
+; #define use_jet4sp8
 
-#define use_sqlcompact35sp2
+; #define use_sqlcompact35sp2
 
-#define use_sql2005express
-#define use_sql2008express
+; #define use_sql2005express
+; #define use_sql2008express
 
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '6.0'
@@ -201,17 +200,14 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\dotnetfx48.iss"
 #endif
 
-#ifdef use_netcore21
-#include "scripts\products\netcore21.iss"
-#endif
-#ifdef use_netcore22
-#include "scripts\products\netcore22.iss"
-#endif
-#ifdef use_netcore30
-#include "scripts\products\netcore30.iss"
-#endif
 #ifdef use_netcore31
 #include "scripts\products\netcore31.iss"
+#endif
+#ifdef use_netcore31asp
+#include "scripts\products\netcore31asp.iss"
+#endif
+#ifdef use_netcore31desktop
+#include "scripts\products\netcore31desktop.iss"
 #endif
 
 #ifdef use_wic
@@ -364,17 +360,14 @@ begin
 	dotnetfx48(80); // install if version < 4.8.0
 #endif
 
-#ifdef use_netcore21
-	netcore21(); // install if 
-#endif
-#ifdef use_netcore22
-	netcore22(); // install if 
-#endif
-#ifdef use_netcore30
-	netcore30(); // install if 
-#endif
 #ifdef use_netcore31
-	netcore31(); // install if 
+	netcore31();
+#endif
+#ifdef use_netcore31asp
+	netcore31asp();
+#endif
+#ifdef use_netcore31desktop
+	netcore31desktop();
 #endif
 
 #ifdef use_vc2005

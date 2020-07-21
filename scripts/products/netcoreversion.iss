@@ -1,46 +1,68 @@
 [Code]
 type
-	NetCoreType = (NetC21, NetC22, NetC30, NetC31);
+	NetCoreRuntimeType = (Asp, Core, Desktop);
+	NetCoreVersionType = (NetC31);
 
 const
-    netcore_reg_x64 = 'Software\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App\';
-	netcore_reg_x86 = 'Software\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App\';
+	netcorecheck_url = 'http://go.microsoft.com/fwlink/?linkid=2135256';
+	netcorecheck_url_x64 = 'http://go.microsoft.com/fwlink/?linkid=2135504';
 
-function netcoreversioninstalled(version: NetCoreType): Boolean;
+function downloadnetcorecheck(): Boolean;
 var
-    netcore_reg: String;
-	names: TArrayOfString;
-    regVersion: String;
-    i: Integer;
+	filename, path: string;
 begin
-    Result := false;
-    case ProcessorArchitecture of
-        paX64: netcore_reg := netcore_reg_x64;
-        paX86: netcore_reg := netcore_reg_x86;
-    end;
+	Result := true;
+	filename := 'netcorecheck.exe';
+	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + filename;
+	if not FileExists(path) then begin
+		path := ExpandConstant('{tmp}{\}') + filename;
 
-    if RegGetValueNames(HKLM, netcore_reg, names) then
-        begin
-            case version of
-                NetC21:
-                    regVersion := '2.1';
-                NetC22:
-                    regVersion := '2.2';
-                NetC30:
-                    regVersion := '3.0';
-                NetC31:
-                    regVersion := '3.1';
-            end;
+		if not FileExists(path) then begin
+			isxdl_AddFile(GetString(netcorecheck_url, netcorecheck_url_x64, ''), path);
+			if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then begin
+				Result := false;
+			end;
+		end;
+	end;
+end;
 
-            for i := 0 to GetArrayLength(names)-1 do
-                begin
-                    if pos(regVersion, names[i]) == 0 then
-                        begin
-                            Result := true;
-                            break;
-                        end;
-                end;
-        end;
+function netcorecheck(runtime: string; version: string): Boolean;
+var
+	exePath: string;
+	execStdout: ansistring;
+	resultCode: integer;
+begin
+	Result := false;
+	if downloadnetcorecheck() then begin
+		exePath := ExpandConstant('{tmp}') + '\netcorecheck.exe';
+		Exec(exePath, runtime + ' ' + version, '', SW_HIDE, ewWaitUntilTerminated, resultCode);
+		if IntToStr(resultCode) = '0' then
+			Result := true;
+	end;
+end;
+
+function netcoreversioninstalled(runtime: NetCoreRuntimeType; version: NetCoreVersionType): Boolean;
+var
+	netcoreRuntime: string;
+	netcoreVersion: string;
+begin
+	Result := false;
+	case runtime of
+		Asp:
+			netcoreRuntime := 'Microsoft.AspNetCore.App';
+		Core:
+			netcoreRuntime := 'Microsoft.NETCore.App';
+		Desktop:
+			netcoreRuntime := 'Microsoft.WindowsDesktop.App';
+	end;
+
+	case version of
+		NetC31:
+			netcoreVersion := '3.1.0';
+	end;
+
+	if netcorecheck(netcoreRuntime, netcoreVersion) then
+		Result := true;
 end;
 
 [Setup]

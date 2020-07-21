@@ -20,6 +20,9 @@ Supported dependency names:
 |   dotnetfx45.exe
 |   dotnetfx46.exe
 |   dotnetfx47.exe
+|   netcore31[*1].exe
+|   netcore31asp[*1].exe
+|   netcore31desktop[*1].exe
 |   ie6.exe
 |   jet4sp8.exe
 |   kb835732.exe
