@@ -29,6 +29,10 @@
 #define use_netcore31asp
 #define use_netcore31desktop
 
+#define use_dotnet50
+#define use_dotnet50asp
+#define use_dotnet50desktop
+
 #define use_msiproduct
 #define use_vc2005
 #define use_vc2008
@@ -210,6 +214,16 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\netcore31desktop.iss"
 #endif
 
+#ifdef use_dotnet50
+#include "scripts\products\dotnet50.iss"
+#endif
+#ifdef use_dotnet50asp
+#include "scripts\products\dotnet50asp.iss"
+#endif
+#ifdef use_dotnet50desktop
+#include "scripts\products\dotnet50desktop.iss"
+#endif
+
 #ifdef use_wic
 #include "scripts\products\wic.iss"
 #endif
@@ -368,6 +382,16 @@ begin
 #endif
 #ifdef use_netcore31desktop
 	netcore31desktop();
+#endif
+
+#ifdef use_dotnet50
+	dotnet50();
+#endif
+#ifdef use_dotnet50asp
+	dotnet50asp();
+#endif
+#ifdef use_dotnet50desktop
+	dotnet50desktop();
 #endif
 
 #ifdef use_vc2005
