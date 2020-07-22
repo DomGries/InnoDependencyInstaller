@@ -1,7 +1,7 @@
 [Code]
 type
 	NetCoreRuntimeType = (Asp, Core, Desktop);
-	NetCoreVersionType = (NetC31);
+	NetCoreVersionType = (NetC31, Net50);
 
 const
 	netcorecheck_url = 'http://go.microsoft.com/fwlink/?linkid=2135256';
@@ -59,6 +59,8 @@ begin
 	case version of
 		NetC31:
 			netcoreVersion := '3.1.0';
+		Net50:
+			netcoreVersion := '5.0.0-preview.7.20364.11';
 	end;
 
 	if netcorecheck(netcoreRuntime, netcoreVersion) then

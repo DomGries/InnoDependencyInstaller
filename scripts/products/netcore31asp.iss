@@ -2,8 +2,8 @@
 ; https://dotnet.microsoft.com/download/dotnet-core/3.1
 
 [CustomMessages]
-netcore31asp_title=ASP.NET Core 3.1
-netcore31asp_title_x64=ASP.NET Core 3.1 64-Bit
+netcore31asp_title=ASP.NET Core Runtime 3.1
+netcore31asp_title_x64=ASP.NET Core Runtime 3.1 64-Bit
 
 netcore31asp_size=1 MB - 7 MB
 netcore31asp_size_x64=1 MB - 8 MB

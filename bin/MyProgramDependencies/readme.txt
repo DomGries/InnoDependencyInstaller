@@ -23,6 +23,9 @@ Supported dependency names:
 |   netcore31[*1].exe
 |   netcore31asp[*1].exe
 |   netcore31desktop[*1].exe
+|   dotnet50[*1].exe
+|   dotnet50asp[*1].exe
+|   dotnet50desktop[*1].exe
 |   ie6.exe
 |   jet4sp8.exe
 |   kb835732.exe
