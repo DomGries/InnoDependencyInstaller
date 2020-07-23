@@ -2,7 +2,7 @@
 ; requires Windows Installer 3.1
 ; requires Internet Explorer 5.01
 ; WARNING: express setup (downloads and installs the components depending on your OS) if you want to deploy it on cd or network download the full bootsrapper on website below
-; http://www.microsoft.com/downloads/en/details.aspx?FamilyID=5765d7a8-7722-4888-a970-ac39b33fd8ab
+; https://www.microsoft.com/downloads/en/details.aspx?FamilyID=5765d7a8-7722-4888-a970-ac39b33fd8ab
 
 [CustomMessages]
 dotnetfx40client_title=.NET Framework 4.0 Client

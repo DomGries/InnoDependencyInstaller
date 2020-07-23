@@ -1,5 +1,5 @@
 ; requires Windows 10, Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003 Service Pack 2, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP Service Pack 3
-; http://www.visualstudio.com/en-us/downloads/
+; https://www.visualstudio.com/en-us/downloads/
 
 [CustomMessages]
 vcredist2017_title=Visual C++ 2017 Redistributable

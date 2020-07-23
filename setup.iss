@@ -1,5 +1,5 @@
-;contribute: http://github.com/domgho/innodependencyinstaller
-;original article: http://codeproject.com/Articles/20868/NET-Framework-1-1-2-0-3-5-Installer-for-InnoSetup
+;contribute: https://github.com/domgho/InnoDependencyInstaller
+;original article: https://www.codeproject.com/Articles/20868/NET-Framework-Installer-for-InnoSetup
 
 ;comment out product defines to disable installing them
 ;#define use_iis
@@ -56,9 +56,9 @@ AppCopyright=Copyright © 2007-2020 domgho
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany=domgho
 AppPublisher=domgho
-;AppPublisherURL=http://...
-;AppSupportURL=http://...
-;AppUpdatesURL=http://...
+;AppPublisherURL=https://...
+;AppSupportURL=https://...
+;AppUpdatesURL=https://...
 OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
 DefaultGroupName={#MyAppSetupName}
 DefaultDirName={pf}\{#MyAppSetupName}
