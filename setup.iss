@@ -366,7 +366,7 @@ begin
 	vcredist2015('14'); // install if version < 14.0
 #endif
 #ifdef use_vc2017
-	vcredist2017('14.1'); // install if version < 14.1
+	vcredist2017('14.10'); // install if version < 14.10
 #endif
 
 #ifdef use_directxruntime
