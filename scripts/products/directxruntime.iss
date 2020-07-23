@@ -2,8 +2,7 @@
 ; https://www.microsoft.com/en-US/download/details.aspx?id=35
 
 [CustomMessages]
-en.directxruntime_title=DirectX End-User Runtime
-de.directxruntime_title=DirectX Endbenutzer Runtime
+directxruntime_title=DirectX End-User Runtime
 
 directxruntime_size=1 MB - 95.6 MB
 

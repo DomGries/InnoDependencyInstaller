@@ -3,8 +3,7 @@
 ; https://www.microsoft.com/downloads/details.aspx?FamilyId=0692C27E-F63A-414C-B3EB-D2342FBB6C00
 
 [CustomMessages]
-en.kb835732_title=Windows 2000 Security Update (KB835732)
-de.kb835732_title=Windows 2000 Sicherheitsupdate (KB835732)
+kb835732_title=Windows 2000 Security Update (KB835732)
 
 kb835732_size=6.8 MB
 

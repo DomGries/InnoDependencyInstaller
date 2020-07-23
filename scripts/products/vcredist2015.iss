@@ -2,8 +2,8 @@
 ; https://www.microsoft.com/en-us/download/details.aspx?id=48145
 
 [CustomMessages]
-vcredist2015_title=Visual C++ 2015 Redistributable
-vcredist2015_title_x64=Visual C++ 2015 64-Bit Redistributable
+vcredist2015_title=Visual C++ 2015 Redistributable (x86)
+vcredist2015_title_x64=Visual C++ 2015 Redistributable (x64)
 
 vcredist2015_size=13.8 MB
 vcredist2015_size_x64=14.6 MB
