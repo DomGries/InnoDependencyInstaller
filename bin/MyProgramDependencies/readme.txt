@@ -42,6 +42,7 @@ vcredist2012[*1].exe
 vcredist2013[*1].exe
 vcredist2015[*1].exe
 vcredist2017[*1].exe
+vcredist2019[*1].exe
 wic[*1]_[*3].exe
 
 

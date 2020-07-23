@@ -33,6 +33,7 @@
 #define use_vc2013
 #define use_vc2015
 #define use_vc2017
+#define use_vc2019
 
 ;requires dxwebsetup.exe in src dir
 ;#define use_directxruntime
@@ -223,6 +224,9 @@ WindowsServicePack=Windows %1 Service Pack %2
 #ifdef use_vc2017
 #include "scripts\products\vcredist2017.iss"
 #endif
+#ifdef use_vc2019
+#include "scripts\products\vcredist2019.iss"
+#endif
 
 #ifdef use_directxruntime
 #include "scripts\products\directxruntime.iss"
@@ -367,6 +371,9 @@ begin
 #endif
 #ifdef use_vc2017
 	vcredist2017('14.10'); // install if version < 14.10
+#endif
+#ifdef use_vc2019
+	vcredist2019('14.20'); // install if version < 14.20
 #endif
 
 #ifdef use_directxruntime
