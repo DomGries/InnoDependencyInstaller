@@ -8,11 +8,6 @@ dotnet50desktop_title_x64=Desktop Runtime 5.0 (x64) Preview 6
 dotnet50desktop_size=1 MB - 49 MB
 dotnet50desktop_size_x64=1 MB - 53 MB
 
-[Files]
-; includes netcorecheck.exe in setup executable so that we don't need to download it
-Source: "src\netcorecheck.exe"; Flags: dontcopy
-Source: "src\netcorecheck_x64.exe"; Flags: dontcopy
-
 [Code]
 const
 	dotnet50desktop_url = 'http://go.microsoft.com/fwlink/?linkid=2137841';
@@ -21,9 +16,7 @@ const
 procedure dotnet50desktop();
 begin
 	if (not IsIA64()) then begin
-		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
-
-		if not netcoreversioninstalled(Desktop, Net50, 7) then
+		if not netcoreinstalled(Desktop, '5.0.0-preview.6.20308.1') then
 			AddProduct('dotnet50desktop' + GetArchitectureString() + '.exe',
 				'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 				CustomMessage('dotnet50desktop_title' + GetArchitectureString()),

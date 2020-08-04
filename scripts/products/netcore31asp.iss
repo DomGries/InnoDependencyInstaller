@@ -8,11 +8,6 @@ netcore31asp_title_x64=ASP.NET Core Runtime 3.1.6 (x64)
 netcore31asp_size=1 MB - 7 MB
 netcore31asp_size_x64=1 MB - 8 MB
 
-[Files]
-; includes netcorecheck.exe in setup executable so that we don't need to download it
-Source: "src\netcorecheck.exe"; Flags: dontcopy
-Source: "src\netcorecheck_x64.exe"; Flags: dontcopy
-
 [Code]
 const
 	netcore31asp_url = 'http://go.microsoft.com/fwlink/?linkid=2137940';
@@ -21,9 +16,7 @@ const
 procedure netcore31asp();
 begin
 	if (not IsIA64()) then begin
-		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
-
-		if not netcoreversioninstalled(Asp, NetC31, 6) then
+		if not netcoreinstalled(Asp, '3.1.6') then
 			AddProduct('netcore31asp' + GetArchitectureString() + '.exe',
 				'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 				CustomMessage('netcore31asp_title' + GetArchitectureString()),

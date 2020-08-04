@@ -8,11 +8,6 @@ dotnet50_title_x64=.NET Runtime 5.0 Preview 6 (x64)
 dotnet50_size=1 MB - 24 MB
 dotnet50_size_x64=1 MB - 27 MB
 
-[Files]
-; includes netcorecheck.exe in setup executable so that we don't need to download it
-Source: "src\netcorecheck.exe"; Flags: dontcopy
-Source: "src\netcorecheck_x64.exe"; Flags: dontcopy
-
 [Code]
 const
 	dotnet50_url = 'http://go.microsoft.com/fwlink/?linkid=2137843';
@@ -21,9 +16,7 @@ const
 procedure dotnet50();
 begin
 	if (not IsIA64()) then begin
-		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
-
-		if not netcoreversioninstalled(Core, Net50, 7) then
+		if not netcoreinstalled(Core, '5.0.0-preview.6.20305.6') then
 			AddProduct('dotnet50' + GetArchitectureString() + '.exe',
 				'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 				CustomMessage('dotnet50_title' + GetArchitectureString()),

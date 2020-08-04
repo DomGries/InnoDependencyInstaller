@@ -26,6 +26,7 @@
 #define use_dotnetfx48
 
 ;requires netcorecheck.exe and netcorecheck_x64.exe in src dir
+;#define use_netcorecheck
 ;#define use_netcore31
 ;#define use_netcore31asp
 ;#define use_netcore31desktop
@@ -131,7 +132,6 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\winversion.iss"
 #include "scripts\products\fileversion.iss"
 #include "scripts\products\dotnetfxversion.iss"
-#include "scripts\products\netcoreversion.iss"
 
 ; actual products
 #ifdef use_iis
@@ -205,6 +205,9 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\dotnetfx48.iss"
 #endif
 
+#ifdef use_netcorecheck
+#include "scripts\products\netcorecheck.iss"
+#endif
 #ifdef use_netcore31
 #include "scripts\products\netcore31.iss"
 #endif

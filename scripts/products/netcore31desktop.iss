@@ -8,11 +8,6 @@ netcore31desktop_title_x64=Desktop Runtime 3.1.6 (x64)
 netcore31desktop_size=1 MB - 23 MB
 netcore31desktop_size_x64=1 MB - 26 MB
 
-[Files]
-; includes netcorecheck.exe in setup executable so that we don't need to download it
-Source: "src\netcorecheck.exe"; Flags: dontcopy
-Source: "src\netcorecheck_x64.exe"; Flags: dontcopy
-
 [Code]
 const
 	netcore31desktop_url = 'http://go.microsoft.com/fwlink/?linkid=2137844';
@@ -21,9 +16,7 @@ const
 procedure netcore31desktop();
 begin
 	if (not IsIA64()) then begin
-		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
-
-		if not netcoreversioninstalled(Desktop, NetC31, 6) then
+		if not netcoreinstalled(Desktop, '3.1.6') then
 			AddProduct('netcore31desktop' + GetArchitectureString() + '.exe',
 				'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 				CustomMessage('netcore31desktop_title' + GetArchitectureString()),
