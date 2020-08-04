@@ -5,8 +5,8 @@
 dotnet50_title=.NET Runtime 5.0 Preview 6 (x86)
 dotnet50_title_x64=.NET Runtime 5.0 Preview 6 (x64)
 
-dotnet50_size=1 MB - 24 MB
-dotnet50_size_x64=1 MB - 27 MB
+dotnet50_size=24 MB
+dotnet50_size_x64=27 MB
 
 [Code]
 const

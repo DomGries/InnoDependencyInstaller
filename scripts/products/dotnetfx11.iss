@@ -5,7 +5,7 @@
 [CustomMessages]
 dotnetfx11_title=.NET Framework 1.1
 
-dotnetfx11_size=23.1 MB
+dotnetfx11_size=23 MB
 
 [Code]
 const
@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx11();
 begin
-	if (IsX86() and not netfxinstalled(NetFx11, '')) then
+	if (IsX86() and not dotnetfxinstalled(NetFx11, '')) then
 		AddProduct('dotnetfx11.exe',
 			'/q:a /c:"install /qb /l"',
 			CustomMessage('dotnetfx11_title'),

@@ -4,7 +4,7 @@
 [CustomMessages]
 directxruntime_title=DirectX End-User Runtime
 
-directxruntime_size=1 MB - 95.6 MB
+directxruntime_size=96 MB
 
 [Files]
 ;includes dxwebsetup.exe in setup executable so that we don't need to download it

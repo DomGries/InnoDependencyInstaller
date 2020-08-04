@@ -6,8 +6,8 @@
 vcredist2008_title=Visual C++ 2008 Redistributable (x86)
 vcredist2008_title_x64=Visual C++ 2008 Redistributable (x64)
 
-vcredist2008_size=4.3 MB
-vcredist2008_size_x64=5.0 MB
+vcredist2008_size=4 MB
+vcredist2008_size_x64=5 MB
 
 [Code]
 const

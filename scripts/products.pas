@@ -59,18 +59,18 @@ begin
 	products[i].MustRebootAfter := mustRebootAfter;
 end;
 
-function SmartExec(product : TProduct; var resultcode : Integer): boolean;
+function SmartExec(product : TProduct; var resultCode : Integer): boolean;
 {
 	Executes a product and returns the exit code.
 	Parameters:
 		product: the product to install
-		resultcode: the exit code
+		resultCode: the exit code
 }
 begin
 	if (LowerCase(Copy(product.File, Length(product.File) - 2, 3)) = 'exe') then begin
-		Result := Exec(product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultcode);
+		Result := Exec(product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode);
 	end else begin
-		Result := ShellExec('', product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultcode);
+		Result := ShellExec('', product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode);
 	end;
 end;
 
@@ -246,11 +246,7 @@ begin
 				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
 				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));
 			end;
-			//isxdl_SetOption('title', FmtMessage(SetupMessage(msgSetupWindowTitle), [CustomMessage('appname')]));
 
-			//if SuppressibleMsgBox(FmtMessage(CustomMessage('depdownload_msg'), [FmtMessage(downloadMessage, [''])]), mbConfirmation, MB_YESNO, IDYES) = IDNO then
-			//	Result := false
-			//else if
 			if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
 				Result := false;
 		end;

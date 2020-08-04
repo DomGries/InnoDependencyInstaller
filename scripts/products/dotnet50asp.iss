@@ -2,11 +2,11 @@
 ; https://dotnet.microsoft.com/download/dotnet/5.0
 
 [CustomMessages]
-dotnet50asp_title=ASP.NET Core Runtime 5.0 (x86) Preview 6
-dotnet50asp_title_x64=ASP.NET Core Runtime 5.0 (x64) Preview 6
+dotnet50asp_title=ASP.NET Core Runtime 5.0 Preview 6 (x86)
+dotnet50asp_title_x64=ASP.NET Core Runtime 5.0 Preview 6 (x64)
 
-dotnet50asp_size=1 MB - 8 MB
-dotnet50asp_size_x64=1 MB - 8 MB
+dotnet50asp_size=8 MB
+dotnet50asp_size_x64=8 MB
 
 [Code]
 const

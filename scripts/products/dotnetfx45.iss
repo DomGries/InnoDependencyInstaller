@@ -5,7 +5,7 @@
 [CustomMessages]
 dotnetfx45_title=.NET Framework 4.5.2
 
-dotnetfx45_size=1 MB - 68 MB
+dotnetfx45_size=68 MB
 
 [Code]
 const
@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx45(minVersion: integer);
 begin
-	if (netfxspversion(NetFx4x, '') < minVersion) then
+	if (dotnetfxspversion(NetFx4x, '') < minVersion) then
 		AddProduct('dotnetfx45.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx45_title'),

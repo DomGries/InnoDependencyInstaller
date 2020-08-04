@@ -5,7 +5,7 @@
 [CustomMessages]
 dotnetfx46_title=.NET Framework 4.6.2
 
-dotnetfx46_size=1 MB - 59 MB
+dotnetfx46_size=59 MB
 
 [Code]
 const
@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx46(minVersion: integer);
 begin
-	if (netfxspversion(NetFx4x, '') < minVersion) then
+	if (dotnetfxspversion(NetFx4x, '') < minVersion) then
 		AddProduct('dotnetfx46.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx46_title'),

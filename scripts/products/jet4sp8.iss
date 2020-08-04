@@ -3,7 +3,7 @@
 [CustomMessages]
 jet4sp8_title=Jet 4
 
-jet4sp8_size=3.7 MB
+jet4sp8_size=4 MB
 
 [Code]
 const

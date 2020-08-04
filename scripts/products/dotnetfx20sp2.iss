@@ -3,7 +3,7 @@
 [CustomMessages]
 dotnetfx20sp2_title=.NET Framework 2.0 Service Pack 2
 
-dotnetfx20sp2_size=24 MB - 52 MB
+dotnetfx20sp2_size=52 MB
 
 [Code]
 const
@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx20sp2();
 begin
-	if (netfxspversion(NetFx20, '') < 2) then
+	if (dotnetfxspversion(NetFx20, '') < 2) then
 		AddProduct('dotnetfx20sp2' + GetArchitectureString() + '.exe',
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20sp2_title'),

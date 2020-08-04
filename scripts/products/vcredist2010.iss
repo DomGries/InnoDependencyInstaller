@@ -5,8 +5,8 @@
 vcredist2010_title=Visual C++ 2010 Redistributable (x86)
 vcredist2010_title_x64=Visual C++ 2010 Redistributable (x64)
 
-vcredist2010_size=8.6 MB
-vcredist2010_size_x64=9.8 MB
+vcredist2010_size=9 MB
+vcredist2010_size_x64=10 MB
 
 [Code]
 const

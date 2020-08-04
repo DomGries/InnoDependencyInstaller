@@ -5,7 +5,7 @@
 [CustomMessages]
 dotnetfx48_title=.NET Framework 4.8
 
-dotnetfx48_size=1 MB - 59 MB
+dotnetfx48_size=59 MB
 
 [Code]
 const
@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx48(minVersion: integer);
 begin
-	if (netfxspversion(NetFx4x, '') < minVersion) then
+	if (dotnetfxspversion(NetFx4x, '') < minVersion) then
 		AddProduct('dotnetfx48.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx48_title'),

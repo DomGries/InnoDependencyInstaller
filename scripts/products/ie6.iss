@@ -5,7 +5,7 @@
 [CustomMessages]
 ie6_title=Internet Explorer 6
 
-ie6_size=1 MB - 77.5 MB
+ie6_size=78 MB
 
 [Code]
 const

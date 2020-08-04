@@ -8,8 +8,8 @@
 [CustomMessages]
 sql2008expressr2_title=SQL Server 2008 Express R2
 
-sql2008expressr2_size=58.2 MB
-sql2008expressr2_size_x64=74.1 MB
+sql2008expressr2_size=58 MB
+sql2008expressr2_size_x64=74 MB
 
 [Code]
 const

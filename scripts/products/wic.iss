@@ -3,7 +3,7 @@
 [CustomMessages]
 wic_title=Windows Imaging Component
  
-wic_size=1.2 MB
+wic_size=1 MB
 
 [Code]
 const

@@ -3,7 +3,7 @@
 [CustomMessages]
 de.dotnetfx20sp2lp_title=.NET Framework 2.0 SP2 Sprachpaket: Deutsch
 
-dotnetfx20sp2lp_size=3.4 MB
+dotnetfx20sp2lp_size=3 MB
 
 dotnetfx20sp2lp_url=
 de.dotnetfx20sp2lp_url=http://download.microsoft.com/download/0/b/1/0b175c8e-34bd-46c0-bfcd-af8d33770c58/netfx20sp2_x86de.exe
@@ -14,7 +14,7 @@ de.dotnetfx20sp2lp_url_ia64=http://download.microsoft.com/download/a/3/3/a3349a2
 procedure dotnetfx20sp2lp();
 begin
 	if (CustomMessage('dotnetfx20sp2lp_url') <> '') then begin
-		if (netfxspversion(NetFx20, CustomMessage('lcid')) < 2) then
+		if (dotnetfxspversion(NetFx20, CustomMessage('lcid')) < 2) then
 			AddProduct('dotnetfx20sp2' + GetArchitectureString() + '_' + ActiveLanguage() + '.exe',
 				'/lang:enu /passive /norestart"',
 				CustomMessage('dotnetfx20sp2lp_title'),

@@ -4,7 +4,6 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 [CustomMessages]
 ; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 ru.lcid=1049
-ru.depdownload_msg=Для продолжения установки требуются следующие приложения:%n%n%1%nСкачать и установить их сейчас?
 ru.depdownload_memo_title=Загрузить зависимости
 ru.depinstall_memo_title=Установить зависимости
 ru.depinstall_title=Установка зависимостей

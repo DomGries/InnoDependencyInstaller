@@ -6,7 +6,7 @@
 [CustomMessages]
 dotnetfx35sp1_title=.NET Framework 3.5 Service Pack 1
 
-dotnetfx35sp1_size=3 MB - 232 MB
+dotnetfx35sp1_size=232 MB
 
 [Code]
 const
@@ -14,7 +14,7 @@ const
 
 procedure dotnetfx35sp1();
 begin
-	if (netfxspversion(NetFx35, '') < 1) then
+	if (dotnetfxspversion(NetFx35, '') < 1) then
 		AddProduct('dotnetfx35sp1.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35sp1_title'),

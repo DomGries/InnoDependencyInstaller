@@ -3,7 +3,7 @@
 [CustomMessages]
 de.dotnetfx20lp_title=.NET Framework 2.0 Sprachpaket: Deutsch
 
-dotnetfx20lp_size=1.8 MB
+dotnetfx20lp_size=2 MB
 
 dotnetfx20lp_url=
 de.dotnetfx20lp_url=http://download.microsoft.com/download/2/9/7/29768238-56c3-4ea6-abba-4c5246f2bc81/langpack.exe
@@ -14,7 +14,7 @@ de.dotnetfx20lp_url_ia64=http://download.microsoft.com/download/8/9/8/898c5670-5
 procedure dotnetfx20lp();
 begin
 	if (CustomMessage('dotnetfx20lp_url') <> '') then begin
-		if (not netfxinstalled(NetFx20, CustomMessage('lcid'))) then
+		if (not dotnetfxinstalled(NetFx20, CustomMessage('lcid'))) then
 			AddProduct('dotnetfx20' + GetArchitectureString() + '_' + ActiveLanguage() + '.exe',
 				'/passive /norestart /lang:ENU',
 				CustomMessage('dotnetfx20lp_title'),

@@ -7,7 +7,7 @@
 [CustomMessages]
 dotnetfx40full_title=.NET Framework 4.0 Full
 
-dotnetfx40full_size=3 MB - 197 MB
+dotnetfx40full_size=197 MB
 
 [Code]
 const
@@ -15,7 +15,7 @@ const
 
 procedure dotnetfx40full();
 begin
-	if (not netfxinstalled(NetFx40Full, '')) then
+	if (not dotnetfxinstalled(NetFx40Full, '')) then
 		AddProduct('dotNetFx40_Full_setup.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx40full_title'),

@@ -2,11 +2,11 @@
 ; https://dotnet.microsoft.com/download/dotnet/5.0
 
 [CustomMessages]
-dotnet50desktop_title=Desktop Runtime 5.0 (x86) Preview 6
-dotnet50desktop_title_x64=Desktop Runtime 5.0 (x64) Preview 6
+dotnet50desktop_title=.NET Desktop Runtime 5.0 Preview 6 (x86)
+dotnet50desktop_title_x64=.NET Desktop Runtime 5.0 Preview 6 (x64)
 
-dotnet50desktop_size=1 MB - 49 MB
-dotnet50desktop_size_x64=1 MB - 53 MB
+dotnet50desktop_size=49 MB
+dotnet50desktop_size_x64=53 MB
 
 [Code]
 const

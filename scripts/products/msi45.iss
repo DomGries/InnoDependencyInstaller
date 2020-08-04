@@ -1,9 +1,9 @@
 [CustomMessages]
 msi45_title=Windows Installer 4.5
 
-msi45win60_size=1.7 MB
-msi45win52_size=3.0 MB
-msi45win51_size=3.2 MB
+msi45win60_size=2 MB
+msi45win52_size=3 MB
+msi45win51_size=3 MB
 
 [Code]
 const

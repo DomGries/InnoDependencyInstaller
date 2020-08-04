@@ -6,8 +6,8 @@
 [CustomMessages]
 sql2005express_title=SQL Server 2005 Express SP3
 
-sql2005express_size=38.1 MB
-sql2005express_size_x64=58.1 MB
+sql2005express_size=38 MB
+sql2005express_size_x64=58 MB
 
 [Code]
 const

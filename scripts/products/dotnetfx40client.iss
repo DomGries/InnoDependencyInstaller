@@ -7,7 +7,7 @@
 [CustomMessages]
 dotnetfx40client_title=.NET Framework 4.0 Client
 
-dotnetfx40client_size=3 MB - 197 MB
+dotnetfx40client_size=197 MB
 
 [Code]
 const
@@ -15,7 +15,7 @@ const
 
 procedure dotnetfx40client();
 begin
-	if (not netfxinstalled(NetFx40Client, '')) then
+	if (not dotnetfxinstalled(NetFx40Client, '')) then
 		AddProduct('dotNetFx40_Client_setup.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx40client_title'),

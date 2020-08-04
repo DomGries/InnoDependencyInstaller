@@ -55,7 +55,7 @@
 #define use_sql2008express
 
 #define MyAppSetupName 'MyProgram'
-#define MyAppVersion '6.0'
+#define MyAppVersion '1.0'
 
 [Setup]
 AppName={#MyAppSetupName}
@@ -77,8 +77,6 @@ SourceDir=.
 AllowNoIcons=yes
 ;SetupIconFile=MyProgramIcon
 
-;MinVersion default value: "0,5.0 (Windows 2000+) if Unicode Inno Setup, else 4.0,4.0 (Windows 95+)"
-;MinVersion=0,5.0
 PrivilegesRequired=admin
 ArchitecturesAllowed=x86 x64 ia64
 ArchitecturesInstallIn64BitMode=x64 ia64
@@ -356,7 +354,7 @@ begin
 
 	// if no .netfx 4.0 is found, install the client (smallest)
 #ifdef use_dotnetfx40
-	if (not netfxinstalled(NetFx40Client, '') and not netfxinstalled(NetFx40Full, '')) then
+	if (not dotnetfxinstalled(NetFx40Client, '') and not dotnetfxinstalled(NetFx40Full, '')) then
 		dotnetfx40client();
 #endif
 
@@ -420,8 +418,6 @@ begin
 #endif
 
 #ifdef use_directxruntime
-	// extracts included setup file to temp folder so that we don't need to download it
-	// and always runs directxruntime installer as we don't know how to check if it is required
 	directxruntime();
 #endif
 

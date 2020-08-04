@@ -5,8 +5,8 @@
 vcredist2019_title=Visual C++ 2015-2019 Redistributable (x86)
 vcredist2019_title_x64=Visual C++ 2015-2019 Redistributable (x64)
 
-vcredist2019_size=13.7 MB
-vcredist2019_size_x64=14.3 MB
+vcredist2019_size=14 MB
+vcredist2019_size_x64=14 MB
 
 [Code]
 const

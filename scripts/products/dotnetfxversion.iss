@@ -5,7 +5,7 @@ type
 const
 	netfx11plus_reg = 'Software\Microsoft\NET Framework Setup\NDP\';
 
-function netfxinstalled(version: NetFXType; lcid: string): boolean;
+function dotnetfxinstalled(version: NetFXType; lcid: string): boolean;
 var
 	regVersion: cardinal;
 	regVersionString: string;
@@ -41,7 +41,7 @@ begin
 	end;
 end;
 
-function netfxspversion(version: NetFXType; lcid: string): integer;
+function dotnetfxspversion(version: NetFXType; lcid: string): integer;
 var
 	regVersion: cardinal;
 begin

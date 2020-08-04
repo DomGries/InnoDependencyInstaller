@@ -4,7 +4,6 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 [CustomMessages]
 ; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 en.lcid=1033
-en.depdownload_msg=The following applications are required before setup can continue:%n%n%1%nDownload and install now?
 en.depdownload_memo_title=Download dependencies
 en.depinstall_memo_title=Install dependencies
 en.depinstall_title=Installing dependencies

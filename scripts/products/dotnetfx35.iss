@@ -6,7 +6,7 @@
 [CustomMessages]
 dotnetfx35_title=.NET Framework 3.5
 
-dotnetfx35_size=3 MB - 197 MB
+dotnetfx35_size=197 MB
 
 [Code]
 const
@@ -14,7 +14,7 @@ const
 
 procedure dotnetfx35();
 begin
-	if (netfxinstalled(NetFx35, '') = false) then
+	if (dotnetfxinstalled(NetFx35, '') = false) then
 		AddProduct('dotnetfx35.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35_title'),

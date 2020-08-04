@@ -5,7 +5,7 @@
 [CustomMessages]
 dotnetfx47_title=.NET Framework 4.7.2
 
-dotnetfx47_size=1 MB - 59 MB
+dotnetfx47_size=59 MB
 
 [Code]
 const
@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx47(minVersion: integer);
 begin
-	if (netfxspversion(NetFx4x, '') < minVersion) then
+	if (dotnetfxspversion(NetFx4x, '') < minVersion) then
 		AddProduct('dotnetfx47.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx47_title'),

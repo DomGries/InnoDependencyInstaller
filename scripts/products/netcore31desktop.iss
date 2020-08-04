@@ -2,11 +2,11 @@
 ; https://dotnet.microsoft.com/download/dotnet-core/3.1
 
 [CustomMessages]
-netcore31desktop_title=Desktop Runtime 3.1.6 (x86)
-netcore31desktop_title_x64=Desktop Runtime 3.1.6 (x64)
+netcore31desktop_title=.NET Desktop Runtime 3.1.6 (x86)
+netcore31desktop_title_x64=.NET Desktop Runtime 3.1.6 (x64)
 
-netcore31desktop_size=1 MB - 23 MB
-netcore31desktop_size_x64=1 MB - 26 MB
+netcore31desktop_size=23 MB
+netcore31desktop_size_x64=26 MB
 
 [Code]
 const

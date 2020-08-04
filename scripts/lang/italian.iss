@@ -4,7 +4,6 @@ Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
 [CustomMessages]
 ; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 it.lcid=1040
-it.depdownload_msg=Le seguenti applicazioni sono necessarie per procedere con l'installazione:%n%n%1%nSi desidera scaricarle ed installarle adesso?
 it.depdownload_memo_title=Dipendenze da scaricare
 it.depinstall_memo_title=Dipendenze da installare
 it.depinstall_title=Installazione delle dipendenze

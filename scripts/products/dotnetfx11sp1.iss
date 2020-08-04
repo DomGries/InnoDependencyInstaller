@@ -5,7 +5,7 @@
 [CustomMessages]
 dotnetfx11sp1_title=.NET Framework 1.1 Service Pack 1
 
-dotnetfx11sp1_size=10.5 MB
+dotnetfx11sp1_size=11 MB
 
 [Code]
 const
@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx11sp1();
 begin
-	if (IsX86() and (netfxspversion(NetFx11, '') < 1)) then
+	if (IsX86() and (dotnetfxspversion(NetFx11, '') < 1)) then
 		AddProduct('dotnetfx11sp1.exe',
 			'/q',
 			CustomMessage('dotnetfx11sp1_title'),

@@ -6,8 +6,8 @@
 vcredist2005_title=Visual C++ 2005 Redistributable (x86)
 vcredist2005_title_x64=Visual C++ 2005 Redistributable (x64)
 
-vcredist2005_size=2.6 MB
-vcredist2005_size_x64=4.1 MB
+vcredist2005_size=3 MB
+vcredist2005_size_x64=4 MB
 
 [Code]
 const

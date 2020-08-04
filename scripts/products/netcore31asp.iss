@@ -5,8 +5,8 @@
 netcore31asp_title=ASP.NET Core Runtime 3.1.6 (x86)
 netcore31asp_title_x64=ASP.NET Core Runtime 3.1.6 (x64)
 
-netcore31asp_size=1 MB - 7 MB
-netcore31asp_size_x64=1 MB - 8 MB
+netcore31asp_size=7 MB
+netcore31asp_size_x64=8 MB
 
 [Code]
 const
