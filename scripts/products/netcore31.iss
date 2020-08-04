@@ -2,21 +2,28 @@
 ; https://dotnet.microsoft.com/download/dotnet-core/3.1
 
 [CustomMessages]
-netcore31_title=.NET Core Runtime 3.1
-netcore31_title_x64=.NET Core Runtime 3.1 64-Bit
+netcore31_title=.NET Core Runtime 3.1.6 (x86)
+netcore31_title_x64=.NET Core Runtime 3.1.6 (x64)
 
 netcore31_size=1 MB - 23 MB
 netcore31_size_x64=1 MB - 25 MB
 
+[Files]
+; includes netcorecheck.exe in setup executable so that we don't need to download it
+Source: "src\netcorecheck_x86.exe"; Flags: dontcopy
+Source: "src\netcorecheck_x64.exe"; Flags: dontcopy
+
 [Code]
 const
-	netcore31_url = 'http://download.visualstudio.microsoft.com/download/pr/717d875c-557e-4d61-a201-8822a2fe8003/ca8639545eb797adfdb8106d8f1a0791/dotnet-runtime-3.1.6-win-x86.exe';
-	netcore31_url_x64 = 'http://download.visualstudio.microsoft.com/download/pr/518aafee-1285-4153-a30a-e4eefd538c90/6437d77a67b9c6b8cf0b7b3323004229/dotnet-runtime-3.1.6-win-x64.exe';
+	netcore31_url = 'http://go.microsoft.com/fwlink/?linkid=2137641';
+	netcore31_url_x64 = 'http://go.microsoft.com/fwlink/?linkid=2137640';
 
 procedure netcore31();
 begin
 	if (not IsIA64()) then begin
-		if not netcoreversioninstalled(Core, NetC31) then
+		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
+
+		if not netcoreversioninstalled(Core, NetC31, 6) then
 			AddProduct('netcore31' + GetArchitectureString() + '.exe',
 				'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 				CustomMessage('netcore31_title' + GetArchitectureString()),

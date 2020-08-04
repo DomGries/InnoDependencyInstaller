@@ -3,45 +3,32 @@ type
 	NetCoreRuntimeType = (Asp, Core, Desktop);
 	NetCoreVersionType = (NetC31, Net50);
 
-const
-	netcorecheck_url = 'http://go.microsoft.com/fwlink/?linkid=2135256';
-	netcorecheck_url_x64 = 'http://go.microsoft.com/fwlink/?linkid=2135504';
-
-function downloadnetcorecheck(): Boolean;
+function netcorecheckincluded(): Boolean;
 var
 	filename, path: string;
 begin
-	Result := true;
-	filename := 'netcorecheck.exe';
-	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + filename;
-	if not FileExists(path) then begin
-		path := ExpandConstant('{tmp}{\}') + filename;
-
-		if not FileExists(path) then begin
-			isxdl_AddFile(GetString(netcorecheck_url, netcorecheck_url_x64, ''), path);
-			if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then begin
-				Result := false;
-			end;
-		end;
-	end;
+	Result := false;
+	filename := 'netcorecheck' + GetArchitectureString() + '.exe';
+	path := ExpandConstant('{tmp}{\}') + filename;
+	if FileExists(path) then
+		Result := true;
 end;
 
 function netcorecheck(runtime: string; version: string): Boolean;
 var
 	exePath: string;
-	execStdout: ansistring;
 	resultCode: integer;
 begin
 	Result := false;
-	if downloadnetcorecheck() then begin
-		exePath := ExpandConstant('{tmp}') + '\netcorecheck.exe';
+	if netcorecheckincluded() then begin
+		exePath := ExpandConstant('{tmp}') + '\netcorecheck' + GetArchitectureString() + '.exe';
 		Exec(exePath, runtime + ' ' + version, '', SW_HIDE, ewWaitUntilTerminated, resultCode);
 		if IntToStr(resultCode) = '0' then
 			Result := true;
 	end;
 end;
 
-function netcoreversioninstalled(runtime: NetCoreRuntimeType; version: NetCoreVersionType): Boolean;
+function netcoreversioninstalled(runtime: NetCoreRuntimeType; version: NetCoreVersionType; patch: integer): Boolean;
 var
 	netcoreRuntime: string;
 	netcoreVersion: string;
@@ -58,9 +45,16 @@ begin
 
 	case version of
 		NetC31:
-			netcoreVersion := '3.1.0';
+			netcoreVersion := '3.1.' + IntToStr(patch);
 		Net50:
-			netcoreVersion := '5.0.0-preview.7.20364.11';
+			case runtime of
+				Asp:
+					netcoreVersion := '5.0.0-preview.6.20312.15';
+				Core:
+					netcoreVersion := '5.0.0-preview.6.20305.6';
+				Desktop:
+					netcoreVersion := '5.0.0-preview.6.20308.1';
+			end;
 	end;
 
 	if netcorecheck(netcoreRuntime, netcoreVersion) then

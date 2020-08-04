@@ -2,21 +2,28 @@
 ; https://dotnet.microsoft.com/download/dotnet/5.0
 
 [CustomMessages]
-dotnet50desktop_title=Desktop Runtime 5.0
-dotnet50desktop_title_x64=Desktop Runtime 5.0 64-Bit
+dotnet50desktop_title=Desktop Runtime 5.0 (x86) Preview 6
+dotnet50desktop_title_x64=Desktop Runtime 5.0 (x64) Preview 6
 
 dotnet50desktop_size=1 MB - 49 MB
 dotnet50desktop_size_x64=1 MB - 53 MB
 
+[Files]
+; includes netcorecheck.exe in setup executable so that we don't need to download it
+Source: "src\netcorecheck_x86.exe"; Flags: dontcopy
+Source: "src\netcorecheck_x64.exe"; Flags: dontcopy
+
 [Code]
 const
-	dotnet50desktop_url = 'http://download.visualstudio.microsoft.com/download/pr/d12f1c16-2d25-4a7f-a3cb-cf839b07526a/b9ac0cb450e8563a2272510a379511fc/windowsdesktop-runtime-5.0.0-preview.7.20366.1-win-x86.exe';
-	dotnet50desktop_url_x64 = 'http://download.visualstudio.microsoft.com/download/pr/b1ad0793-f281-4574-b672-09ac4bd6ff9c/303e98093e01e9b10a425d58b26bb601/windowsdesktop-runtime-5.0.0-preview.7.20366.1-win-x64.exe';
+	dotnet50desktop_url = 'http://go.microsoft.com/fwlink/?linkid=2137841';
+	dotnet50desktop_url_x64 = 'http://go.microsoft.com/fwlink/?linkid=2137938';
 
 procedure dotnet50desktop();
 begin
 	if (not IsIA64()) then begin
-		if not netcoreversioninstalled(Desktop, Net50) then
+		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
+
+		if not netcoreversioninstalled(Desktop, Net50, 7) then
 			AddProduct('dotnet50desktop' + GetArchitectureString() + '.exe',
 				'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 				CustomMessage('dotnet50desktop_title' + GetArchitectureString()),
