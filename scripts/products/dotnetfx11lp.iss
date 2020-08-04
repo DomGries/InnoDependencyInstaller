@@ -1,4 +1,5 @@
 [CustomMessages]
+dotnetfx11lp_title=
 de.dotnetfx11lp_title=.NET Framework 1.1 Sprachpaket: Deutsch
 
 dotnetfx11lp_size=1 MB
