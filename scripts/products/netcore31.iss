@@ -6,7 +6,7 @@ netcore31_title=.NET Core Runtime 3.1.6 (x86)
 netcore31_title_x64=.NET Core Runtime 3.1.6 (x64)
 
 netcore31_size=1 MB - 23 MB
-netcore31_size_x64=1 MB - 25 MB
+netcore31_size_x64=1 MB - 26 MB
 
 [Files]
 ; includes netcorecheck.exe in setup executable so that we don't need to download it

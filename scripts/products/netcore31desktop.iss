@@ -5,8 +5,8 @@
 netcore31desktop_title=Desktop Runtime 3.1.6 (x86)
 netcore31desktop_title_x64=Desktop Runtime 3.1.6 (x64)
 
-netcore31desktop_size=1 MB - 48 MB
-netcore31desktop_size_x64=1 MB - 54 MB
+netcore31desktop_size=1 MB - 23 MB
+netcore31desktop_size_x64=1 MB - 26 MB
 
 [Files]
 ; includes netcorecheck.exe in setup executable so that we don't need to download it
