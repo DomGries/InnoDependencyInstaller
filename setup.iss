@@ -5,7 +5,6 @@
 ;#define use_iis
 #define use_kb835732
 
-#define use_msi20
 #define use_msi31
 #define use_msi45
 
@@ -142,9 +141,6 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\kb835732.iss"
 #endif
 
-#ifdef use_msi20
-#include "scripts\products\msi20.iss"
-#endif
 #ifdef use_msi31
 #include "scripts\products\msi31.iss"
 #endif
@@ -291,9 +287,6 @@ begin
 	if (not iis()) then exit;
 #endif
 
-#ifdef use_msi20
-	msi20('2.0'); // install if version < 2.0
-#endif
 #ifdef use_msi31
 	msi31('3.1'); // install if version < 3.1
 #endif
