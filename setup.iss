@@ -27,7 +27,7 @@
 
 ;requires netcorecheck_x86.exe and netcorecheck_x64.exe in src dir
 ;#define use_netcore31
-;p#define use_netcore31asp
+;#define use_netcore31asp
 ;#define use_netcore31desktop
 ;#define use_dotnet50
 ;#define use_dotnet50asp

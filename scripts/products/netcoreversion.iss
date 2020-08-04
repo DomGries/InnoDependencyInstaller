@@ -1,3 +1,8 @@
+; The netcorecheck tool is necessary for detecting if a specific version of .NET Core/.NET 5.0 is installed.
+; The source code can be found here: https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck.
+; For more information about the tool, see this GitHub issue: https://github.com/dotnet/runtime/issues/36479.
+; The tool was developed with the intention of sharing it with other installer technologies as necessary.
+
 [Code]
 type
 	NetCoreRuntimeType = (Asp, Core, Desktop);
