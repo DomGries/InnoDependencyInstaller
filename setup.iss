@@ -25,6 +25,14 @@
 #define use_dotnetfx47
 #define use_dotnetfx48
 
+;requires netcorecheck.exe and netcorecheck_x64.exe in src dir
+;#define use_netcore31
+;#define use_netcore31asp
+;#define use_netcore31desktop
+;#define use_dotnet50
+;#define use_dotnet50asp
+;#define use_dotnet50desktop
+
 #define use_msiproduct
 #define use_vc2005
 #define use_vc2008
@@ -123,6 +131,7 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\winversion.iss"
 #include "scripts\products\fileversion.iss"
 #include "scripts\products\dotnetfxversion.iss"
+#include "scripts\products\netcoreversion.iss"
 
 ; actual products
 #ifdef use_iis
@@ -194,6 +203,25 @@ WindowsServicePack=Windows %1 Service Pack %2
 
 #ifdef use_dotnetfx48
 #include "scripts\products\dotnetfx48.iss"
+#endif
+
+#ifdef use_netcore31
+#include "scripts\products\netcore31.iss"
+#endif
+#ifdef use_netcore31asp
+#include "scripts\products\netcore31asp.iss"
+#endif
+#ifdef use_netcore31desktop
+#include "scripts\products\netcore31desktop.iss"
+#endif
+#ifdef use_dotnet50
+#include "scripts\products\dotnet50.iss"
+#endif
+#ifdef use_dotnet50asp
+#include "scripts\products\dotnet50asp.iss"
+#endif
+#ifdef use_dotnet50desktop
+#include "scripts\products\dotnet50desktop.iss"
 #endif
 
 #ifdef use_wic
@@ -347,6 +375,25 @@ begin
 #endif
 #ifdef use_dotnetfx48
 	dotnetfx48(80); // install if version < 4.8.0
+#endif
+
+#ifdef use_netcore31
+	netcore31();
+#endif
+#ifdef use_netcore31asp
+	netcore31asp();
+#endif
+#ifdef use_netcore31desktop
+	netcore31desktop();
+#endif
+#ifdef use_dotnet50
+	dotnet50();
+#endif
+#ifdef use_dotnet50asp
+	dotnet50asp();
+#endif
+#ifdef use_dotnet50desktop
+	dotnet50desktop();
 #endif
 
 #ifdef use_vc2005
