@@ -70,7 +70,11 @@ AppPublisher=domgho
 ;AppUpdatesURL=https://...
 OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
 DefaultGroupName={#MyAppSetupName}
+#if VER < EncodeVer(6,0,0)
 DefaultDirName={pf}\{#MyAppSetupName}
+#else
+DefaultDirName={autopf}\{#MyAppSetupName}
+#endif
 UninstallDisplayIcon={app}\MyProgram.exe
 OutputDir=bin
 SourceDir=.
