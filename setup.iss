@@ -2,13 +2,10 @@
 ;original article: https://www.codeproject.com/Articles/20868/NET-Framework-Installer-for-InnoSetup
 
 ;comment out product defines to disable installing them
-;#define use_iis
 #define use_kb835732
 
 #define use_msi31
 #define use_msi45
-
-#define use_ie6
 
 #define use_dotnetfx11
 #define use_dotnetfx11lp
@@ -46,12 +43,7 @@
 ;requires dxwebsetup.exe in src dir
 ;#define use_directxruntime
 
-#define use_mdac28
-#define use_jet4sp8
-
 #define use_sqlcompact35sp2
-
-#define use_sql2005express
 #define use_sql2008express
 
 #define MyAppSetupName 'MyProgram'
@@ -133,10 +125,6 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\dotnetfxversion.iss"
 
 ; actual products
-#ifdef use_iis
-#include "scripts\products\iis.iss"
-#endif
-
 #ifdef use_kb835732
 #include "scripts\products\kb835732.iss"
 #endif
@@ -146,10 +134,6 @@ WindowsServicePack=Windows %1 Service Pack %2
 #endif
 #ifdef use_msi45
 #include "scripts\products\msi45.iss"
-#endif
-
-#ifdef use_ie6
-#include "scripts\products\ie6.iss"
 #endif
 
 #ifdef use_dotnetfx11
@@ -259,19 +243,8 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\directxruntime.iss"
 #endif
 
-#ifdef use_mdac28
-#include "scripts\products\mdac28.iss"
-#endif
-#ifdef use_jet4sp8
-#include "scripts\products\jet4sp8.iss"
-#endif
-
 #ifdef use_sqlcompact35sp2
 #include "scripts\products\sqlcompact35sp2.iss"
-#endif
-
-#ifdef use_sql2005express
-#include "scripts\products\sql2005express.iss"
 #endif
 #ifdef use_sql2008express
 #include "scripts\products\sql2008express.iss"
@@ -283,19 +256,11 @@ begin
 	// initialize windows version
 	initwinversion();
 
-#ifdef use_iis
-	if (not iis()) then exit;
-#endif
-
 #ifdef use_msi31
 	msi31('3.1'); // install if version < 3.1
 #endif
 #ifdef use_msi45
 	msi45('4.5'); // install if version < 4.5
-#endif
-
-#ifdef use_ie6
-	ie6('5.0.2919'); // install if version < 5.0.2919
 #endif
 
 #ifdef use_dotnetfx11
@@ -423,19 +388,8 @@ begin
 	directxruntime();
 #endif
 
-#ifdef use_mdac28
-	mdac28('2.8'); // install if version < 2.8
-#endif
-#ifdef use_jet4sp8
-	jet4sp8('4.0.8015'); // install if version < 4.0.8015
-#endif
-
 #ifdef use_sqlcompact35sp2
 	sqlcompact35sp2();
-#endif
-
-#ifdef use_sql2005express
-	sql2005express();
 #endif
 #ifdef use_sql2008express
 	sql2008express();

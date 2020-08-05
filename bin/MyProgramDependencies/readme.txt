@@ -28,17 +28,12 @@ dotnetfx48.exe
 dotnet50[*1].exe
 dotnet50asp[*1].exe
 dotnet50desktop[*1].exe
-ie6.exe
-jet4sp8.exe
 kb835732.exe
-mdac28.exe
-msi20.exe
 msi31.exe
 msi45_[*4]
 netcore31[*1].exe
 netcore31asp[*1].exe
 netcore31desktop[*1].exe
-sql2005express[*1].exe
 sql2008express[*1].exe
 sqlcompact35sp2.msi
 vcredist2005[*1].exe
