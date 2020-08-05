@@ -2,10 +2,9 @@
 ;original article: https://www.codeproject.com/Articles/20868/NET-Framework-Installer-for-InnoSetup
 
 ;comment out product defines to disable installing them
-#define use_kb835732
-
 #define use_msi31
 #define use_msi45
+#define use_wic
 
 #define use_dotnetfx11
 #define use_dotnetfx11lp
@@ -14,7 +13,6 @@
 #define use_dotnetfx35
 #define use_dotnetfx35lp
 
-#define use_wic
 #define use_dotnetfx40
 #define use_dotnetfx45
 #define use_dotnetfx46
@@ -125,15 +123,14 @@ WindowsServicePack=Windows %1 Service Pack %2
 #include "scripts\products\dotnetfxversion.iss"
 
 ; actual products
-#ifdef use_kb835732
-#include "scripts\products\kb835732.iss"
-#endif
-
 #ifdef use_msi31
 #include "scripts\products\msi31.iss"
 #endif
 #ifdef use_msi45
 #include "scripts\products\msi45.iss"
+#endif
+#ifdef use_wic
+#include "scripts\products\wic.iss"
 #endif
 
 #ifdef use_dotnetfx11
@@ -172,15 +169,12 @@ WindowsServicePack=Windows %1 Service Pack %2
 #ifdef use_dotnetfx45
 #include "scripts\products\dotnetfx45.iss"
 #endif
-
 #ifdef use_dotnetfx46
 #include "scripts\products\dotnetfx46.iss"
 #endif
-
 #ifdef use_dotnetfx47
 #include "scripts\products\dotnetfx47.iss"
 #endif
-
 #ifdef use_dotnetfx48
 #include "scripts\products\dotnetfx48.iss"
 #endif
@@ -205,10 +199,6 @@ WindowsServicePack=Windows %1 Service Pack %2
 #endif
 #ifdef use_dotnet50desktop
 #include "scripts\products\dotnet50desktop.iss"
-#endif
-
-#ifdef use_wic
-#include "scripts\products\wic.iss"
 #endif
 
 #ifdef use_msiproduct
@@ -262,6 +252,9 @@ begin
 #ifdef use_msi45
 	msi45('4.5'); // install if version < 4.5
 #endif
+#ifdef use_wic
+	wic();
+#endif
 
 #ifdef use_dotnetfx11
 	dotnetfx11();
@@ -290,9 +283,6 @@ begin
 #endif
 	end else begin
 		if minwinversion(5, 0) and minwinspversion(5, 0, 4) then begin
-#ifdef use_kb835732
-			kb835732();
-#endif
 			dotnetfx20sp1();
 #ifdef use_dotnetfx20lp
 			dotnetfx20sp1lp();
@@ -313,10 +303,6 @@ begin
 	//dotnetfx35lp();
 	dotnetfx35sp1lp();
 #endif
-#endif
-
-#ifdef use_wic
-	wic();
 #endif
 
 	// if no .netfx 4.0 is found, install the client (smallest)
