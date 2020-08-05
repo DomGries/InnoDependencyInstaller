@@ -14,24 +14,24 @@ const
 	INSTALLSTATE_ABSENT = 2;		// The product is installed for a different user.
 	INSTALLSTATE_DEFAULT = 5;		// The product is installed for the current user.
 
-function MsiQueryProductState(szProduct: string): INSTALLSTATE;
+function MsiQueryProductState(szProduct: String): INSTALLSTATE;
 external 'MsiQueryProductState{#AW}@msi.dll stdcall';
 
-function MsiEnumRelatedProducts(szUpgradeCode: string; nReserved: dword; nIndex: dword; szProductCode: string): integer;
+function MsiEnumRelatedProducts(szUpgradeCode: String; nReserved: DWORD; nIndex: DWORD; szProductCode: String): Integer;
 external 'MsiEnumRelatedProducts{#AW}@msi.dll stdcall';
 
-function MsiGetProductInfo(szProductCode: string; szProperty: string; szValue: string; var nvalueSize: dword): integer;
+function MsiGetProductInfo(szProductCode: String; szProperty: String; szValue: String; var nvalueSize: DWORD): Integer;
 external 'MsiGetProductInfo{#AW}@msi.dll stdcall';
 
-function msiproduct(productID: string): boolean;
+function msiproduct(productID: String): Boolean;
 begin
 	Result := MsiQueryProductState(productID) = INSTALLSTATE_DEFAULT;
 end;
 
-function msiproductupgrade(upgradeCode: string; minVersion: string): boolean;
+function msiproductupgrade(upgradeCode: String; minVersion: String): Boolean;
 var
-	productCode, version: string;
-	valueSize: dword;
+	productCode, version: String;
+	valueSize: DWORD;
 begin
 	SetLength(productCode, 39);
 	Result := false;

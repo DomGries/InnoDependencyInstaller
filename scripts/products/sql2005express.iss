@@ -16,7 +16,7 @@ const
 
 procedure sql2005express();
 var
-	version: string;
+	version: String;
 begin
 	// CHECK NOT FINISHED YET
 	// RTM: 9.00.1399.06

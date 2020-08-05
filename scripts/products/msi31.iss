@@ -7,7 +7,7 @@ msi31_size=3 MB
 const
 	msi31_url = 'http://download.microsoft.com/download/1/4/7/147ded26-931c-4daf-9095-ec7baf996f46/WindowsInstaller-KB893803-v2-x86.exe';
 
-procedure msi31(minVersion: string);
+procedure msi31(minVersion: String);
 begin
 	// Check for required Windows Installer 3.0 on Windows 2000 or higher
 	if (IsX86() and minwinversion(5, 0) and (compareversion(fileversion(ExpandConstant('{sys}{\}msi.dll')), minVersion) < 0)) then

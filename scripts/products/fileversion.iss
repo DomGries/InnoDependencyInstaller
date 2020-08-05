@@ -1,7 +1,7 @@
 [Code]
-function GetFullVersion(VersionMS, VersionLS: cardinal): string;
+function GetFullVersion(VersionMS, VersionLS: Cardinal): String;
 var
-	version: string;
+	version: String;
 begin
 	version := IntToStr(word(VersionMS shr 16));
 	version := version + '.' + IntToStr(word(VersionMS and not $ffff0000));
@@ -12,9 +12,9 @@ begin
 	Result := version;
 end;
 
-function fileversion(file: string): string;
+function fileversion(file: String): String;
 var
-	versionMS, versionLS: cardinal;
+	versionMS, versionLS: Cardinal;
 begin
 	if GetVersionNumbers(file, versionMS, versionLS) then
 		Result := GetFullVersion(versionMS, versionLS)

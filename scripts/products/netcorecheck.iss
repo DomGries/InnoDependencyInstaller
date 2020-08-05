@@ -12,10 +12,10 @@ Source: "src\netcorecheck_x64.exe"; Flags: dontcopy
 type
 	NetCoreRuntimeType = (Asp, Core, Desktop);
 
-function netcoreinstalled(runtime: NetCoreRuntimeType; version: string): Boolean;
+function netcoreinstalled(runtime: NetCoreRuntimeType; version: String): Boolean;
 var
-	netcoreRuntime: string;
-	resultCode: integer;
+	netcoreRuntime: String;
+	resultCode: Integer;
 begin
 	case runtime of
 		Asp:

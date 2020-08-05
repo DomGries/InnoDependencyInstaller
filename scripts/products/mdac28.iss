@@ -7,9 +7,9 @@ mdac28_size=5 MB
 const
 	mdac28_url = 'http://download.microsoft.com/download/c/d/f/cdfd58f1-3973-4c51-8851-49ae3777586f/MDAC_TYP.EXE';
 
-procedure mdac28(minVersion: string);
+procedure mdac28(minVersion: String);
 var
-	version: string;
+	version: String;
 begin
 	// check for MDAC installation
 	RegQueryStringValue(HKLM, 'Software\Microsoft\DataAccess', 'FullInstallVer', version);

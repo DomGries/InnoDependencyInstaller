@@ -11,7 +11,7 @@ dotnetfx47_size=59 MB
 const
 	dotnetfx47_url = 'http://download.microsoft.com/download/0/5/C/05C1EC0E-D5EE-463B-BFE3-9311376A6809/NDP472-KB4054531-Web.exe';
 
-procedure dotnetfx47(minVersion: integer);
+procedure dotnetfx47(minVersion: Integer);
 begin
 	if (dotnetfxspversion(NetFx4x, '') < minVersion) then
 		AddProduct('dotnetfx47.exe',

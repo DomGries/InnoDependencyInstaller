@@ -16,7 +16,7 @@ const
 	vcredist2012_upgradecode = '{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}';
 	vcredist2012_upgradecode_x64 = '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}';
 
-procedure vcredist2012(minVersion: string);
+procedure vcredist2012(minVersion: String);
 begin
 	if (not IsIA64()) then begin
 		if (not msiproductupgrade(GetString(vcredist2012_upgradecode, vcredist2012_upgradecode_x64, ''), minVersion)) then

@@ -1,4 +1,3 @@
-; .NET 5.0 is currently in preview. This product and netcoreversion.iss will be updated upon it's release.
 ; https://dotnet.microsoft.com/download/dotnet/5.0
 
 [CustomMessages]

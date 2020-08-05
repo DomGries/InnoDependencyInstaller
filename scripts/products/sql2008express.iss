@@ -18,7 +18,7 @@ const
 
 procedure sql2008express();
 var
-	version: string;
+	version: String;
 begin
 	// This check does not take into account that a full version of SQL Server could be installed,
 	// making Express unnecessary.

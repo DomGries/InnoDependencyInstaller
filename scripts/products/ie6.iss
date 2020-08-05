@@ -11,9 +11,9 @@ ie6_size=78 MB
 const
 	ie6_url = 'http://download.microsoft.com/download/ie6sp1/finrel/6_sp1/W98NT42KMeXP/EN-US/ie6setup.exe';
 
-procedure ie6(minVersion: string);
+procedure ie6(minVersion: String);
 var
-	version: string;
+	version: String;
 begin
 	RegQueryStringValue(HKLM, 'Software\Microsoft\Internet Explorer', 'Version', version);
 	if (compareversion(version, minVersion) < 0) then

@@ -11,7 +11,7 @@ const
 	msi45win52_url = 'http://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/WindowsServer2003-KB942288-v4-x86.exe';
 	msi45win51_url = 'http://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/WindowsXP-KB942288-v3-x86.exe';
 
-procedure msi45(minVersion: string);
+procedure msi45(minVersion: String);
 begin
 	if (IsX86() and (compareversion(fileversion(ExpandConstant('{sys}{\}msi.dll')), minVersion) < 0)) then begin
 		if minwinversion(6, 0) then

@@ -274,7 +274,7 @@ WindowsServicePack=Windows %1 Service Pack %2
 #endif
 
 [Code]
-function InitializeSetup(): boolean;
+function InitializeSetup(): Boolean;
 begin
 	// initialize windows version
 	initwinversion();

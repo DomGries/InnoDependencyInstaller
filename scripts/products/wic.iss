@@ -10,7 +10,7 @@ const
 	wic_url = 'http://download.microsoft.com/download/f/f/1/ff178bb1-da91-48ed-89e5-478a99387d4f/wic_x86_';
 	wic_url_x64 = 'http://download.microsoft.com/download/6/4/5/645fed5f-a6e7-44d9-9d10-fe83348796b0/wic_x64';
 
-function GetConvertedLanguageID(): string;
+function GetConvertedLanguageID(): String;
 begin
 	Result := 'enu';
 	case ActiveLanguage() of

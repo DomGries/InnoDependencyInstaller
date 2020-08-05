@@ -18,7 +18,7 @@ const
 	vcredist2008_upgradecode_sp1mfc = '{DE2C306F-A067-38EF-B86C-03DE4B0312F9}';
 	vcredist2008_upgradecode_sp1mfc_x64 = '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}';
 
-procedure vcredist2008(minVersion: string);
+procedure vcredist2008(minVersion: String);
 begin
 	if (not IsIA64()) then begin
 		if (not msiproductupgrade(GetString(vcredist2008_upgradecode_sp1mfc, vcredist2008_upgradecode_sp1mfc_x64, ''), minVersion) and not msiproductupgrade(vcredist2008_upgradecode, minVersion)) then

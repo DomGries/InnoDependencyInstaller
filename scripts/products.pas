@@ -6,20 +6,20 @@ type
 		File: String;
 		Title: String;
 		Parameters: String;
-		ForceSuccess : boolean;
-		InstallClean : boolean;
-		MustRebootAfter : boolean;
+		ForceSuccess: Boolean;
+		InstallClean: Boolean;
+		MustRebootAfter: Boolean;
 	end;
 
 	InstallResult = (InstallSuccessful, InstallRebootRequired, InstallError);
 
 var
-	installMemo, downloadMessage: string;
+	installMemo, downloadMessage: String;
 	products: array of TProduct;
-	delayedReboot, isForcedX86: boolean;
+	delayedReboot, isForcedX86: Boolean;
 	DependencyPage: TOutputProgressWizardPage;
 
-procedure AddProduct(filename, parameters, title, size, url: string; forceSuccess, installClean, mustRebootAfter : boolean);
+procedure AddProduct(filename, parameters, title, size, url: String; forceSuccess, installClean, mustRebootAfter: Boolean);
 {
 	Adds a product to the list of products to download.
 	Parameters:
@@ -33,7 +33,7 @@ procedure AddProduct(filename, parameters, title, size, url: string; forceSucces
 		mustRebootAfter: whether the product needs a reboot after installing
 }
 var
-	path: string;
+	path: String;
 	i: Integer;
 begin
 	installMemo := installMemo + '%1' + title + #13;
@@ -59,7 +59,7 @@ begin
 	products[i].MustRebootAfter := mustRebootAfter;
 end;
 
-function SmartExec(product : TProduct; var resultCode : Integer): boolean;
+function SmartExec(product: TProduct; var resultCode: Integer): Boolean;
 {
 	Executes a product and returns the exit code.
 	Parameters:
@@ -74,11 +74,12 @@ begin
 	end;
 end;
 
-function PendingReboot: boolean;
+function PendingReboot: Boolean;
 {
 	Checks whether the machine has a pending reboot.
 }
-var	names: String;
+var
+	names: String;
 begin
 	if (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', names)) then begin
 		Result := true;
@@ -168,14 +169,14 @@ end;
 	--------------------
 }
 
-function PrepareToInstall(var NeedsRestart: boolean): String;
+function PrepareToInstall(var NeedsRestart: Boolean): String;
 {
 	Before the "preparing to install" page.
-	See: http://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
+	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
 var
 	i: Integer;
-	s: string;
+	s: String;
 begin
 	delayedReboot := false;
 
@@ -199,10 +200,10 @@ begin
 	end;
 end;
 
-function NeedRestart : boolean;
+function NeedRestart: Boolean;
 {
 	Checks whether a restart is needed at the end of install
-	See: http://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
+	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
 begin
 	Result := delayedReboot;
@@ -211,10 +212,10 @@ end;
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 {
 	Just before the "ready" page.
-	See: http://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
+	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
 var
-	s: string;
+	s: String;
 begin
 	if downloadMessage <> '' then
 		s := s + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMessage, [Space]) + NewLine;
@@ -231,10 +232,10 @@ begin
 	Result := s
 end;
 
-function NextButtonClick(CurPageID: Integer): boolean;
+function NextButtonClick(CurPageID: Integer): Boolean;
 {
 	At each "next" button click
-	See: http://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
+	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
 begin
 	Result := true;
@@ -259,7 +260,7 @@ end;
 	-----------------------------
 }
 
-function IsX86: boolean;
+function IsX86: Boolean;
 {
 	Gets whether the computer is x86 (32 bits).
 }
@@ -267,7 +268,7 @@ begin
 	Result := isForcedX86 or (ProcessorArchitecture = paX86) or (ProcessorArchitecture = paUnknown);
 end;
 
-function IsX64: boolean;
+function IsX64: Boolean;
 {
 	Gets whether the computer is x64 (64 bits).
 }
@@ -275,7 +276,7 @@ begin
 	Result := (not isForcedX86) and Is64BitInstallMode and (ProcessorArchitecture = paX64);
 end;
 
-function IsIA64: boolean;
+function IsIA64: Boolean;
 {
 	Gets whether the computer is IA64 (Itanium 64 bits).
 }
@@ -316,7 +317,7 @@ begin
 	end;
 end;
 
-procedure SetForceX86(value: boolean);
+procedure SetForceX86(value: Boolean);
 {
 	Forces the setup to use X86 products
 }
