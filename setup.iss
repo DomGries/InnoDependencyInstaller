@@ -188,20 +188,24 @@
 #endif
 
 
+; setup
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
+#define MyAppPublisher 'domgho'
+#define MyAppCopyright 'Copyright © domgho'
+#define MyAppURL 'https://github.com/domgho/InnoDependencyInstaller'
 
 [Setup]
 AppName={#MyAppSetupName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright=Copyright © 2007-2020 domgho
+AppCopyright={#MyAppCopyright}
 VersionInfoVersion={#MyAppVersion}
-VersionInfoCompany=domgho
-AppPublisher=domgho
-;AppPublisherURL=https://...
-;AppSupportURL=https://...
-;AppUpdatesURL=https://...
+VersionInfoCompany={#MyAppPublisher}
+AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
+AppUpdatesURL={#MyAppURL}
 OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
 DefaultGroupName={#MyAppSetupName}
 #if VER < EncodeVer(6,0,0)
