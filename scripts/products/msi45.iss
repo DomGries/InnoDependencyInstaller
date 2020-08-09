@@ -12,8 +12,10 @@ const
 	msi45win51_url = 'http://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/WindowsXP-KB942288-v3-x86.exe';
 
 procedure msi45(minVersion: String);
+var
+	version: String;
 begin
-	if (IsX86() and (compareversion(fileversion(ExpandConstant('{sys}{\}msi.dll')), minVersion) < 0)) then begin
+	if (IsX86() and GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), version) and (compareversion(version, minVersion) < 0)) then begin
 		if minwinversion(6, 0) then
 			AddProduct('msi45_60.msu',
 				'/quiet /norestart',

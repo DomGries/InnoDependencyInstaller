@@ -66,7 +66,6 @@
 ; helper functions
 #include "scripts\products\stringversion.iss"
 #include "scripts\products\winversion.iss"
-#include "scripts\products\fileversion.iss"
 #include "scripts\products\dotnetfxversion.iss"
 
 ; actual products
