@@ -1,7 +1,8 @@
-;contribute: https://github.com/domgho/InnoDependencyInstaller
-;official article: https://www.codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
+; contribute: https://github.com/domgho/InnoDependencyInstaller
+; official article: https://www.codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
 
-;comment out product defines to disable installing them
+
+; comment out product defines to disable installing them
 #define use_msi31
 #define use_msi45
 #define use_wic
@@ -19,7 +20,7 @@
 #define use_dotnetfx47
 #define use_dotnetfx48
 
-;requires netcorecheck.exe and netcorecheck_x64.exe in src dir
+; requires netcorecheck.exe and netcorecheck_x64.exe in src dir
 ;#define use_netcorecheck
 ;#define use_netcore31
 ;#define use_netcore31asp
@@ -38,7 +39,7 @@
 #define use_vc2017
 #define use_vc2019
 
-;requires dxwebsetup.exe in src dir
+; requires dxwebsetup.exe in src dir
 ;#define use_directxruntime
 
 #define use_sqlcompact35sp2

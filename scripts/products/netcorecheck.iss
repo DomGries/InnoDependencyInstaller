@@ -4,9 +4,8 @@
 ; download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
 
 [Files]
-; includes netcorecheck.exe in setup executable so that we don't need to download it
-Source: "src\netcorecheck.exe"; Flags: dontcopy
-Source: "src\netcorecheck_x64.exe"; Flags: dontcopy
+Source: "src\netcorecheck.exe"; Flags: dontcopy noencryption
+Source: "src\netcorecheck_x64.exe"; Flags: dontcopy noencryption
 
 [Code]
 type

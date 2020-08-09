@@ -7,8 +7,7 @@ directxruntime_title=DirectX End-User Runtime
 directxruntime_size=96 MB
 
 [Files]
-;includes dxwebsetup.exe in setup executable so that we don't need to download it
-Source: "src\dxwebsetup.exe"; Flags: dontcopy
+Source: "src\dxwebsetup.exe"; Flags: dontcopy noencryption
 
 [Code]
 const

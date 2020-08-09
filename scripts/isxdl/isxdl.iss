@@ -1,5 +1,5 @@
 [Files]
-Source: "scripts\isxdl\isxdl.dll"; Flags: dontcopy
+Source: "scripts\isxdl\isxdl.dll"; Flags: dontcopy noencryption
 
 [Code]
 procedure isxdl_AddFile(URL, Filename: PAnsiChar);

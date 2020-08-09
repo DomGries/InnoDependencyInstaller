@@ -15,4 +15,4 @@ nl.depinstall_error=Er is een fout opgetreden tijdens het installeren van de afh
 nl.isxdl_langfile=dutch.ini
 
 [Files]
-Source: "scripts\isxdl\dutch.ini"; Flags: dontcopy
+Source: "scripts\isxdl\dutch.ini"; Flags: dontcopy noencryption

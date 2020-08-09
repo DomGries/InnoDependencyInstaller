@@ -15,4 +15,4 @@ de.depinstall_error=Ein Fehler ist während der Installation der Abghängigkeiten 
 de.isxdl_langfile=german.ini
 
 [Files]
-Source: "scripts\isxdl\german.ini"; Flags: dontcopy
+Source: "scripts\isxdl\german.ini"; Flags: dontcopy noencryption

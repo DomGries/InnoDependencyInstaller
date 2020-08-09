@@ -15,4 +15,4 @@ it.depinstall_error=Si è verificato un errore durante l'installazione delle dip
 it.isxdl_langfile=italian.ini
 
 [Files]
-Source: "scripts\isxdl\italian.ini"; Flags: dontcopy
+Source: "scripts\isxdl\italian.ini"; Flags: dontcopy noencryption
