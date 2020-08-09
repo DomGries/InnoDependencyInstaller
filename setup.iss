@@ -1,5 +1,5 @@
 ;contribute: https://github.com/domgho/InnoDependencyInstaller
-;original article: https://www.codeproject.com/Articles/20868/NET-Framework-Installer-for-InnoSetup
+;official article: https://www.codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
 
 ;comment out product defines to disable installing them
 #define use_msi31
@@ -44,40 +44,6 @@
 #define use_sqlcompact35sp2
 #define use_sql2008express
 
-#define MyAppSetupName 'MyProgram'
-#define MyAppVersion '1.0'
-
-[Setup]
-AppName={#MyAppSetupName}
-AppVersion={#MyAppVersion}
-AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright=Copyright © 2007-2020 domgho
-VersionInfoVersion={#MyAppVersion}
-VersionInfoCompany=domgho
-AppPublisher=domgho
-;AppPublisherURL=https://...
-;AppSupportURL=https://...
-;AppUpdatesURL=https://...
-OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
-DefaultGroupName={#MyAppSetupName}
-#if VER < EncodeVer(6,0,0)
-DefaultDirName={pf}\{#MyAppSetupName}
-#else
-DefaultDirName={autopf}\{#MyAppSetupName}
-#endif
-UninstallDisplayIcon={app}\MyProgram.exe
-OutputDir=bin
-SourceDir=.
-AllowNoIcons=yes
-;SetupIconFile=MyProgramIcon
-
-PrivilegesRequired=admin
-ArchitecturesAllowed=x86 x64 ia64
-ArchitecturesInstallIn64BitMode=x64 ia64
-
-; downloading and installing dependencies will only work if the memo/ready page is enabled (default and current behaviour)
-DisableReadyPage=no
-DisableReadyMemo=no
 
 ; supported languages
 #include "scripts\lang\english.iss"
@@ -92,26 +58,6 @@ DisableReadyMemo=no
 #include "scripts\lang\russian.iss"
 #include "scripts\lang\japanese.iss"
 #endif
-
-[Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
-
-[Files]
-Source: "src\MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsX64
-Source: "src\MyProgram-IA64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsIA64
-Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode
-
-[Icons]
-Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"
-Name: "{group}\{cm:UninstallProgram,{#MyAppSetupName}}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"; Tasks: desktopicon
-
-[Run]
-Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
-
-[CustomMessages]
-DependenciesDir=MyProgramDependencies
-WindowsServicePack=Windows %1 Service Pack %2
 
 ; shared code for installing the products
 #include "scripts\products.iss"
@@ -239,6 +185,62 @@ WindowsServicePack=Windows %1 Service Pack %2
 #ifdef use_sql2008express
 #include "scripts\products\sql2008express.iss"
 #endif
+
+
+#define MyAppSetupName 'MyProgram'
+#define MyAppVersion '1.0'
+
+[Setup]
+AppName={#MyAppSetupName}
+AppVersion={#MyAppVersion}
+AppVerName={#MyAppSetupName} {#MyAppVersion}
+AppCopyright=Copyright © 2007-2020 domgho
+VersionInfoVersion={#MyAppVersion}
+VersionInfoCompany=domgho
+AppPublisher=domgho
+;AppPublisherURL=https://...
+;AppSupportURL=https://...
+;AppUpdatesURL=https://...
+OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
+DefaultGroupName={#MyAppSetupName}
+#if VER < EncodeVer(6,0,0)
+DefaultDirName={pf}\{#MyAppSetupName}
+#else
+DefaultDirName={autopf}\{#MyAppSetupName}
+#endif
+UninstallDisplayIcon={app}\MyProgram.exe
+OutputDir=bin
+SourceDir=.
+AllowNoIcons=yes
+;SetupIconFile=MyProgramIcon
+
+PrivilegesRequired=admin
+ArchitecturesAllowed=x86 x64 ia64
+ArchitecturesInstallIn64BitMode=x64 ia64
+
+; downloading and installing dependencies will only work if the memo/ready page is enabled (default and current behaviour)
+DisableReadyPage=no
+DisableReadyMemo=no
+
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
+
+[Files]
+Source: "src\MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsX64
+Source: "src\MyProgram-IA64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsIA64
+Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode
+
+[Icons]
+Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"
+Name: "{group}\{cm:UninstallProgram,{#MyAppSetupName}}"; Filename: "{uninstallexe}"
+Name: "{commondesktop}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"; Tasks: desktopicon
+
+[Run]
+Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
+
+[CustomMessages]
+DependenciesDir=MyProgramDependencies
+WindowsServicePack=Windows %1 Service Pack %2
 
 [Code]
 function InitializeSetup(): Boolean;
