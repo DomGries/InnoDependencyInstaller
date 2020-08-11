@@ -13,31 +13,23 @@ begin
 	if (lcid <> '') then
 		lcid := '\' + lcid;
 
-	if (version = NetFx10) then begin
-		RegQueryStringValue(HKLM, 'Software\Microsoft\.NETFramework\Policy\v1.0\3705', 'Install', regVersionString);
-		Result := regVersionString <> '';
-	end else begin
-		case version of
-			NetFx11:
-				RegQueryDWordValue(HKLM, netfx11plus_reg + 'v1.1.4322' + lcid, 'Install', regVersion);
-			NetFx20:
-				RegQueryDWordValue(HKLM, netfx11plus_reg + 'v2.0.50727' + lcid, 'Install', regVersion);
-			NetFx30:
-				RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.0\Setup' + lcid, 'InstallSuccess', regVersion);
-			NetFx35:
-				RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.5' + lcid, 'Install', regVersion);
-			NetFx40Client:
-				RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Client' + lcid, 'Install', regVersion);
-			NetFx40Full:
-				RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Install', regVersion);
-			NetFx4x:
-			begin
-				RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Release', regVersion);
-				Result := (regVersion >= 378389); // 4.5.0+
-				Exit;
-			end;
-		end;
-		Result := (regVersion <> 0);
+	case version of
+		NetFx10:
+			Result := RegQueryStringValue(HKLM, 'Software\Microsoft\.NETFramework\Policy\v1.0\3705', 'Install', regVersionString) and (regVersionString <> '');
+		NetFx11:
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v1.1.4322' + lcid, 'Install', regVersion) and (regVersion <> 0);
+		NetFx20:
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v2.0.50727' + lcid, 'Install', regVersion) and (regVersion <> 0);
+		NetFx30:
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.0\Setup' + lcid, 'InstallSuccess', regVersion) and (regVersion <> 0);
+		NetFx35:
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.5' + lcid, 'Install', regVersion) and (regVersion <> 0);
+		NetFx40Client:
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Client' + lcid, 'Install', regVersion) and (regVersion <> 0);
+		NetFx40Full:
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Install', regVersion) and (regVersion <> 0);
+		NetFx4x:
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Release', regVersion) and (regVersion >= 378389); // 4.5.0+
 	end;
 end;
 
