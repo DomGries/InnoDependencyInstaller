@@ -25,7 +25,9 @@ begin
 			netcoreRuntime := 'Microsoft.WindowsDesktop.App';
 	end;
 
-	ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
+	if not FileExists(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureString() + '.exe') then
+		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
+
 	Result := Exec(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureString() + '.exe', netcoreRuntime + ' ' + version, '', SW_HIDE, ewWaitUntilTerminated, resultCode) and (resultCode = 0);
 end;
 
