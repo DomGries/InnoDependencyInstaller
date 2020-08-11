@@ -14,7 +14,7 @@ type
 	InstallResult = (InstallSuccessful, InstallRebootRequired, InstallError);
 
 var
-	installMemo, downloadMessage: String;
+	installMemo, downloadMemo: String;
 	products: array of TProduct;
 	delayedReboot, isForcedX86: Boolean;
 	DependencyPage: TOutputProgressWizardPage;
@@ -36,8 +36,6 @@ var
 	path: String;
 	i: Integer;
 begin
-	installMemo := installMemo + '%1' + title + #13;
-
 	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + filename;
 	if not FileExists(path) then begin
 		path := ExpandConstant('{tmp}{\}') + filename;
@@ -45,8 +43,12 @@ begin
 		if not FileExists(path) then begin
 			isxdl_AddFile(url, path);
 
-			downloadMessage := downloadMessage + '%1' + title + ' (' + size + ')' + #13;
+			downloadMemo := downloadMemo + '%1' + title + ' (' + size + ')' + #13;
+		end else begin
+			installMemo := installMemo + '%1' + title + #13;
 		end;
+	end else begin
+		installMemo := installMemo + '%1' + title + #13;
 	end;
 
 	i := GetArrayLength(products);
@@ -217,8 +219,8 @@ function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoType
 var
 	s: String;
 begin
-	if downloadMessage <> '' then
-		s := s + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMessage, [Space]) + NewLine;
+	if downloadMemo <> '' then
+		s := s + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMemo, [Space]) + NewLine;
 	if installMemo <> '' then
 		s := s + CustomMessage('depinstall_memo_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
 
@@ -241,7 +243,7 @@ begin
 	Result := true;
 
 	if CurPageID = wpReady then begin
-		if downloadMessage <> '' then begin
+		if downloadMemo <> '' then begin
 			// change isxdl language only if it is not english because isxdl default language is already english
 			if (ActiveLanguage() <> 'en') then begin
 				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
