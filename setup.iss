@@ -21,13 +21,13 @@
 #define use_dotnetfx48
 
 ; requires netcorecheck.exe and netcorecheck_x64.exe in src dir
-;#define use_netcorecheck
-;#define use_netcore31
-;#define use_netcore31asp
-;#define use_netcore31desktop
-;#define use_dotnet50
-;#define use_dotnet50asp
-;#define use_dotnet50desktop
+#define use_netcorecheck
+#define use_netcore31
+#define use_netcore31asp
+#define use_netcore31desktop
+#define use_dotnet50
+#define use_dotnet50asp
+#define use_dotnet50desktop
 
 #define use_msiproduct
 #define use_vc2005
