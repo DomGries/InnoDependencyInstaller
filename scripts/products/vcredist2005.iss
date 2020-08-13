@@ -1,6 +1,6 @@
-; requires Windows 2000 Service Pack 3, Windows 98, Windows 98 Second Edition, Windows ME, Windows Server 2003, Windows XP Service Pack 2
-; requires Windows Installer 3.0
-; https://www.microsoft.com/en-us/download/details.aspx?id=3387
+// requires Windows 2000 Service Pack 3, Windows 98, Windows 98 Second Edition, Windows ME, Windows Server 2003, Windows XP Service Pack 2
+// requires Windows Installer 3.0
+// https://www.microsoft.com/en-us/download/details.aspx?id=3387
 
 [CustomMessages]
 vcredist2005_title=Visual C++ 2005 Redistributable (x86)
@@ -29,5 +29,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]

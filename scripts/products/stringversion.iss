@@ -58,5 +58,3 @@ begin
 	temp2 := versionB;
 	Result := compareinnerversion(temp1, temp2);
 end;
-
-[Setup]

@@ -20,5 +20,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]

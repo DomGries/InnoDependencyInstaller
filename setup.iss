@@ -1,8 +1,8 @@
-; contribute: https://github.com/domgho/InnoDependencyInstaller
-; official article: https://www.codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
+// contribute: https://github.com/domgho/InnoDependencyInstaller
+// official article: https://www.codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
 
 
-; comment out product defines to disable installing them
+// comment out product defines to disable installing them
 #define use_msi31
 #define use_msi45
 #define use_wic
@@ -20,7 +20,7 @@
 #define use_dotnetfx47
 #define use_dotnetfx48
 
-; requires netcorecheck.exe and netcorecheck_x64.exe in src dir
+// requires netcorecheck.exe and netcorecheck_x64.exe in src dir
 #define use_netcorecheck
 #define use_netcore31
 #define use_netcore31asp
@@ -39,14 +39,14 @@
 #define use_vc2017
 #define use_vc2019
 
-; requires dxwebsetup.exe in src dir
-;#define use_directxruntime
+// requires dxwebsetup.exe in src dir
+//#define use_directxruntime
 
 #define use_sqlcompact35sp2
 #define use_sql2008express
 
 
-; supported languages
+// supported languages
 #include "scripts\lang\english.iss"
 #include "scripts\lang\german.iss"
 #include "scripts\lang\french.iss"
@@ -60,15 +60,15 @@
 #include "scripts\lang\japanese.iss"
 #endif
 
-; shared code for installing the products
+// shared code for installing the products
 #include "scripts\products.iss"
 
-; helper functions
+// helper functions
 #include "scripts\products\stringversion.iss"
 #include "scripts\products\winversion.iss"
 #include "scripts\products\dotnetfxversion.iss"
 
-; actual products
+// actual products
 #ifdef use_msi31
 #include "scripts\products\msi31.iss"
 #endif
@@ -99,10 +99,10 @@
 #endif
 
 #ifdef use_dotnetfx35
-;#include "scripts\products\dotnetfx35.iss"
+//#include "scripts\products\dotnetfx35.iss"
 #include "scripts\products\dotnetfx35sp1.iss"
 #ifdef use_dotnetfx35lp
-;#include "scripts\products\dotnetfx35lp.iss"
+//#include "scripts\products\dotnetfx35lp.iss"
 #include "scripts\products\dotnetfx35sp1lp.iss"
 #endif
 #endif
@@ -187,7 +187,7 @@
 #endif
 
 
-; setup
+// setup
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
 #define MyAppPublisher 'domgho'
@@ -216,13 +216,13 @@ UninstallDisplayIcon={app}\MyProgram.exe
 OutputDir=bin
 SourceDir=.
 AllowNoIcons=yes
-;SetupIconFile=MyProgramIcon
+//SetupIconFile=MyProgramIcon
 
 PrivilegesRequired=admin
 ArchitecturesAllowed=x86 x64 ia64
 ArchitecturesInstallIn64BitMode=x64 ia64
 
-; downloading and installing dependencies will only work if the memo/ready page is enabled (default and current behaviour)
+// downloading and installing dependencies will only work if the memo/ready page is enabled (default and current behaviour)
 DisableReadyPage=no
 DisableReadyMemo=no
 

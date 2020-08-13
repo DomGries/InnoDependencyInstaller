@@ -45,5 +45,3 @@ begin
 		end;
 	end;
 end;
-
-[Setup]

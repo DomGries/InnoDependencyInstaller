@@ -2,7 +2,7 @@
 Name: "de"; MessagesFile: "compiler:Languages\German.isl"
 
 [CustomMessages]
-; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
+// https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 de.lcid=1031
 de.depdownload_memo_title=Abhängigkeiten downloaden
 de.depinstall_memo_title=Abhängigkeiten installieren

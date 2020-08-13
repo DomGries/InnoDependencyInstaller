@@ -1,5 +1,5 @@
-; requires Windows 7, Windows Server 2003 Service Pack 1, Windows Server 2003 Service Pack 2, Windows Server 2008, Windows Vista, Windows XP Service Pack 2, Windows XP Service Pack 3
-; https://www.microsoft.com/en-US/download/details.aspx?id=35
+// requires Windows 7, Windows Server 2003 Service Pack 1, Windows Server 2003 Service Pack 2, Windows Server 2008, Windows Vista, Windows XP Service Pack 2, Windows XP Service Pack 3
+// https://www.microsoft.com/en-US/download/details.aspx?id=35
 
 [CustomMessages]
 directxruntime_title=DirectX End-User Runtime
@@ -24,5 +24,3 @@ begin
 		directxruntime_url,
 		true, false, false);
 end;
-
-[Setup]

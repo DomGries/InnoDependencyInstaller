@@ -1,5 +1,5 @@
-; requires Windows 7, Windows Server 2003 R2 (32-Bit x86), Windows Server 2003 Service Pack 2, Windows Server 2008 R2, Windows Server 2008 Service Pack 2, Windows Vista Service Pack 2, Windows XP Service Pack 3
-; https://www.microsoft.com/en-us/download/details.aspx?id=5555
+// requires Windows 7, Windows Server 2003 R2 (32-Bit x86), Windows Server 2003 Service Pack 2, Windows Server 2008 R2, Windows Server 2008 Service Pack 2, Windows Vista Service Pack 2, Windows XP Service Pack 3
+// https://www.microsoft.com/en-us/download/details.aspx?id=5555
 
 [CustomMessages]
 vcredist2010_title=Visual C++ 2010 Redistributable (x86)
@@ -28,5 +28,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]

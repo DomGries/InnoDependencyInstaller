@@ -2,7 +2,7 @@
 Name: "nl"; MessagesFile: "compiler:Languages\Dutch.isl"
 
 [CustomMessages]
-; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
+// https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 nl.lcid=1043
 nl.depdownload_memo_title=Download afhankelijkheden
 nl.depinstall_memo_title=Installeer afhankelijkheden

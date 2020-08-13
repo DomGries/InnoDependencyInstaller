@@ -2,7 +2,7 @@
 Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
 
 [CustomMessages]
-; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
+// https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 it.lcid=1040
 it.depdownload_memo_title=Dipendenze da scaricare
 it.depinstall_memo_title=Dipendenze da installare

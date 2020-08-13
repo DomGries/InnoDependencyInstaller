@@ -2,7 +2,7 @@
 Name: "en"; MessagesFile: "compiler:Default.isl"
 
 [CustomMessages]
-; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
+// https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 en.lcid=1033
 en.depdownload_memo_title=Download dependencies
 en.depinstall_memo_title=Install dependencies

@@ -1,4 +1,4 @@
-; https://dotnet.microsoft.com/download/dotnet/5.0
+// https://dotnet.microsoft.com/download/dotnet/5.0
 
 [CustomMessages]
 dotnet50desktop_title=.NET Desktop Runtime 5.0 Preview 6 (x86)
@@ -24,5 +24,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]

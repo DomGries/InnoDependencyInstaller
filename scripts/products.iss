@@ -2,5 +2,3 @@
 
 [Code]
 #include "products.pas"
-
-[Setup]

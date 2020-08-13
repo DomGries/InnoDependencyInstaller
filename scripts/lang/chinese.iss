@@ -2,7 +2,7 @@
 Name: "chs"; MessagesFile: "compiler:Default.isl"
 
 [CustomMessages]
-; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
+// https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 chs.lcid=2052
 chs.depdownload_memo_title=下载依赖组建
 chs.depinstall_memo_title=安装依赖组建

@@ -1,6 +1,6 @@
-; requires Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Server 2012 R2, Windows Vista Service Pack 2
-; express setup (downloads and installs the components depending on your OS) if you want to deploy it locally download the full installer on website below
-; https://www.microsoft.com/en-us/download/details.aspx?id=42642
+// requires Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Server 2012 R2, Windows Vista Service Pack 2
+// express setup (downloads and installs the components depending on your OS) if you want to deploy it locally download the full installer on website below
+// https://www.microsoft.com/en-us/download/details.aspx?id=42642
 
 [CustomMessages]
 dotnetfx45_title=.NET Framework 4.5.2
@@ -21,5 +21,3 @@ begin
 			dotnetfx45_url,
 			false, false, false);
 end;
-
-[Setup]

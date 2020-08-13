@@ -17,5 +17,3 @@ begin
 			sqlcompact35sp2_url,
 			false, false, false);
 end;
-
-[Setup]

@@ -1,5 +1,5 @@
-; requires Windows 10, Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003 Service Pack 2, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP Service Pack 3
-; https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
+// requires Windows 10, Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003 Service Pack 2, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP Service Pack 3
+// https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 
 [CustomMessages]
 vcredist2019_title=Visual C++ 2015-2019 Redistributable (x86)
@@ -28,5 +28,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]

@@ -1,7 +1,7 @@
-; NetCoreCheck tool is necessary for detecting if a specific version of .NET Core/.NET 5.0 is installed: https://github.com/dotnet/runtime/issues/36479
-; source code: https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
-; download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
-; download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
+// NetCoreCheck tool is necessary for detecting if a specific version of .NET Core/.NET 5.0 is installed: https://github.com/dotnet/runtime/issues/36479
+// source code: https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
+// download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
+// download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
 
 [Files]
 Source: "src\netcorecheck.exe"; Flags: dontcopy noencryption
@@ -30,5 +30,3 @@ begin
 
 	Result := Exec(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureString() + '.exe', netcoreRuntime + ' ' + version, '', SW_HIDE, ewWaitUntilTerminated, resultCode) and (resultCode = 0);
 end;
-
-[Setup]

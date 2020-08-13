@@ -1,4 +1,4 @@
-; https://www.microsoft.com/downloads/details.aspx?familyid=92E0E1CE-8693-4480-84FA-7D85EEF59016
+// https://www.microsoft.com/downloads/details.aspx?familyid=92E0E1CE-8693-4480-84FA-7D85EEF59016
 
 [CustomMessages]
 dotnetfx20lp_title=
@@ -27,5 +27,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]

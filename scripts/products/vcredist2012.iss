@@ -1,5 +1,5 @@
-; requires Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP
-; https://www.microsoft.com/en-us/download/details.aspx?id=30679
+// requires Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP
+// https://www.microsoft.com/en-us/download/details.aspx?id=30679
 
 [CustomMessages]
 vcredist2012_title=Visual C++ 2012 Redistributable (x86)
@@ -28,5 +28,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]

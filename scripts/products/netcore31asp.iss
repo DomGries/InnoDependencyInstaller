@@ -1,5 +1,5 @@
-; requires Windows 10 Version 1607+, Windows 7 SP1+, Windows 8.1, Windows Server 2012 R2
-; https://dotnet.microsoft.com/download/dotnet-core/3.1
+// requires Windows 10 Version 1607+, Windows 7 SP1+, Windows 8.1, Windows Server 2012 R2
+// https://dotnet.microsoft.com/download/dotnet-core/3.1
 
 [CustomMessages]
 netcore31asp_title=ASP.NET Core Runtime 3.1.6 (x86)
@@ -25,5 +25,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]

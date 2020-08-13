@@ -2,7 +2,7 @@
 Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [CustomMessages]
-; https://www.microsoft.com/globaldev/reference/lcid-all.mspx
+// https://www.microsoft.com/globaldev/reference/lcid-all.mspx
 pl.lcid=1045
 pl.depdownload_memo_title=Pobierz zależności
 pl.depinstall_memo_title=Zainstaluj zależności

@@ -1,4 +1,4 @@
-; https://www.microsoft.com/downloads/details.aspx?FamilyID=1cc39ffe-a2aa-4548-91b3-855a2de99304
+// https://www.microsoft.com/downloads/details.aspx?FamilyID=1cc39ffe-a2aa-4548-91b3-855a2de99304
 
 [CustomMessages]
 dotnetfx20sp1lp_title=
@@ -27,5 +27,3 @@ begin
 				false, false, false);
 	end;
 end;
-
-[Setup]
