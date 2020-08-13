@@ -230,9 +230,9 @@ DisableReadyMemo=no
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 
 [Files]
-Source: "src\MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsX64
-Source: "src\MyProgram-IA64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsIA64
-Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode
+Source: "src\MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsX64; Flags: ignoreversion
+Source: "src\MyProgram-IA64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsIA64; Flags: ignoreversion
+Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"
