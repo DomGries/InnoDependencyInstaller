@@ -15,4 +15,4 @@ ru.depinstall_error=В процессе установки зависимост�
 ru.isxdl_langfile=russian.ini
 
 [Files]
-Source: "scripts\isxdl\russian.ini"; Flags: dontcopy noencryption
+Source: "{#InnoDependencyInstallerDir}\scripts\isxdl\russian.ini"; Flags: dontcopy noencryption

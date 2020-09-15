@@ -15,4 +15,4 @@ chs.depinstall_error=安装依赖组建时出错。请重新启动计算机并�
 chs.isxdl_langfile=chinese.ini
 
 [Files]
-Source: "scripts\isxdl\chinese.ini"; Flags: dontcopy noencryption
+Source: "{#InnoDependencyInstallerDir}\scripts\isxdl\chinese.ini"; Flags: dontcopy noencryption

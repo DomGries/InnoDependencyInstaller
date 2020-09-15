@@ -15,4 +15,4 @@ ja.depinstall_error=依存ファイルのインストール中にエラーが発
 ja.isxdl_langfile=japanese.ini
 
 [Files]
-Source: "scripts\isxdl\japanese.ini"; Flags: dontcopy noencryption
+Source: "{#InnoDependencyInstallerDir}\scripts\isxdl\japanese.ini"; Flags: dontcopy noencryption

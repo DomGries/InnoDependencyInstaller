@@ -15,4 +15,4 @@ pl.depinstall_error=Wystąpił błąd podczas instalowania zależności. Uruchom
 pl.isxdl_langfile=polish.ini
 
 [Files]
-Source: "scripts\isxdl\polish.ini"; Flags: dontcopy noencryption
+Source: "{#InnoDependencyInstallerDir}\scripts\isxdl\polish.ini"; Flags: dontcopy noencryption

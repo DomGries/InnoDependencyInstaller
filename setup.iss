@@ -45,6 +45,8 @@
 #define use_sqlcompact35sp2
 #define use_sql2008express
 
+// Inno Dependency Installer root directory (must be changed when used as a submodule)
+#define InnoDependencyInstallerDir '.'
 
 // supported languages
 #include "scripts\lang\english.iss"

@@ -15,4 +15,4 @@ fr.depinstall_error=Une erreur est survenue lors de l'installation des dépendanc
 fr.isxdl_langfile=french3.ini
 
 [Files]
-Source: "scripts\isxdl\french3.ini"; Flags: dontcopy noencryption
+Source: "{#InnoDependencyInstallerDir}\scripts\isxdl\french3.ini"; Flags: dontcopy noencryption
