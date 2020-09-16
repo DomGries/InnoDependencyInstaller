@@ -69,11 +69,7 @@ function SmartExec(product: TProduct; var resultCode: Integer): Boolean;
 		resultCode: the exit code
 }
 begin
-	if (LowerCase(Copy(product.File, Length(product.File) - 2, 3)) = 'exe') then begin
-		Result := Exec(product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode);
-	end else begin
-		Result := ShellExec('', product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode);
-	end;
+	Result := ShellExec('', product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode);
 end;
 
 function PendingReboot: Boolean;
