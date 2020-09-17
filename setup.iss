@@ -1,6 +1,43 @@
 // contribute: https://github.com/domgho/InnoDependencyInstaller
 // official article: https://www.codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
 
+#define MyAppSetupName 'MyProgram'
+#define MyAppVersion '1.0'
+#define MyAppPublisher 'domgho'
+#define MyAppCopyright 'Copyright © domgho'
+#define MyAppURL 'https://github.com/domgho/InnoDependencyInstaller'
+
+[Setup]
+AppName={#MyAppSetupName}
+AppVersion={#MyAppVersion}
+AppVerName={#MyAppSetupName} {#MyAppVersion}
+AppCopyright={#MyAppCopyright}
+VersionInfoVersion={#MyAppVersion}
+VersionInfoCompany={#MyAppPublisher}
+AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
+AppUpdatesURL={#MyAppURL}
+OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
+DefaultGroupName={#MyAppSetupName}
+#if VER < EncodeVer(6,0,0)
+DefaultDirName={pf}\{#MyAppSetupName}
+#else
+DefaultDirName={autopf}\{#MyAppSetupName}
+#endif
+UninstallDisplayIcon={app}\MyProgram.exe
+OutputDir=bin
+SourceDir=.
+AllowNoIcons=yes
+
+PrivilegesRequired=admin
+ArchitecturesAllowed=x86 x64 ia64
+ArchitecturesInstallIn64BitMode=x64 ia64
+
+// downloading and installing dependencies will only work if the memo/ready page is enabled (default and current behaviour)
+DisableReadyPage=no
+DisableReadyMemo=no
+
 
 // comment out product defines to disable installing them
 #define use_msi31
@@ -187,45 +224,7 @@
 #endif
 
 
-// setup
-#define MyAppSetupName 'MyProgram'
-#define MyAppVersion '1.0'
-#define MyAppPublisher 'domgho'
-#define MyAppCopyright 'Copyright © domgho'
-#define MyAppURL 'https://github.com/domgho/InnoDependencyInstaller'
-
-[Setup]
-AppName={#MyAppSetupName}
-AppVersion={#MyAppVersion}
-AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright={#MyAppCopyright}
-VersionInfoVersion={#MyAppVersion}
-VersionInfoCompany={#MyAppPublisher}
-AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
-AppUpdatesURL={#MyAppURL}
-OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
-DefaultGroupName={#MyAppSetupName}
-#if VER < EncodeVer(6,0,0)
-DefaultDirName={pf}\{#MyAppSetupName}
-#else
-DefaultDirName={autopf}\{#MyAppSetupName}
-#endif
-UninstallDisplayIcon={app}\MyProgram.exe
-OutputDir=bin
-SourceDir=.
-AllowNoIcons=yes
-//SetupIconFile=MyProgramIcon
-
-PrivilegesRequired=admin
-ArchitecturesAllowed=x86 x64 ia64
-ArchitecturesInstallIn64BitMode=x64 ia64
-
-// downloading and installing dependencies will only work if the memo/ready page is enabled (default and current behaviour)
-DisableReadyPage=no
-DisableReadyMemo=no
-
+// content
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 
