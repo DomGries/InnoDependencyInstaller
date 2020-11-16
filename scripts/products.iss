@@ -1,2 +1,0 @@
-[Code]
-#include "products.pas"

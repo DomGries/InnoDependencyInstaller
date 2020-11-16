@@ -92,7 +92,8 @@ DisableReadyMemo=no
 #include "scripts\lang\japanese.iss"
 
 // shared code for installing the products
-#include "scripts\products.iss"
+[Code]
+#include "scripts\products.pas"
 
 // helper functions
 #include "scripts\products\stringversion.iss"
