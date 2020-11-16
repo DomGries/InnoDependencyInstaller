@@ -11,8 +11,3 @@ pl.depinstall_description=Instalator instaluje zależności na komputerze, prosz
 pl.depinstall_status=Instalowanie %1....
 pl.depinstall_missing=%1 musi być zainstalowany przed instalacją, aby mogła ona być kontynuowana. Zainstaluj %1 i ponownie uruchom program instalacyjny.
 pl.depinstall_error=Wystąpił błąd podczas instalowania zależności. Uruchom ponownie komputer, a następnie ponownie uruchom program instalacyjny lub ręcznie zainstaluj następujące programy:%n
-
-pl.isxdl_langfile=polish.ini
-
-[Files]
-Source: "scripts\isxdl\polish.ini"; Flags: dontcopy noencryption

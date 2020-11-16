@@ -11,8 +11,3 @@ ja.depinstall_description=セットアップが依存ファイルをインスト
 ja.depinstall_status=インストール中 %1...
 ja.depinstall_missing=セットアップを継続するために %1 をインストールする必要があります. %1 をインストールし、再度セットアップを実行してください.
 ja.depinstall_error=依存ファイルのインストール中にエラーが発生しました. コンピューターを再起動しセットアップを再度実行するか、依存ファイルを手動でインストールしてください:%n
-
-ja.isxdl_langfile=japanese.ini
-
-[Files]
-Source: "scripts\isxdl\japanese.ini"; Flags: dontcopy noencryption

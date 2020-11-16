@@ -11,8 +11,3 @@ chs.depinstall_description=安装程序正在安装所需的依赖组建，请�
 chs.depinstall_status=正在安装 %1...
 chs.depinstall_missing=必须安装 %1 之后才能继续本安装程序。请先安装 %1，然后在重新运行本安装程序。
 chs.depinstall_error=安装依赖组建时出错。请重新启动计算机并再次运行安装程序，或手动安装下列依赖组建：%n
-
-chs.isxdl_langfile=chinese.ini
-
-[Files]
-Source: "scripts\isxdl\chinese.ini"; Flags: dontcopy noencryption

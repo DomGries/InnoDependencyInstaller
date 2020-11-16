@@ -17,7 +17,12 @@ var
 	installMemo, downloadMemo: String;
 	products: array of TProduct;
 	delayedReboot, isForcedX86: Boolean;
-	DependencyPage: TOutputProgressWizardPage;
+	DownloadPage: TDownloadWizardPage;
+
+procedure initproducts();
+begin
+	DownloadPage := CreateDownloadPage(CustomMessage('depinstall_title'), CustomMessage('depinstall_description'), nil);
+end;
 
 procedure AddProduct(filename, parameters, title, size, url: String; forceSuccess, installClean, mustRebootAfter: Boolean);
 {
@@ -41,7 +46,7 @@ begin
 		path := ExpandConstant('{tmp}{\}') + filename;
 
 		if not FileExists(path) then begin
-			isxdl_AddFile(url, path);
+			DownloadPage.Add(url, filename, '');
 
 			downloadMemo := downloadMemo + '%1' + title + ' (' + size + ')' + #13;
 		end else begin
@@ -88,17 +93,16 @@ begin
 	productCount := GetArrayLength(products);
 
 	if productCount > 0 then begin
-		DependencyPage := CreateOutputProgressPage(CustomMessage('depinstall_title'), CustomMessage('depinstall_description'));
-		DependencyPage.Show;
-
 		for i := 0 to productCount - 1 do begin
 			if (products[i].InstallClean and (delayedReboot or PendingReboot())) then begin
 				Result := InstallRebootRequired;
 				break;
 			end;
 
-			DependencyPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
-			DependencyPage.SetProgress(i, productCount);
+			DownloadPage.Clear;
+			DownloadPage.Show;
+			DownloadPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
+			DownloadPage.SetProgress(i + 1, productCount);
 
 			while true do begin
 				// set 0 as used code for shown error if ShellExec fails
@@ -146,7 +150,7 @@ begin
 		end;
 		SetArrayLength(products, productCount - finishCount);
 
-		DependencyPage.Hide;
+		DownloadPage.Hide;
 	end;
 end;
 
@@ -229,14 +233,13 @@ begin
 
 	if CurPageID = wpReady then begin
 		if downloadMemo <> '' then begin
-			// change isxdl language only if it is not english because isxdl default language is already english
-			if (ActiveLanguage() <> 'en') then begin
-				ExtractTemporaryFile(CustomMessage('isxdl_langfile'));
-				isxdl_SetOption('language', ExpandConstant('{tmp}{\}') + CustomMessage('isxdl_langfile'));
-			end;
-
-			if isxdl_DownloadFiles(StrToInt(ExpandConstant('{wizardhwnd}'))) = 0 then
+			DownloadPage.Show;
+			try
+				DownloadPage.Download;
+			except
 				Result := false;
+			end;
+			DownloadPage.Hide;
 		end;
 	end;
 end;

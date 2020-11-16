@@ -11,8 +11,3 @@ de.depinstall_description=Warten Sie bitte während Abhängigkeiten auf Ihrem Comp
 de.depinstall_status=Installiere %1...
 de.depinstall_missing=%1 muss installiert werden bevor das Setup fortfahren kann. Bitte installieren Sie %1 und starten Sie das Setup erneut.
 de.depinstall_error=Ein Fehler ist während der Installation der Abghängigkeiten aufgetreten. Bitte starten Sie den Computer neu und führen Sie das Setup erneut aus oder installieren Sie die folgenden Abhängigkeiten per Hand:%n
-
-de.isxdl_langfile=german.ini
-
-[Files]
-Source: "scripts\isxdl\german.ini"; Flags: dontcopy noencryption

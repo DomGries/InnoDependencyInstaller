@@ -11,8 +11,3 @@ nl.depinstall_description=Een moment geduld aub Setup installeert afhankelijkhed
 nl.depinstall_status=Installeren %1...
 nl.depinstall_missing=%1 moet worden geïnstalleerd vóór de installatie kan worden voortgezet. Installeer %1 en voer Setup opnieuw uit.
 nl.depinstall_error=Er is een fout opgetreden tijdens het installeren van de afhankelijkheden. Gelieve de computer opnieuw op en voer de installatie opnieuw uit of de volgende afhankelijkheden handmatig installeren:%n
-
-nl.isxdl_langfile=dutch.ini
-
-[Files]
-Source: "scripts\isxdl\dutch.ini"; Flags: dontcopy noencryption

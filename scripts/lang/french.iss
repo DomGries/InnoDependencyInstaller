@@ -11,8 +11,3 @@ fr.depinstall_description=Veuillez patienter pendant que les dépendances sont in
 fr.depinstall_status=Installation de %1...
 fr.depinstall_missing=%1 doit être installé avant de pouvoir continuer. Veuillez installer %1 et exécutez à nouveau le programme d'installation.
 fr.depinstall_error=Une erreur est survenue lors de l'installation des dépendances. Veuillez redémarrer l'ordinateur, et exécutez à nouveau le programme d'installation, ou installez les dépendances suivantes manuellement :%n
-
-fr.isxdl_langfile=french3.ini
-
-[Files]
-Source: "scripts\isxdl\french3.ini"; Flags: dontcopy noencryption
