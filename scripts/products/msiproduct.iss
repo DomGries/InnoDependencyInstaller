@@ -1,10 +1,4 @@
 [Code]
-#ifdef UNICODE
-	#define AW "W"
-#else
-	#define AW "A"
-#endif
-
 type
 	INSTALLSTATE = Longint;
 const
@@ -15,13 +9,13 @@ const
 	INSTALLSTATE_DEFAULT = 5;		// The product is installed for the current user.
 
 function MsiQueryProductState(szProduct: String): INSTALLSTATE;
-external 'MsiQueryProductState{#AW}@msi.dll stdcall';
+external 'MsiQueryProductStateW@msi.dll stdcall';
 
 function MsiEnumRelatedProducts(szUpgradeCode: String; nReserved: DWORD; nIndex: DWORD; szProductCode: String): Integer;
-external 'MsiEnumRelatedProducts{#AW}@msi.dll stdcall';
+external 'MsiEnumRelatedProductsW@msi.dll stdcall';
 
 function MsiGetProductInfo(szProductCode: String; szProperty: String; szValue: String; var nvalueSize: DWORD): Integer;
-external 'MsiGetProductInfo{#AW}@msi.dll stdcall';
+external 'MsiGetProductInfoW@msi.dll stdcall';
 
 function msiproduct(productID: String): Boolean;
 begin

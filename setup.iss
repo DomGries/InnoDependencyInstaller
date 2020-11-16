@@ -20,11 +20,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
 DefaultGroupName={#MyAppSetupName}
-#if VER < EncodeVer(6,0,0)
-DefaultDirName={pf}\{#MyAppSetupName}
-#else
 DefaultDirName={autopf}\{#MyAppSetupName}
-#endif
 UninstallDisplayIcon={app}\MyProgram.exe
 OutputDir=bin
 SourceDir=.
@@ -89,13 +85,10 @@ DisableReadyMemo=no
 #include "scripts\lang\french.iss"
 #include "scripts\lang\italian.iss"
 #include "scripts\lang\dutch.iss"
-
-#ifdef UNICODE
 #include "scripts\lang\chinese.iss"
 #include "scripts\lang\polish.iss"
 #include "scripts\lang\russian.iss"
 #include "scripts\lang\japanese.iss"
-#endif
 
 // shared code for installing the products
 #include "scripts\products.iss"
