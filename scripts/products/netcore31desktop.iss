@@ -10,8 +10,8 @@ netcore31desktop_size_x64=26 MB
 
 [Code]
 const
-	netcore31desktop_url = 'http://go.microsoft.com/fwlink/?linkid=2137844';
-	netcore31desktop_url_x64 = 'http://go.microsoft.com/fwlink/?linkid=2137941';
+	netcore31desktop_url = 'https://go.microsoft.com/fwlink/?linkid=2137844';
+	netcore31desktop_url_x64 = 'https://go.microsoft.com/fwlink/?linkid=2137941';
 
 procedure netcore31desktop();
 begin

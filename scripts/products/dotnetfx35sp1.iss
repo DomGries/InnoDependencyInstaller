@@ -10,7 +10,7 @@ dotnetfx35sp1_size=232 MB
 
 [Code]
 const
-	dotnetfx35sp1_url = 'http://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe';
+	dotnetfx35sp1_url = 'https://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe';
 
 procedure dotnetfx35sp1();
 begin

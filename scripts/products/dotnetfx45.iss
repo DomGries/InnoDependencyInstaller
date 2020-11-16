@@ -9,7 +9,7 @@ dotnetfx45_size=68 MB
 
 [Code]
 const
-	dotnetfx45_url = 'http://download.microsoft.com/download/B/4/1/B4119C11-0423-477B-80EE-7A474314B347/NDP452-KB2901954-Web.exe';
+	dotnetfx45_url = 'https://download.microsoft.com/download/B/4/1/B4119C11-0423-477B-80EE-7A474314B347/NDP452-KB2901954-Web.exe';
 
 procedure dotnetfx45(minVersion: Integer);
 begin

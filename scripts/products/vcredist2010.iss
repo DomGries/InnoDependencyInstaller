@@ -10,8 +10,8 @@ vcredist2010_size_x64=10 MB
 
 [Code]
 const
-	vcredist2010_url = 'http://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe';
-	vcredist2010_url_x64 = 'http://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe';
+	vcredist2010_url = 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe';
+	vcredist2010_url_x64 = 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe';
 
 	vcredist2010_upgradecode = '{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}';
 	vcredist2010_upgradecode_x64 = '{5B75F761-BAC8-33BC-A381-464DDDD813A3}';

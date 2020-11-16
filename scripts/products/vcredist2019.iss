@@ -10,8 +10,8 @@ vcredist2019_size_x64=14 MB
 
 [Code]
 const
-	vcredist2019_url = 'http://aka.ms/vs/16/release/vc_redist.x86.exe';
-	vcredist2019_url_x64 = 'http://aka.ms/vs/16/release/vc_redist.x64.exe';
+	vcredist2019_url = 'https://aka.ms/vs/16/release/vc_redist.x86.exe';
+	vcredist2019_url_x64 = 'https://aka.ms/vs/16/release/vc_redist.x64.exe';
 
 	vcredist2019_upgradecode = '{65E5BD06-6392-3027-8C26-853107D3CF1A}';
 	vcredist2019_upgradecode_x64 = '{36F68A90-239C-34DF-B58C-64B30153CE35}';

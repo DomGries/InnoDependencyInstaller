@@ -11,8 +11,8 @@ vcredist2008_size_x64=5 MB
 
 [Code]
 const
-	vcredist2008_url = 'http://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe';
-	vcredist2008_url_x64 = 'http://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe';
+	vcredist2008_url = 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe';
+	vcredist2008_url_x64 = 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe';
 
 	vcredist2008_upgradecode = '{AA783A14-A7A3-3D33-95F0-9A351D530011}';
 	vcredist2008_upgradecode_sp1mfc = '{DE2C306F-A067-38EF-B86C-03DE4B0312F9}';

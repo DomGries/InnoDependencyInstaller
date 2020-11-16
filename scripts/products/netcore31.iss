@@ -10,8 +10,8 @@ netcore31_size_x64=26 MB
 
 [Code]
 const
-	netcore31_url = 'http://go.microsoft.com/fwlink/?linkid=2137641';
-	netcore31_url_x64 = 'http://go.microsoft.com/fwlink/?linkid=2137640';
+	netcore31_url = 'https://go.microsoft.com/fwlink/?linkid=2137641';
+	netcore31_url_x64 = 'https://go.microsoft.com/fwlink/?linkid=2137640';
 
 procedure netcore31();
 begin

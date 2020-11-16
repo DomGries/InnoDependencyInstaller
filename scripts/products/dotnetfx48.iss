@@ -9,7 +9,7 @@ dotnetfx48_size=59 MB
 
 [Code]
 const
-	dotnetfx48_url = 'http://download.visualstudio.microsoft.com/download/pr/7afca223-55d2-470a-8edc-6a1739ae3252/c9b8749dd99fc0d4453b2a3e4c37ba16/ndp48-web.exe';
+	dotnetfx48_url = 'https://download.visualstudio.microsoft.com/download/pr/7afca223-55d2-470a-8edc-6a1739ae3252/c9b8749dd99fc0d4453b2a3e4c37ba16/ndp48-web.exe';
 
 procedure dotnetfx48(minVersion: Integer);
 begin

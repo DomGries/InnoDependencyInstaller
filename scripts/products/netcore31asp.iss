@@ -10,8 +10,8 @@ netcore31asp_size_x64=8 MB
 
 [Code]
 const
-	netcore31asp_url = 'http://go.microsoft.com/fwlink/?linkid=2137940';
-	netcore31asp_url_x64 = 'http://go.microsoft.com/fwlink/?linkid=2137939';
+	netcore31asp_url = 'https://go.microsoft.com/fwlink/?linkid=2137940';
+	netcore31asp_url_x64 = 'https://go.microsoft.com/fwlink/?linkid=2137939';
 
 procedure netcore31asp();
 begin

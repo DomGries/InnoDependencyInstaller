@@ -5,7 +5,7 @@ sqlcompact35sp2_size=5 MB
 
 [Code]
 const
-	sqlcompact35sp2_url = 'http://download.microsoft.com/download/E/C/1/EC1B2340-67A0-4B87-85F0-74D987A27160/SSCERuntime-ENU.exe';
+	sqlcompact35sp2_url = 'https://download.microsoft.com/download/E/C/1/EC1B2340-67A0-4B87-85F0-74D987A27160/SSCERuntime-ENU.exe';
 
 procedure sqlcompact35sp2();
 begin
