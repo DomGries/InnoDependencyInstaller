@@ -61,17 +61,6 @@ begin
 	products[i].MustRebootAfter := mustRebootAfter;
 end;
 
-function SmartExec(product: TProduct; var resultCode: Integer): Boolean;
-{
-	Executes a product and returns the exit code.
-	Parameters:
-		product: the product to install
-		resultCode: the exit code
-}
-begin
-	Result := ShellExec('', product.File, product.Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode);
-end;
-
 function PendingReboot: Boolean;
 {
 	Checks whether the machine has a pending reboot.
@@ -112,9 +101,9 @@ begin
 			DependencyPage.SetProgress(i, productCount);
 
 			while true do begin
-				// set 0 as used code for shown error if SmartExec fails
+				// set 0 as used code for shown error if ShellExec fails
 				resultCode := 0;
-				if SmartExec(products[i], resultCode) then begin
+				if ShellExec('', products[i].File, products[i].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode) then begin
 					// setup executed; resultCode contains the exit code
 					if (products[i].MustRebootAfter) then begin
 						// delay reboot after install if we installed the last dependency anyways

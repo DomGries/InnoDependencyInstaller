@@ -1,11 +1,11 @@
-// contribute: https://github.com/domgho/InnoDependencyInstaller
-// official article: https://www.codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
+// contribute: https://github.com/DomGho/InnoDependencyInstaller
+// official article: https://codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
 
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
-#define MyAppPublisher 'domgho'
-#define MyAppCopyright 'Copyright © domgho'
-#define MyAppURL 'https://github.com/domgho/InnoDependencyInstaller'
+#define MyAppPublisher 'DomGho'
+#define MyAppCopyright 'Copyright © DomGho'
+#define MyAppURL 'https://github.com/DomGho/InnoDependencyInstaller'
 
 [Setup]
 AppName={#MyAppSetupName}
