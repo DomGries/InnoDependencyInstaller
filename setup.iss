@@ -26,6 +26,7 @@ OutputDir=bin
 SourceDir=.
 AllowNoIcons=yes
 
+MinVersion=6.0
 PrivilegesRequired=admin
 ArchitecturesAllowed=x86 x64 ia64
 ArchitecturesInstallIn64BitMode=x64 ia64
