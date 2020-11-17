@@ -3,7 +3,9 @@
 }
 type
 	TProduct = record
-		File: String;
+		URL: String;
+		Filename: String;
+		Path: String;
 		Title: String;
 		Parameters: String;
 		ForceSuccess: Boolean;
@@ -19,11 +21,6 @@ var
 	delayedReboot, isForcedX86: Boolean;
 	DownloadPage: TDownloadWizardPage;
 
-procedure initproducts();
-begin
-	DownloadPage := CreateDownloadPage(CustomMessage('depinstall_title'), CustomMessage('depinstall_description'), nil);
-end;
-
 procedure AddProduct(filename, parameters, title, size, url: String; forceSuccess, installClean, mustRebootAfter: Boolean);
 {
 	Adds a product to the list of products to download.
@@ -38,15 +35,24 @@ procedure AddProduct(filename, parameters, title, size, url: String; forceSucces
 		mustRebootAfter: whether the product needs a reboot after installing
 }
 var
-	path: String;
+	product: TProduct;
 	i: Integer;
 begin
-	path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + filename;
-	if not FileExists(path) then begin
-		path := ExpandConstant('{tmp}{\}') + filename;
+	product.URL := '';
+	product.Filename := '';
+	product.Title := title;
+	product.Parameters := parameters;
+	product.ForceSuccess := forceSuccess;
+	product.InstallClean := installClean;
+	product.MustRebootAfter := mustRebootAfter;
 
-		if not FileExists(path) then begin
-			DownloadPage.Add(url, filename, '');
+	product.Path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + filename;
+	if not FileExists(product.Path) then begin
+		product.Path := ExpandConstant('{tmp}{\}') + filename;
+
+		if not FileExists(product.Path) then begin
+			product.URL := url;
+			product.Filename := filename;
 
 			downloadMemo := downloadMemo + '%1' + title + ' (' + size + ')' + #13;
 		end else begin
@@ -58,12 +64,7 @@ begin
 
 	i := GetArrayLength(products);
 	SetArrayLength(products, i + 1);
-	products[i].File := path;
-	products[i].Title := title;
-	products[i].Parameters := parameters;
-	products[i].ForceSuccess := forceSuccess;
-	products[i].InstallClean := installClean;
-	products[i].MustRebootAfter := mustRebootAfter;
+	products[i] := product;
 end;
 
 function PendingReboot: Boolean;
@@ -106,7 +107,7 @@ begin
 			while true do begin
 				// set 0 as used code for shown error if ShellExec fails
 				resultCode := 0;
-				if ShellExec('', products[i].File, products[i].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode) then begin
+				if ShellExec('', products[i].Path, products[i].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode) then begin
 					// setup executed; resultCode contains the exit code
 					if (products[i].MustRebootAfter) then begin
 						// delay reboot after install if we installed the last dependency anyways
@@ -158,6 +159,11 @@ end;
 	INNO EVENT FUNCTIONS
 	--------------------
 }
+
+procedure InitializeWizard();
+begin
+	DownloadPage := CreateDownloadPage(CustomMessage('depinstall_title'), CustomMessage('depinstall_description'), nil);
+end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 {
@@ -239,10 +245,19 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 }
 var
 	retry: Boolean;
+	i, productCount: Integer;
 begin
 	Result := true;
 
 	if (CurPageID = wpReady) and (downloadMemo <> '') then begin
+		DownloadPage.Clear;
+		productCount := GetArrayLength(products);
+		for i := 0 to productCount - 1 do begin
+			if (products[i].URL <> '') then begin
+				DownloadPage.Add(products[i].URL, products[i].Filename, '');
+			end;
+		end;
+
 		DownloadPage.Show;
 		retry := true;
 		while retry do begin

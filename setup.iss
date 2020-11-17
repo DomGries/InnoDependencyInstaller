@@ -241,10 +241,8 @@ DependenciesDir=MyProgramDependencies
 WindowsServicePack=Windows %1 Service Pack %2
 
 [Code]
-procedure InitializeWizard();
+function InitializeSetup(): Boolean;
 begin
-	initproducts();
-
 	// initialize windows version
 	initwinversion();
 
@@ -383,4 +381,5 @@ begin
 	sql2008express();
 #endif
 
+	Result := true;
 end;
