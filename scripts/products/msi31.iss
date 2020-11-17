@@ -18,5 +18,5 @@ begin
 			CustomMessage('msi31_title'),
 			CustomMessage('msi31_size'),
 			msi31_url,
-			false, false, false);
+			'', false, false, false);
 end;

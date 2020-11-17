@@ -19,5 +19,5 @@ begin
 			CustomMessage('dotnetfx48_title'),
 			CustomMessage('dotnetfx48_size'),
 			dotnetfx48_url,
-			false, false, false);
+			'', false, false, false);
 end;

@@ -21,6 +21,6 @@ begin
 				CustomMessage('dotnet50desktop_title' + GetArchitectureString()),
 				CustomMessage('dotnet50desktop_size' + GetArchitectureString()),
 				GetString(dotnet50desktop_url, dotnet50desktop_url_x64, ''),
-				false, false, false);
+				'', false, false, false);
 	end;
 end;

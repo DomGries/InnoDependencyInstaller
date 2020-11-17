@@ -5,6 +5,7 @@ type
 	TProduct = record
 		URL: String;
 		Filename: String;
+		Checksum: String;
 		Path: String;
 		Title: String;
 		Parameters: String;
@@ -21,7 +22,7 @@ var
 	delayedReboot, isForcedX86: Boolean;
 	DownloadPage: TDownloadWizardPage;
 
-procedure AddProduct(filename, parameters, title, size, url: String; forceSuccess, installClean, mustRebootAfter: Boolean);
+procedure AddProduct(filename, parameters, title, size, url, checksum: String; forceSuccess, installClean, mustRebootAfter: Boolean);
 {
 	Adds a product to the list of products to download.
 	Parameters:
@@ -40,6 +41,7 @@ var
 begin
 	product.URL := '';
 	product.Filename := '';
+	product.Checksum := checksum;
 	product.Title := title;
 	product.Parameters := parameters;
 	product.ForceSuccess := forceSuccess;
@@ -254,7 +256,7 @@ begin
 		productCount := GetArrayLength(products);
 		for i := 0 to productCount - 1 do begin
 			if (products[i].URL <> '') then begin
-				DownloadPage.Add(products[i].URL, products[i].Filename, '');
+				DownloadPage.Add(products[i].URL, products[i].Filename, products[i].Checksum);
 			end;
 		end;
 

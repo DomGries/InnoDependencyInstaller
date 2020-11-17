@@ -22,5 +22,5 @@ begin
 		CustomMessage('directxruntime_title'),
 		CustomMessage('directxruntime_size'),
 		directxruntime_url,
-		true, false, false);
+		'', true, false, false);
 end;

@@ -30,20 +30,20 @@ begin
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win60_size' + GetArchitectureString()),
 				GetString(msi45win60_url, msi45win60_url_x64, msi45win60_url_ia64),
-				false, false, false)
+				'', false, false, false)
 		else if minwinversion(5, 2) then
 			AddProduct('msi45_52' + GetArchitectureString() + '.exe',
 				'/quiet /norestart',
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win52_size' + GetArchitectureString()),
 				GetString(msi45win52_url, msi45win52_url_x64, msi45win52_url_ia64),
-				false, false, false)
+				'', false, false, false)
 		else if minwinversion(5, 1) and IsX86() then
 			AddProduct('msi45_51.exe',
 				'/quiet /norestart',
 				CustomMessage('msi45_title'),
 				CustomMessage('msi45win51_size'),
 				msi45win51_url,
-				false, false, false);
+				'', false, false, false);
 	end;
 end;

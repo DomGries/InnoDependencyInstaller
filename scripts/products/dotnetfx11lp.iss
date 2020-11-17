@@ -17,6 +17,6 @@ begin
 				CustomMessage('dotnetfx11lp_title'),
 				CustomMessage('dotnetfx11lp_size'),
 				CustomMessage('dotnetfx11lp_url'),
-				false, false, false);
+				'', false, false, false);
 	end;
 end;

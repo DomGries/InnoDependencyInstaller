@@ -22,6 +22,6 @@ begin
 				CustomMessage('netcore31desktop_title' + GetArchitectureString()),
 				CustomMessage('netcore31desktop_size' + GetArchitectureString()),
 				GetString(netcore31desktop_url, netcore31desktop_url_x64, ''),
-				false, false, false);
+				'', false, false, false);
 	end;
 end;

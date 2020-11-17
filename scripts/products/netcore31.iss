@@ -22,6 +22,6 @@ begin
 				CustomMessage('netcore31_title' + GetArchitectureString()),
 				CustomMessage('netcore31_size' + GetArchitectureString()),
 				GetString(netcore31_url, netcore31_url_x64, ''),
-				false, false, false);
+				'', false, false, false);
 	end;
 end;

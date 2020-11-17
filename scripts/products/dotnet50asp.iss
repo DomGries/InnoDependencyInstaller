@@ -17,7 +17,7 @@ begin
 	if (not IsIA64()) then begin
 		if not netcoreinstalled(Asp, '5.0.0') then
 			AddProduct('dotnet50asp' + GetArchitectureString() + '.exe',
-				'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+				'', '/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 				CustomMessage('dotnet50asp_title' + GetArchitectureString()),
 				CustomMessage('dotnet50asp_size' + GetArchitectureString()),
 				GetString(dotnet50asp_url, dotnet50asp_url_x64, ''),

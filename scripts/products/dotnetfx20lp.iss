@@ -24,6 +24,6 @@ begin
 				CustomMessage('dotnetfx20lp_title'),
 				CustomMessage('dotnetfx20lp_size'),
 				CustomMessage('dotnetfx20lp_url' + GetArchitectureString()),
-				false, false, false);
+				'', false, false, false);
 	end;
 end;

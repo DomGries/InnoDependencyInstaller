@@ -25,6 +25,6 @@ begin
 				CustomMessage('vcredist2015_title' + GetArchitectureString()),
 				CustomMessage('vcredist2015_size' + GetArchitectureString()),
 				GetString(vcredist2015_url, vcredist2015_url_x64, ''),
-				false, false, false);
+				'', false, false, false);
 	end;
 end;
