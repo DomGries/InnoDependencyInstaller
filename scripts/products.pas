@@ -127,7 +127,7 @@ begin
 					end;
 				end;
 
-				case MsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [products[i].Title, IntToStr(resultCode)]), mbError, MB_ABORTRETRYIGNORE) of
+				case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [products[i].Title, IntToStr(resultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
 					IDABORT: begin
 						Result := InstallError;
 						break;
@@ -240,7 +240,7 @@ begin
 			try
 				DownloadPage.Download;
 			except
-				case MsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE) of
+				case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
 					IDABORT: begin
 						Result := false;
 					end;

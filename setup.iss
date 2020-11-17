@@ -270,11 +270,11 @@ begin
 #ifdef use_dotnetfx20
 	// check if .netfx 2.0 can be installed on this OS
 	if not minwinspversion(5, 0, 3) then begin
-		MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [FmtMessage(CustomMessage('WindowsServicePack'), ['2000', '3'])]), mbError, MB_OK);
+		SuppressibleMsgBox(FmtMessage(CustomMessage('depinstall_missing'), [FmtMessage(CustomMessage('WindowsServicePack'), ['2000', '3'])]), mbError, MB_OK, IDOK);
 		exit;
 	end;
 	if not minwinspversion(5, 1, 2) then begin
-		MsgBox(FmtMessage(CustomMessage('depinstall_missing'), [FmtMessage(CustomMessage('WindowsServicePack'), ['XP', '2'])]), mbError, MB_OK);
+		SuppressibleMsgBox(FmtMessage(CustomMessage('depinstall_missing'), [FmtMessage(CustomMessage('WindowsServicePack'), ['XP', '2'])]), mbError, MB_OK, IDOK);
 		exit;
 	end;
 
