@@ -99,7 +99,6 @@ begin
 				break;
 			end;
 
-			DownloadPage.Clear;
 			DownloadPage.Show;
 			DownloadPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
 			DownloadPage.SetProgress(i + 1, productCount);
@@ -180,14 +179,14 @@ begin
 			end;
 
 			Result := s;
-			end;
+		end;
 		InstallRebootRequired: begin
 			Result := products[0].Title;
 			NeedsRestart := true;
 
 			// write into the registry that the installer needs to be executed again after restart
 			RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
-			end;
+		end;
 	end;
 end;
 
@@ -228,19 +227,30 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 	At each "next" button click
 	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
+var
+	retry: Boolean;
 begin
 	Result := true;
 
-	if CurPageID = wpReady then begin
-		if downloadMemo <> '' then begin
-			DownloadPage.Show;
+	if (CurPageID = wpReady) and (downloadMemo <> '') then begin
+		DownloadPage.Show;
+		retry := true;
+		while retry do begin
+			retry := false;
 			try
 				DownloadPage.Download;
 			except
-				Result := false;
+				case MsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE) of
+					IDABORT: begin
+						Result := false;
+					end;
+					IDRETRY: begin
+						retry := true;
+					end;
+				end;
 			end;
-			DownloadPage.Hide;
 		end;
+		DownloadPage.Hide;
 	end;
 end;
 
