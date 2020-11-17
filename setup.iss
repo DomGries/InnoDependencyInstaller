@@ -243,9 +243,6 @@ WindowsServicePack=Windows %1 Service Pack %2
 [Code]
 function InitializeSetup(): Boolean;
 begin
-	// initialize windows version
-	initwinversion();
-
 #ifdef use_msi31
 	msi31('3.1'); // install if version < 3.1
 #endif
