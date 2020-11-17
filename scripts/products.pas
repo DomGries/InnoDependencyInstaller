@@ -204,22 +204,32 @@ function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoType
 	Just before the "ready" page.
 	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
-var
-	s: String;
 begin
+	Result := ''
+
 	if downloadMemo <> '' then
-		s := s + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMemo, [Space]) + NewLine;
+		Result := Result + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMemo, [Space]) + NewLine;
 	if installMemo <> '' then
-		s := s + CustomMessage('depinstall_memo_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
+		Result := Result + CustomMessage('depinstall_memo_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
 
-	if MemoDirInfo <> '' then
-		s := s + MemoDirInfo + NewLine + NewLine;
-	if MemoGroupInfo <> '' then
-		s := s + MemoGroupInfo + NewLine + NewLine;
-	if MemoTasksInfo <> '' then
-		s := s + MemoTasksInfo;
-
-	Result := s
+	if MemoUserInfoInfo <> '' then begin
+		Result := Result + MemoUserInfoInfo + Newline + NewLine;
+	end;
+	if MemoDirInfo <> '' then begin
+		Result := Result + MemoDirInfo + Newline + NewLine;
+	end;
+	if MemoTypeInfo <> '' then begin
+		Result := Result + MemoTypeInfo + Newline + NewLine;
+	end;
+	if MemoComponentsInfo <> '' then begin
+		Result := Result + MemoComponentsInfo + Newline + NewLine;
+	end;
+	if MemoGroupInfo <> '' then begin
+		Result := Result + MemoGroupInfo + Newline + NewLine;
+	end;
+	if MemoTasksInfo <> '' then begin
+		Result := Result + MemoTasksInfo + Newline + NewLine;
+	end;
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
