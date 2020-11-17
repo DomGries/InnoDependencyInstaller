@@ -267,12 +267,16 @@ begin
 			try
 				DownloadPage.Download;
 			except
-				case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
-					IDABORT: begin
-						Result := false;
-					end;
-					IDRETRY: begin
-						retry := true;
+				if (GetExceptionMessage = SetupMessage(msgErrorDownloadAborted)) then begin
+					Result := false;
+				end else begin
+					case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
+						IDABORT: begin
+							Result := false;
+						end;
+						IDRETRY: begin
+							retry := true;
+						end;
 					end;
 				end;
 			end;
