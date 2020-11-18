@@ -88,25 +88,25 @@ begin
 		NetFx4x: begin
 			if RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Release', regVersion) then begin
 				if regVersion >= 528040 then begin
-					regVersion := 80 // 4.8.0+ 
+					regVersion := 80; // 4.8.0+ 
 				end else if regVersion >= 461808 then begin
-					regVersion := 72 // 4.7.2+
+					regVersion := 72; // 4.7.2+
 				end else if regVersion >= 461308 then begin
-					regVersion := 71 // 4.7.1+
+					regVersion := 71; // 4.7.1+
 				end else if regVersion >= 460798 then begin
-					regVersion := 70 // 4.7.0+
+					regVersion := 70; // 4.7.0+
 				end else if regVersion >= 394802 then begin
-					regVersion := 62 // 4.6.2+
+					regVersion := 62; // 4.6.2+
 				end else if regVersion >= 394254 then begin
-					regVersion := 61 // 4.6.1+
+					regVersion := 61; // 4.6.1+
 				end else if regVersion >= 393295 then begin
-					regVersion := 60 // 4.6.0+
+					regVersion := 60; // 4.6.0+
 				end else if regVersion >= 379893 then begin
-					regVersion := 52 // 4.5.2+
+					regVersion := 52; // 4.5.2+
 				end else if regVersion >= 378675 then begin
-					regVersion := 51 // 4.5.1+
+					regVersion := 51; // 4.5.1+
 				end else if regVersion >= 378389 then begin
-					regVersion := 50 // 4.5.0+
+					regVersion := 50; // 4.5.0+
 				end else begin
 					regVersion := -1;
 				end;

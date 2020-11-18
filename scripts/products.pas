@@ -48,8 +48,14 @@ begin
 	product.InstallClean := installClean;
 	product.MustRebootAfter := mustRebootAfter;
 
-	product.Path := ExpandConstant('{src}{\}') + CustomMessage('DependenciesDir') + '\' + filename;
-	if not FileExists(product.Path) then begin
+	try
+		product.Path := CustomMessage('DependenciesDir');
+	except
+		// catch exception on undefined custom message
+		product.Path := '';
+	end;
+
+	if (product.Path = '') or not FileExists(ExpandConstant('{src}{\}') + product.Path + '\' + filename) then begin
 		product.Path := ExpandConstant('{tmp}{\}') + filename;
 
 		if not FileExists(product.Path) then begin
@@ -61,6 +67,7 @@ begin
 			installMemo := installMemo + '%1' + title + #13;
 		end;
 	end else begin
+		product.Path := ExpandConstant('{src}{\}') + product.Path + '\' + filename;
 		installMemo := installMemo + '%1' + title + #13;
 	end;
 
