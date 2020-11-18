@@ -9,11 +9,12 @@ const
 
 procedure sqlcompact35sp2();
 begin
-	if (isX86() and not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server Compact Edition\v3.5')) then
+	if isX86() and not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server Compact Edition\v3.5') then begin
 		AddProduct('sqlcompact35sp2.msi',
 			'/qb',
 			CustomMessage('sqlcompact35sp2_title'),
 			CustomMessage('sqlcompact35sp2_size'),
 			sqlcompact35sp2_url,
-			'', false, false, false);
+			'', False, False, False);
+	end;
 end;

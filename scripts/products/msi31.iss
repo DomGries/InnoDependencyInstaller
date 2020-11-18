@@ -12,11 +12,12 @@ var
 	version: String;
 begin
 	// Check for required Windows Installer 3.0 on Windows 2000 or higher
-	if (IsX86() and minwinversion(5, 0) and GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), version) and (compareversion(version, minVersion) < 0)) then
+	if IsX86() and minwinversion(5, 0) and GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), version) and (compareversion(version, minVersion) < 0) then begin
 		AddProduct('msi31.exe',
 			'/passive /norestart',
 			CustomMessage('msi31_title'),
 			CustomMessage('msi31_size'),
 			msi31_url,
-			'', false, false, false);
+			'', False, False, False);
+	end;
 end;

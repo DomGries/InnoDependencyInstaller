@@ -10,13 +10,12 @@ de.dotnetfx35sp1lp_url=https://download.microsoft.com/download/d/7/2/d728b7b9-45
 [Code]
 procedure dotnetfx35sp1lp();
 begin
-	if (CustomMessage('dotnetfx35sp1lp_url') <> '') then begin
-		if (dotnetfxspversion(NetFx35, CustomMessage('lcid')) < 1) then
-			AddProduct('dotnetfx35sp1_' + ActiveLanguage() + '.exe',
-				'/lang:enu /passive /norestart',
-				CustomMessage('dotnetfx35sp1lp_title'),
-				CustomMessage('dotnetfx35sp1lp_size'),
-				CustomMessage('dotnetfx35sp1lp_url'),
-				'', false, false, false);
+	if (CustomMessage('dotnetfx35sp1lp_url') <> '') and (dotnetfxspversion(NetFx35, CustomMessage('lcid')) < 1) then begin
+		AddProduct('dotnetfx35sp1_' + ActiveLanguage() + '.exe',
+			'/lang:enu /passive /norestart',
+			CustomMessage('dotnetfx35sp1lp_title'),
+			CustomMessage('dotnetfx35sp1lp_size'),
+			CustomMessage('dotnetfx35sp1lp_url'),
+			'', False, False, False);
 	end;
 end;

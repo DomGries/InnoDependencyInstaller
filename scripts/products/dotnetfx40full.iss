@@ -15,11 +15,12 @@ const
 
 procedure dotnetfx40full();
 begin
-	if (not dotnetfxinstalled(NetFx40Full, '')) then
+	if not dotnetfxinstalled(NetFx40Full, '') then begin
 		AddProduct('dotNetFx40_Full_setup.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx40full_title'),
 			CustomMessage('dotnetfx40full_size'),
 			dotnetfx40full_url,
-			'', false, false, false);
+			'', False, False, False);
+	end;
 end;

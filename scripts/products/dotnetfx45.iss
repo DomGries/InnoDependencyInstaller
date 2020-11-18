@@ -13,11 +13,12 @@ const
 
 procedure dotnetfx45(minVersion: Integer);
 begin
-	if (dotnetfxspversion(NetFx4x, '') < minVersion) then
+	if dotnetfxspversion(NetFx4x, '') < minVersion then begin
 		AddProduct('dotnetfx45.exe',
 			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
 			CustomMessage('dotnetfx45_title'),
 			CustomMessage('dotnetfx45_size'),
 			dotnetfx45_url,
-			'', false, false, false);
+			'', False, False, False);
+	end;
 end;

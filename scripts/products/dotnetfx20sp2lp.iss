@@ -17,13 +17,12 @@ de.dotnetfx20sp2lp_url_ia64=https://download.microsoft.com/download/a/3/3/a3349a
 [Code]
 procedure dotnetfx20sp2lp();
 begin
-	if (CustomMessage('dotnetfx20sp2lp_url') <> '') then begin
-		if (dotnetfxspversion(NetFx20, CustomMessage('lcid')) < 2) then
-			AddProduct('dotnetfx20sp2' + GetArchitectureString() + '_' + ActiveLanguage() + '.exe',
-				'/lang:enu /passive /norestart"',
-				CustomMessage('dotnetfx20sp2lp_title'),
-				CustomMessage('dotnetfx20sp2lp_size'),
-				CustomMessage('dotnetfx20sp2lp_url' + GetArchitectureString()),
-				'', false, false, false);
+	if (CustomMessage('dotnetfx20sp2lp_url') <> '') and (dotnetfxspversion(NetFx20, CustomMessage('lcid')) < 2) then begin
+		AddProduct('dotnetfx20sp2' + GetArchitectureString() + '_' + ActiveLanguage() + '.exe',
+			'/lang:enu /passive /norestart"',
+			CustomMessage('dotnetfx20sp2lp_title'),
+			CustomMessage('dotnetfx20sp2lp_size'),
+			CustomMessage('dotnetfx20sp2lp_url' + GetArchitectureString()),
+			'', False, False, False);
 	end;
 end;

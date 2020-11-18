@@ -15,11 +15,12 @@ const
 
 procedure dotnetfx20sp1();
 begin
-	if (dotnetfxspversion(NetFx20, '') < 1) then
+	if dotnetfxspversion(NetFx20, '') < 1 then begin
 		AddProduct('dotnetfx20sp1' + GetArchitectureString() + '.exe',
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20sp1_title'),
 			CustomMessage('dotnetfx20sp1_size'),
 			GetString(dotnetfx20sp1_url, dotnetfx20sp1_url_x64, dotnetfx20sp1_url_ia64),
-			'', false, false, false);
+			'', False, False, False);
+	end;
 end;

@@ -14,11 +14,12 @@ const
 
 procedure dotnetfx35sp1();
 begin
-	if (dotnetfxspversion(NetFx35, '') < 1) then
+	if dotnetfxspversion(NetFx35, '') < 1 then begin
 		AddProduct('dotnetfx35sp1.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35sp1_title'),
 			CustomMessage('dotnetfx35sp1_size'),
 			dotnetfx35sp1_url,
-			'', false, false, false);
+			'', False, False, False);
+	end;
 end;

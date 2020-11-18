@@ -20,13 +20,12 @@ const
 
 procedure vcredist2008(minVersion: String);
 begin
-	if (not IsIA64()) then begin
-		if (not msiproductupgrade(GetString(vcredist2008_upgradecode_sp1mfc, vcredist2008_upgradecode_sp1mfc_x64, ''), minVersion) and not msiproductupgrade(vcredist2008_upgradecode, minVersion)) then
-			AddProduct('vcredist2008' + GetArchitectureString() + '.exe',
-				'/q',
-				CustomMessage('vcredist2008_title' + GetArchitectureString()),
-				CustomMessage('vcredist2008_size' + GetArchitectureString()),
-				GetString(vcredist2008_url, vcredist2008_url_x64, ''),
-				'', false, false, false);
+	if not IsIA64() and not msiproductupgrade(GetString(vcredist2008_upgradecode_sp1mfc, vcredist2008_upgradecode_sp1mfc_x64, ''), minVersion) and not msiproductupgrade(vcredist2008_upgradecode, minVersion) then begin
+		AddProduct('vcredist2008' + GetArchitectureString() + '.exe',
+			'/q',
+			CustomMessage('vcredist2008_title' + GetArchitectureString()),
+			CustomMessage('vcredist2008_size' + GetArchitectureString()),
+			GetString(vcredist2008_url, vcredist2008_url_x64, ''),
+			'', False, False, False);
 	end;
 end;

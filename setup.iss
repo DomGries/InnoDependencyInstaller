@@ -297,8 +297,9 @@ begin
 
 	// if no .netfx 4.0 is found, install the client (smallest)
 #ifdef use_dotnetfx40
-	if (not dotnetfxinstalled(NetFx40Client, '') and not dotnetfxinstalled(NetFx40Full, '')) then
+	if not dotnetfxinstalled(NetFx40Client, '') and not dotnetfxinstalled(NetFx40Full, '') then begin
 		dotnetfx40client();
+	end;
 #endif
 
 #ifdef use_dotnetfx45
@@ -346,9 +347,9 @@ begin
 	vcredist2012('11'); // install if version < 11.0
 #endif
 #ifdef use_vc2013
-	//SetForceX86(true); // force 32-bit install of next products
+	//SetForceX86(True); // force 32-bit install of next products
 	vcredist2013('12'); // install if version < 12.0
-	//SetForceX86(false); // disable forced 32-bit install again
+	//SetForceX86(False); // disable forced 32-bit install again
 #endif
 #ifdef use_vc2015
 	vcredist2015('14'); // install if version < 14.0
@@ -371,5 +372,5 @@ begin
 	sql2008express();
 #endif
 
-	Result := true;
+	Result := True;
 end;

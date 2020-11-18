@@ -15,13 +15,12 @@ const
 
 procedure netcore31();
 begin
-	if (not IsIA64()) then begin
-		if not netcoreinstalled(Core, '3.1.6') then
-			AddProduct('netcore31' + GetArchitectureString() + '.exe',
-				'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
-				CustomMessage('netcore31_title' + GetArchitectureString()),
-				CustomMessage('netcore31_size' + GetArchitectureString()),
-				GetString(netcore31_url, netcore31_url_x64, ''),
-				'', false, false, false);
+	if not IsIA64() and not netcoreinstalled(Core, '3.1.6') then begin
+		AddProduct('netcore31' + GetArchitectureString() + '.exe',
+			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+			CustomMessage('netcore31_title' + GetArchitectureString()),
+			CustomMessage('netcore31_size' + GetArchitectureString()),
+			GetString(netcore31_url, netcore31_url_x64, ''),
+			'', False, False, False);
 	end;
 end;

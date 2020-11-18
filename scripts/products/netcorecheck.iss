@@ -17,16 +17,20 @@ var
 	resultCode: Integer;
 begin
 	case runtime of
-		Asp:
+		Asp: begin
 			netcoreRuntime := 'Microsoft.AspNetCore.App';
-		Core:
+		end;
+		Core: begin
 			netcoreRuntime := 'Microsoft.NETCore.App';
-		Desktop:
+		end;
+		Desktop: begin
 			netcoreRuntime := 'Microsoft.WindowsDesktop.App';
+		end;
 	end;
 
-	if not FileExists(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureString() + '.exe') then
+	if not FileExists(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureString() + '.exe') then begin
 		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
+	end;
 
 	Result := Exec(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureString() + '.exe', netcoreRuntime + ' ' + version, '', SW_HIDE, ewWaitUntilTerminated, resultCode) and (resultCode = 0);
 end;

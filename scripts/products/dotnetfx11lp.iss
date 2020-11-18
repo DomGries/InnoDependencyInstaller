@@ -10,13 +10,12 @@ de.dotnetfx11lp_url=https://download.microsoft.com/download/6/8/2/6821e687-526a-
 [Code]
 procedure dotnetfx11lp();
 begin
-	if (CustomMessage('dotnetfx11lp_url') <> '') then begin
-		if (IsX86() and not dotnetfxinstalled(NetFx11, CustomMessage('lcid'))) then
-			AddProduct('dotnetfx11' + ActiveLanguage() + '.exe',
-				'/q:a /c:"inst.exe /qb /l"',
-				CustomMessage('dotnetfx11lp_title'),
-				CustomMessage('dotnetfx11lp_size'),
-				CustomMessage('dotnetfx11lp_url'),
-				'', false, false, false);
+	if (CustomMessage('dotnetfx11lp_url') <> '') and IsX86() and not dotnetfxinstalled(NetFx11, CustomMessage('lcid')) then begin
+		AddProduct('dotnetfx11' + ActiveLanguage() + '.exe',
+			'/q:a /c:"inst.exe /qb /l"',
+			CustomMessage('dotnetfx11lp_title'),
+			CustomMessage('dotnetfx11lp_size'),
+			CustomMessage('dotnetfx11lp_url'),
+			'', False, False, False);
 	end;
 end;

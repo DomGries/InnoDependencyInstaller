@@ -13,11 +13,12 @@ const
 
 procedure dotnetfx11sp1();
 begin
-	if (IsX86() and (dotnetfxspversion(NetFx11, '') < 1)) then
+	if IsX86() and (dotnetfxspversion(NetFx11, '') < 1) then begin
 		AddProduct('dotnetfx11sp1.exe',
 			'/q',
 			CustomMessage('dotnetfx11sp1_title'),
 			CustomMessage('dotnetfx11sp1_size'),
 			dotnetfx11sp1_url,
-			'', false, false, false);
+			'', False, False, False);
+	end;
 end;

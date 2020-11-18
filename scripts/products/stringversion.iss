@@ -5,13 +5,13 @@ var
 	pos1: Integer;
 
 begin
-	if (Length(temp) = 0) then begin
+	if Length(temp) = 0 then begin
 		Result := -1;
 		Exit;
 	end;
 
 	pos1 := Pos('.', temp);
-	if (pos1 = 0) then begin
+	if pos1 = 0 then begin
 		Result := StrToInt(temp);
 		temp := '';
 	end else begin
@@ -33,16 +33,16 @@ begin
 		Exit;
 	end;
 
-	if (num1 < 0) then begin
+	if num1 < 0 then begin
 		num1 := 0;
 	end;
-	if (num2 < 0) then begin
+	if num2 < 0 then begin
 		num2 := 0;
 	end;
 
-	if (num1 < num2) then begin
+	if num1 < num2 then begin
 		Result := -1;
-	end else if (num1 > num2) then begin
+	end else if num1 > num2 then begin
 		Result := 1;
 	end else begin
 		Result := compareinnerversion(x, y);

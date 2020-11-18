@@ -14,11 +14,12 @@ const
 
 procedure dotnetfx35();
 begin
-	if (dotnetfxinstalled(NetFx35, '') = false) then
+	if not dotnetfxinstalled(NetFx35, '') then begin
 		AddProduct('dotnetfx35.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35_title'),
 			CustomMessage('dotnetfx35_size'),
 			dotnetfx35_url,
-			'', false, false, false);
+			'', False, False, False);
+	end;
 end;

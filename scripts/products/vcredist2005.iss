@@ -19,13 +19,12 @@ const
 
 procedure vcredist2005(minVersion: String);
 begin
-	if (not IsIA64()) then begin
-		if (not msiproductupgrade(GetString(vcredist2005_upgradecode, vcredist2005_upgradecode_x64, ''), minVersion)) then
-			AddProduct('vcredist2005' + GetArchitectureString() + '.exe',
-				'/q:a /c:"install /qb /l',
-				CustomMessage('vcredist2005_title' + GetArchitectureString()),
-				CustomMessage('vcredist2005_size' + GetArchitectureString()),
-				GetString(vcredist2005_url, vcredist2005_url_x64, ''),
-				'', false, false, false);
+	if not IsIA64() and not msiproductupgrade(GetString(vcredist2005_upgradecode, vcredist2005_upgradecode_x64, ''), minVersion) then begin
+		AddProduct('vcredist2005' + GetArchitectureString() + '.exe',
+			'/q:a /c:"install /qb /l',
+			CustomMessage('vcredist2005_title' + GetArchitectureString()),
+			CustomMessage('vcredist2005_size' + GetArchitectureString()),
+			GetString(vcredist2005_url, vcredist2005_url_x64, ''),
+			'', False, False, False);
 	end;
 end;

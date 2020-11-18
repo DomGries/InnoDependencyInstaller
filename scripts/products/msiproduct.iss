@@ -28,13 +28,13 @@ var
 	valueSize: DWORD;
 begin
 	SetLength(productCode, 39);
-	Result := false;
+	Result := False;
 
-	if (MsiEnumRelatedProducts(upgradeCode, 0, 0, productCode) = 0) then begin
+	if MsiEnumRelatedProducts(upgradeCode, 0, 0, productCode) = 0 then begin
 		SetLength(version, 39);
 		valueSize := Length(version);
 
-		if (MsiGetProductInfo(productCode, 'VersionString', version, valueSize) = 0) then begin
+		if MsiGetProductInfo(productCode, 'VersionString', version, valueSize) = 0 then begin
 			Result := compareversion(version, minVersion) >= 0;
 		end;
 	end;

@@ -18,13 +18,12 @@ const
 
 procedure vcredist2015(minVersion: String);
 begin
-	if (not IsIA64()) then begin
-		if (not msiproductupgrade(GetString(vcredist2015_upgradecode, vcredist2015_upgradecode_x64, ''), minVersion)) then
-			AddProduct('vcredist2015' + GetArchitectureString() + '.exe',
-				'/passive /norestart',
-				CustomMessage('vcredist2015_title' + GetArchitectureString()),
-				CustomMessage('vcredist2015_size' + GetArchitectureString()),
-				GetString(vcredist2015_url, vcredist2015_url_x64, ''),
-				'', false, false, false);
+	if not IsIA64() and not msiproductupgrade(GetString(vcredist2015_upgradecode, vcredist2015_upgradecode_x64, ''), minVersion) then begin
+		AddProduct('vcredist2015' + GetArchitectureString() + '.exe',
+			'/passive /norestart',
+			CustomMessage('vcredist2015_title' + GetArchitectureString()),
+			CustomMessage('vcredist2015_size' + GetArchitectureString()),
+			GetString(vcredist2015_url, vcredist2015_url_x64, ''),
+			'', False, False, False);
 	end;
 end;
