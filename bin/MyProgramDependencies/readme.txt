@@ -28,9 +28,7 @@ dotnetfx48.exe
 dotnet50[*1].exe
 dotnet50asp[*1].exe
 dotnet50desktop[*1].exe
-kb835732.exe
-msi31.exe
-msi45_[*4]
+msi45[*1].msu
 netcore31[*1].exe
 netcore31asp[*1].exe
 netcore31desktop[*1].exe
@@ -44,10 +42,7 @@ vcredist2013[*1].exe
 vcredist2015[*1].exe
 vcredist2017[*1].exe
 vcredist2019[*1].exe
-wic[*1]_[*3].exe
 
 
 [*1] = "_x64" for 64-bit OS, "_ia64" for Itanium OS or "" (empty) for 32-bit OS
 [*2] = 2 letter language name ... e.g. "en", "de", "fr", "sp", ...
-[*3] = 3 letter language name ... e.g. "enu", "deu", "fra", "esn", ...
-[*4] = windows version of msi 4.5 ... either "60[*1].msu", "52[*1].exe" or "51.exe"

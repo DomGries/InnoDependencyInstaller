@@ -37,7 +37,6 @@ DisableReadyMemo=no
 
 
 // comment out product defines to disable installing them
-#define use_msi31
 #define use_msi45
 
 #define use_dotnetfx11
@@ -100,9 +99,6 @@ DisableReadyMemo=no
 #include "scripts\products\dotnetfxversion.iss"
 
 // actual products
-#ifdef use_msi31
-#include "scripts\products\msi31.iss"
-#endif
 #ifdef use_msi45
 #include "scripts\products\msi45.iss"
 #endif
@@ -127,10 +123,10 @@ DisableReadyMemo=no
 #endif
 
 #ifdef use_dotnetfx35
-//#include "scripts\products\dotnetfx35.iss"
+#include "scripts\products\dotnetfx35.iss"
 #include "scripts\products\dotnetfx35sp1.iss"
 #ifdef use_dotnetfx35lp
-//#include "scripts\products\dotnetfx35lp.iss"
+#include "scripts\products\dotnetfx35lp.iss"
 #include "scripts\products\dotnetfx35sp1lp.iss"
 #endif
 #endif
@@ -234,14 +230,10 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupNam
 
 [CustomMessages]
 DependenciesDir=MyProgramDependencies
-WindowsServicePack=Windows %1 Service Pack %2
 
 [Code]
 function InitializeSetup(): Boolean;
 begin
-#ifdef use_msi31
-	msi31('3.1'); // install if version < 3.1
-#endif
 #ifdef use_msi45
 	msi45('4.5'); // install if version < 4.5
 #endif
@@ -254,36 +246,15 @@ begin
 	dotnetfx11sp1();
 #endif
 
-	// install .netfx 2.0 sp2 if possible; if not sp1 if possible; if not .netfx 2.0
 #ifdef use_dotnetfx20
-	// check if .netfx 2.0 can be installed on this OS
-	if not minwinspversion(5, 0, 3) then begin
-		SuppressibleMsgBox(FmtMessage(CustomMessage('depinstall_missing'), [FmtMessage(CustomMessage('WindowsServicePack'), ['2000', '3'])]), mbError, MB_OK, IDOK);
-		exit;
-	end;
-	if not minwinspversion(5, 1, 2) then begin
-		SuppressibleMsgBox(FmtMessage(CustomMessage('depinstall_missing'), [FmtMessage(CustomMessage('WindowsServicePack'), ['XP', '2'])]), mbError, MB_OK, IDOK);
-		exit;
-	end;
-
-	if minwinversion(5, 1) then begin
-		dotnetfx20sp2();
+	//dotnetfx20();
+	//dotnetfx20sp1();
+	dotnetfx20sp2();
 #ifdef use_dotnetfx20lp
-		dotnetfx20sp2lp();
+	//dotnetfx20lp();
+	//dotnetfx20sp1lp();
+	dotnetfx20sp2lp();
 #endif
-	end else begin
-		if minwinversion(5, 0) and minwinspversion(5, 0, 4) then begin
-			dotnetfx20sp1();
-#ifdef use_dotnetfx20lp
-			dotnetfx20sp1lp();
-#endif
-		end else begin
-			dotnetfx20();
-#ifdef use_dotnetfx20lp
-			dotnetfx20lp();
-#endif
-		end;
-	end;
 #endif
 
 #ifdef use_dotnetfx35
