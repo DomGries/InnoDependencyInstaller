@@ -39,7 +39,6 @@ DisableReadyMemo=no
 // comment out product defines to disable installing them
 #define use_msi31
 #define use_msi45
-#define use_wic
 
 #define use_dotnetfx11
 #define use_dotnetfx11lp
@@ -106,9 +105,6 @@ DisableReadyMemo=no
 #endif
 #ifdef use_msi45
 #include "scripts\products\msi45.iss"
-#endif
-#ifdef use_wic
-#include "scripts\products\wic.iss"
 #endif
 
 #ifdef use_dotnetfx11
@@ -248,9 +244,6 @@ begin
 #endif
 #ifdef use_msi45
 	msi45('4.5'); // install if version < 4.5
-#endif
-#ifdef use_wic
-	wic();
 #endif
 
 #ifdef use_dotnetfx11
