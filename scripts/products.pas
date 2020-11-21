@@ -248,35 +248,40 @@ begin
 	Result := True;
 
 	if (CurPageID = wpReady) and (installMemo <> '') then begin
-		DownloadPage.Clear;
+		DownloadPage.Show;
+
 		productCount := GetArrayLength(products);
 		for i := 0 to productCount - 1 do begin
 			if products[i].URL <> '' then begin
+				DownloadPage.Clear;
 				DownloadPage.Add(products[i].URL, products[i].Filename, products[i].Checksum);
-			end;
-		end;
 
-		DownloadPage.Show;
-		retry := True;
-		while retry do begin
-			retry := False;
-			try
-				DownloadPage.Download;
-			except
-				if GetExceptionMessage = SetupMessage(msgErrorDownloadAborted) then begin
-					Result := False;
-				end else begin
-					case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
-						IDABORT: begin
+				retry := True;
+				while retry do begin
+					retry := False;
+
+					try
+						DownloadPage.Download;
+					except
+						if GetExceptionMessage = SetupMessage(msgErrorDownloadAborted) then begin
 							Result := False;
-						end;
-						IDRETRY: begin
-							retry := True;
+							i := productCount;
+						end else begin
+							case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
+								IDABORT: begin
+									Result := False;
+									i := productCount;
+								end;
+								IDRETRY: begin
+									retry := True;
+								end;
+							end;
 						end;
 					end;
 				end;
 			end;
 		end;
+
 		DownloadPage.Hide;
 	end;
 end;
