@@ -17,7 +17,7 @@ de.dotnetfx20sp2lp_url_ia64=https://download.microsoft.com/download/a/3/3/a3349a
 [Code]
 procedure dotnetfx20sp2lp();
 begin
-	if (CustomMessage('dotnetfx20sp2lp_url') <> '') and (dotnetfxspversion(NetFx20, CustomMessage('lcid')) < 2) then begin
+	if (CustomMessage('dotnetfx20sp2lp_url') <> '') and (dotnetfxspversion(NetFx20, GetUILanguage) < 2) then begin
 		AddProduct('dotnetfx20sp2' + GetArchitectureString() + '_' + ActiveLanguage() + '.exe',
 			'/lang:enu /passive /norestart"',
 			CustomMessage('dotnetfx20sp2lp_title'),

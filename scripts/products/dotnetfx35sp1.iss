@@ -14,7 +14,7 @@ const
 
 procedure dotnetfx35sp1();
 begin
-	if dotnetfxspversion(NetFx35, '') < 1 then begin
+	if dotnetfxspversion(NetFx35, 0) < 1 then begin
 		AddProduct('dotnetfx35sp1.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35sp1_title'),

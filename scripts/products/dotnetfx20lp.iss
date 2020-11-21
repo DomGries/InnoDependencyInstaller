@@ -17,7 +17,7 @@ de.dotnetfx20lp_url_ia64=https://download.microsoft.com/download/8/9/8/898c5670-
 [Code]
 procedure dotnetfx20lp();
 begin
-	if (CustomMessage('dotnetfx20lp_url') <> '') and not dotnetfxinstalled(NetFx20, CustomMessage('lcid')) then begin
+	if (CustomMessage('dotnetfx20lp_url') <> '') and not dotnetfxinstalled(NetFx20, GetUILanguage) then begin
 		AddProduct('dotnetfx20' + GetArchitectureString() + '_' + ActiveLanguage() + '.exe',
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20lp_title'),

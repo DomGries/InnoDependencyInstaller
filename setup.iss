@@ -79,15 +79,15 @@ DisableReadyMemo=no
 
 
 // supported languages
-#include "scripts\lang\english.iss"
-#include "scripts\lang\german.iss"
-#include "scripts\lang\french.iss"
-#include "scripts\lang\italian.iss"
-#include "scripts\lang\dutch.iss"
-#include "scripts\lang\chinese.iss"
-#include "scripts\lang\polish.iss"
-#include "scripts\lang\russian.iss"
-#include "scripts\lang\japanese.iss"
+[Languages]
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
+Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
+Name: "de"; MessagesFile: "compiler:Languages\German.isl"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
+Name: "pt"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
+Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 // shared code for installing the products
 [Code]
@@ -268,7 +268,7 @@ begin
 
 	// if no .netfx 4.0 is found, install the client (smallest)
 #ifdef use_dotnetfx40
-	if not dotnetfxinstalled(NetFx40Client, '') and not dotnetfxinstalled(NetFx40Full, '') then begin
+	if not dotnetfxinstalled(NetFx40Client, 0) and not dotnetfxinstalled(NetFx40Full, 0) then begin
 		dotnetfx40client();
 	end;
 #endif

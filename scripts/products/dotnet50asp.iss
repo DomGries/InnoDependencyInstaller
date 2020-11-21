@@ -16,7 +16,7 @@ procedure dotnet50asp();
 begin
 	if not IsIA64() and not netcoreinstalled(Asp, '5.0.0') then begin
 		AddProduct('dotnet50asp' + GetArchitectureString() + '.exe',
-			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('dotnet50asp_title' + GetArchitectureString()),
 			CustomMessage('dotnet50asp_size' + GetArchitectureString()),
 			GetString(dotnet50asp_url, dotnet50asp_url_x64, ''),

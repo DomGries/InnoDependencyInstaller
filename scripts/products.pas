@@ -17,7 +17,7 @@ type
 	InstallResult = (InstallSuccessful, InstallRebootRequired, InstallError);
 
 var
-	installMemo, downloadMemo: String;
+	installMemo: String;
 	products: array of TProduct;
 	delayedReboot, isForcedX86: Boolean;
 	DownloadPage: TDownloadWizardPage;
@@ -62,7 +62,7 @@ begin
 			product.URL := url;
 			product.Filename := filename;
 
-			downloadMemo := downloadMemo + '%1' + title + ' (' + size + ')' + #13;
+			installMemo := installMemo + '%1' + title + ' (' + size + ')' + #13;
 		end else begin
 			installMemo := installMemo + '%1' + title + #13;
 		end;
@@ -105,7 +105,7 @@ begin
 			end;
 
 			DownloadPage.Show;
-			DownloadPage.SetText(FmtMessage(CustomMessage('depinstall_status'), [products[i].Title]), '');
+			DownloadPage.SetText(products[i].Title, '');
 			DownloadPage.SetProgress(i + 1, productCount);
 
 			while True do begin
@@ -166,7 +166,7 @@ end;
 
 procedure InitializeWizard();
 begin
-	DownloadPage := CreateDownloadPage(CustomMessage('depinstall_title'), CustomMessage('depinstall_description'), nil);
+	DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
@@ -182,7 +182,7 @@ begin
 
 	case InstallProducts() of
 		InstallError: begin
-			s := CustomMessage('depinstall_error');
+			s := SetupMessage(msgReadyMemoTasks);
 
 			for i := 0 to GetArrayLength(products) - 1 do begin
 				s := s + #13 + '	' + products[i].Title;
@@ -216,14 +216,6 @@ function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoType
 }
 begin
 	Result := ''
-
-	if downloadMemo <> '' then begin
-		Result := Result + CustomMessage('depdownload_memo_title') + ':' + NewLine + FmtMessage(downloadMemo, [Space]) + NewLine;
-	end;
-	if installMemo <> '' then begin
-		Result := Result + CustomMessage('depinstall_memo_title') + ':' + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
-	end;
-
 	if MemoUserInfoInfo <> '' then begin
 		Result := Result + MemoUserInfoInfo + Newline + NewLine;
 	end;
@@ -239,8 +231,8 @@ begin
 	if MemoGroupInfo <> '' then begin
 		Result := Result + MemoGroupInfo + Newline + NewLine;
 	end;
-	if MemoTasksInfo <> '' then begin
-		Result := Result + MemoTasksInfo + Newline + NewLine;
+	if (MemoTasksInfo <> '') or (installMemo <> '') then begin
+		Result := Result + MemoTasksInfo + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
 	end;
 end;
 
@@ -255,7 +247,7 @@ var
 begin
 	Result := True;
 
-	if (CurPageID = wpReady) and (downloadMemo <> '') then begin
+	if (CurPageID = wpReady) and (installMemo <> '') then begin
 		DownloadPage.Clear;
 		productCount := GetArrayLength(products);
 		for i := 0 to productCount - 1 do begin

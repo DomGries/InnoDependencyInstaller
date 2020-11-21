@@ -17,7 +17,7 @@ procedure netcore31desktop();
 begin
 	if not IsIA64() and not netcoreinstalled(Desktop, '3.1.10') then begin
 		AddProduct('netcore31desktop' + GetArchitectureString() + '.exe',
-			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('netcore31desktop_title' + GetArchitectureString()),
 			CustomMessage('netcore31desktop_size' + GetArchitectureString()),
 			GetString(netcore31desktop_url, netcore31desktop_url_x64, ''),

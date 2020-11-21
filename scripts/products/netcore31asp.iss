@@ -17,7 +17,7 @@ procedure netcore31asp();
 begin
 	if not IsIA64() and not netcoreinstalled(Asp, '3.1.10') then begin
 		AddProduct('netcore31asp' + GetArchitectureString() + '.exe',
-			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('netcore31asp_title' + GetArchitectureString()),
 			CustomMessage('netcore31asp_size' + GetArchitectureString()),
 			GetString(netcore31asp_url, netcore31asp_url_x64, ''),

@@ -13,9 +13,9 @@ const
 
 procedure dotnetfx46(minVersion: Integer);
 begin
-	if dotnetfxspversion(NetFx4x, '') < minVersion then begin
+	if dotnetfxspversion(NetFx4x, 0) < minVersion then begin
 		AddProduct('dotnetfx46.exe',
-			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('dotnetfx46_title'),
 			CustomMessage('dotnetfx46_size'),
 			dotnetfx46_url,

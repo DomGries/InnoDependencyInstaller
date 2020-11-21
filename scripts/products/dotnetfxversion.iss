@@ -5,13 +5,16 @@ type
 const
 	netfx11plus_reg = 'Software\Microsoft\NET Framework Setup\NDP\';
 
-function dotnetfxinstalled(version: NetFXType; lcid: String): Boolean;
+function dotnetfxinstalled(version: NetFXType; languageId: Integer): Boolean;
 var
 	regVersion: Cardinal;
 	regVersionString: String;
+	lcid: String;
 begin
-	if lcid <> '' then begin
-		lcid := '\' + lcid;
+	if languageId <> 0 then begin
+		lcid := '\' + IntToStr(languageId);
+	end else begin
+		lcid := '';
 	end;
 
 	case version of
@@ -42,12 +45,15 @@ begin
 	end;
 end;
 
-function dotnetfxspversion(version: NetFXType; lcid: String): Integer;
+function dotnetfxspversion(version: NetFXType; languageId: Integer): Integer;
 var
 	regVersion: Cardinal;
+	lcid: String;
 begin
-	if lcid <> '' then begin
-		lcid := '\' + lcid;
+	if languageId <> 0 then begin
+		lcid := '\' + IntToStr(languageId);
+	end else begin
+		lcid := '';
 	end;
 
 	case version of

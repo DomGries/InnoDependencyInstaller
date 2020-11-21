@@ -15,9 +15,9 @@ const
 
 procedure dotnetfx40client();
 begin
-	if not dotnetfxinstalled(NetFx40Client, '') then begin
+	if not dotnetfxinstalled(NetFx40Client, 0) then begin
 		AddProduct('dotNetFx40_Client_setup.exe',
-			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('dotnetfx40client_title'),
 			CustomMessage('dotnetfx40client_size'),
 			dotnetfx40client_url,

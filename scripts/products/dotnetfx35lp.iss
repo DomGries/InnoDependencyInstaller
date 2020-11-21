@@ -10,7 +10,7 @@ de.dotnetfx35lp_url=https://download.microsoft.com/download/d/1/e/d1e617c3-c7f4-
 [Code]
 procedure dotnetfx35lp();
 begin
-	if (CustomMessage('dotnetfx35lp_url') <> '') and not dotnetfxinstalled(NetFx35, CustomMessage('lcid')) then begin
+	if (CustomMessage('dotnetfx35lp_url') <> '') and not dotnetfxinstalled(NetFx35, GetUILanguage) then begin
 		AddProduct('dotnetfx35_' + ActiveLanguage() + '.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35lp_title'),

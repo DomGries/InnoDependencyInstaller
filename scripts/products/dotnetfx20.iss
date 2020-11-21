@@ -17,7 +17,7 @@ const
 
 procedure dotnetfx20();
 begin
-	if not dotnetfxinstalled(NetFx20, '') then begin
+	if not dotnetfxinstalled(NetFx20, 0) then begin
 		AddProduct('dotnetfx20' + GetArchitectureString() + '.exe',
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20_title'),

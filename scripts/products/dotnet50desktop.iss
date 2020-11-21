@@ -16,7 +16,7 @@ procedure dotnet50desktop();
 begin
 	if not IsIA64() and not netcoreinstalled(Desktop, '5.0.0') then begin
 		AddProduct('dotnet50desktop' + GetArchitectureString() + '.exe',
-			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('dotnet50desktop_title' + GetArchitectureString()),
 			CustomMessage('dotnet50desktop_size' + GetArchitectureString()),
 			GetString(dotnet50desktop_url, dotnet50desktop_url_x64, ''),

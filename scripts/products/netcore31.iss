@@ -17,7 +17,7 @@ procedure netcore31();
 begin
 	if not IsIA64() and not netcoreinstalled(Core, '3.1.10') then begin
 		AddProduct('netcore31' + GetArchitectureString() + '.exe',
-			'/lcid ' + CustomMessage('lcid') + ' /passive /norestart',
+			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('netcore31_title' + GetArchitectureString()),
 			CustomMessage('netcore31_size' + GetArchitectureString()),
 			GetString(netcore31_url, netcore31_url_x64, ''),

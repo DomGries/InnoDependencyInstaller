@@ -14,7 +14,7 @@ const
 
 procedure dotnetfx35();
 begin
-	if not dotnetfxinstalled(NetFx35, '') then begin
+	if not dotnetfxinstalled(NetFx35, 0) then begin
 		AddProduct('dotnetfx35.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35_title'),
