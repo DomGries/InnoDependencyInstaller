@@ -79,12 +79,11 @@ DisableReadyMemo=no
 // types and variables
 type
 	TProduct = record
-		URL: String;
 		Filename: String;
-		Checksum: String;
-		Path: String;
-		Title: String;
 		Parameters: String;
+		Title: String;
+		URL: String;
+		Checksum: String;
 		ForceSuccess: Boolean;
 		InstallClean: Boolean;
 		RebootAfter: Boolean;
@@ -105,32 +104,20 @@ var
 begin
 	MemoInstallInfo := MemoInstallInfo + #13 + '%1' + Title;
 
-	Product.URL := '';
-	Product.Filename := '';
-	Product.Checksum := Checksum;
-	Product.Title := Title;
+	Product.Filename := Filename;
 	Product.Parameters := Parameters;
+	Product.Title := Title;
+
+	if FileExists(ExpandConstant('{tmp}{\}') + Filename) then begin
+		Product.URL := '';
+	end else begin
+		Product.URL := URL;
+	end;
+
+	Product.Checksum := Checksum;
 	Product.ForceSuccess := ForceSuccess;
 	Product.InstallClean := InstallClean;
 	Product.RebootAfter := RebootAfter;
-
-	try
-		Product.Path := CustomMessage('DependenciesDir');
-	except
-		// catch exception on undefined custom message
-		Product.Path := '';
-	end;
-
-	if (Product.Path = '') or not FileExists(ExpandConstant('{src}{\}') + Product.Path + '\' + Filename) then begin
-		Product.Path := ExpandConstant('{tmp}{\}') + Filename;
-
-		if not FileExists(Product.Path) then begin
-			Product.URL := URL;
-			Product.Filename := Filename;
-		end;
-	end else begin
-		Product.Path := ExpandConstant('{src}{\}') + Product.Path + '\' + Filename;
-	end;
 
 	I := GetArrayLength(Products);
 	SetArrayLength(Products, I + 1);
@@ -166,7 +153,7 @@ begin
 			while True do begin
 				// set 0 as used code for shown error if ShellExec fails
 				ResultCode := 0;
-				if ShellExec('', Products[I].Path, Products[I].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+				if ShellExec('', ExpandConstant('{tmp}{\}') + Products[I].Filename, Products[I].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
 					// setup executed; ResultCode contains the exit code
 					if Products[I].RebootAfter then begin
 						// delay reboot after install if we installed the last dependency anyways
