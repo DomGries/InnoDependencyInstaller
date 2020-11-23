@@ -267,8 +267,8 @@ end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
-  Retry: Boolean;
   I, ProductCount: Integer;
+  Retry: Boolean;
 begin
   Result := True;
 
@@ -425,28 +425,11 @@ end;
 
 
 #ifdef InstallMsiProduct
-type
-  INSTALLSTATE = Longint;
-const
-  INSTALLSTATE_INVALIDARG = -2; // An invalid parameter was passed to the function.
-  INSTALLSTATE_UNKNOWN = -1;    // The product is neither advertised or installed.
-  INSTALLSTATE_ADVERTISED = 1;  // The product is advertised but not installed.
-  INSTALLSTATE_ABSENT = 2;      // The product is installed for a different user.
-  INSTALLSTATE_DEFAULT = 5;     // The product is installed for the current user.
-
-function MsiQueryProductState(Product: String): INSTALLSTATE;
-external 'MsiQueryProductStateW@msi.dll stdcall';
-
 function MsiEnumRelatedProducts(UpgradeCode: String; Reserved: DWORD; Index: DWORD; ProductCode: String): Integer;
 external 'MsiEnumRelatedProductsW@msi.dll stdcall';
 
 function MsiGetProductInfo(ProductCode: String; PropertyName: String; Value: String; var ValueSize: DWORD): Integer;
 external 'MsiGetProductInfoW@msi.dll stdcall';
-
-function MsiProduct(ProductId: String): Boolean;
-begin
-  Result := MsiQueryProductState(ProductId) = INSTALLSTATE_DEFAULT;
-end;
 
 function MsiProductUpgrade(UpgradeCode: String; MinVersion: String): Boolean;
 var
@@ -540,7 +523,7 @@ begin
   // https://www.microsoft.com/downloads/details.aspx?familyid=5B2C0358-915B-4EB5-9B1D-10E506DA9D0F
   if not IsDotNetInstalled(net20, 0) then begin
     AddDependency('dotnetfx20' + GetArchitectureSuffix + '.exe',
-      '/passive /norestart /lang:ENU',
+      '/lang:ENU /passive /norestart',
       '.NET Framework 2.0',
       GetString('https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x86.exe', 'https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x64.exe'),
       '', False, False, False);
@@ -551,7 +534,7 @@ begin
   // https://www.microsoft.com/downloads/details.aspx?FamilyID=ab99342f-5d1a-413d-8319-81da479ab0d7
   if not IsDotNetInstalled(net35, 0) then begin
     AddDependency('dotnetfx35.exe',
-      '/lang:enu /passive /norestart',
+      '/lang:ENU /passive /norestart',
       '.NET Framework 3.5',
       'https://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe',
       '', False, False, False);
