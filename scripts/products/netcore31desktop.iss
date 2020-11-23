@@ -1,9 +1,4 @@
-// requires Windows 10 Version 1607+, Windows 7 SP1+, Windows 8.1, Windows Server 2012 R2
 // https://dotnet.microsoft.com/download/dotnet-core/3.1
-
-[CustomMessages]
-netcore31desktop_title=.NET Desktop Runtime 3.1.10 (x86)
-netcore31desktop_title_x64=.NET Desktop Runtime 3.1.10 (x64)
 
 [Code]
 const
@@ -15,7 +10,7 @@ begin
 	if not netcoreinstalled(Desktop, '3.1.10') then begin
 		AddProduct('netcore31desktop' + GetArchitectureString() + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-			CustomMessage('netcore31desktop_title' + GetArchitectureString()),
+			'.NET Desktop Runtime 3.1.10' + GetArchitectureTitle,
 			GetString(netcore31desktop_url, netcore31desktop_url_x64),
 			'', False, False, False);
 	end;

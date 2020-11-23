@@ -1,9 +1,4 @@
-// requires Windows Server 2016 (version 1709), Windows 10 Anniversary Update (version 1607) (x86 and x64), Windows 10 Creators Update (version 1703) (x86 and x64), Windows 10 Fall Creators Update (version 1709) (x86 and x64), Windows Server 2012 R2 (x64), Windows 8.1 (x86 and x64), Windows Server 2012 (x64), Windows Server 2008 R2 Service Pack 1 (x64), Windows 7 Service Pack 1 (x86 and x64)
-// express setup (downloads and installs the components depending on your OS) if you want to deploy it locally download the full installer on website below
 // https://support.microsoft.com/en-us/help/4054531
-
-[CustomMessages]
-dotnetfx47_title=.NET Framework 4.7.2
 
 [Code]
 const
@@ -14,7 +9,7 @@ begin
 	if dotnetfxspversion(NetFx4x, 0) < minVersion then begin
 		AddProduct('dotnetfx47.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-			CustomMessage('dotnetfx47_title'),
+			'.NET Framework 4.7.2',
 			dotnetfx47_url,
 			'', False, False, False);
 	end;

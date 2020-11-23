@@ -1,9 +1,4 @@
-// requires Windows 2000 Service Pack 4, Windows Server 2003, Windows XP Service Pack 2
-// requires KB 835732 on Windows 2000 Service Pack 4
 // https://www.microsoft.com/downloads/details.aspx?FamilyID=79bc3b77-e02c-4ad3-aacf-a7633f706ba5
-
-[CustomMessages]
-dotnetfx20sp1_title=.NET Framework 2.0 Service Pack 1
 
 [Code]
 const
@@ -15,7 +10,7 @@ begin
 	if dotnetfxspversion(NetFx20, 0) < 1 then begin
 		AddProduct('dotnetfx20sp1' + GetArchitectureString() + '.exe',
 			'/passive /norestart /lang:ENU',
-			CustomMessage('dotnetfx20sp1_title'),
+			'.NET Framework 2.0 Service Pack 1',
 			GetString(dotnetfx20sp1_url, dotnetfx20sp1_url_x64),
 			'', False, False, False);
 	end;

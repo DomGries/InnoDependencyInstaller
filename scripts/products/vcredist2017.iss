@@ -1,9 +1,4 @@
-// requires Windows 10, Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003 Service Pack 2, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Vista Service Pack 2, Windows XP Service Pack 3
 // https://www.visualstudio.com/en-us/downloads/
-
-[CustomMessages]
-vcredist2017_title=Visual C++ 2017 Redistributable (x86)
-vcredist2017_title_x64=Visual C++ 2017 Redistributable (x64)
 
 [Code]
 const
@@ -18,7 +13,7 @@ begin
 	if not msiproductupgrade(GetString(vcredist2017_upgradecode, vcredist2017_upgradecode_x64), minVersion) then begin
 		AddProduct('vcredist2017' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
-			CustomMessage('vcredist2017_title' + GetArchitectureString()),
+			'Visual C++ 2017 Redistributable' + GetArchitectureTitle,
 			GetString(vcredist2017_url, vcredist2017_url_x64),
 			'', False, False, False);
 	end;

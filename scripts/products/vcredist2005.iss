@@ -1,10 +1,4 @@
-// requires Windows 2000 Service Pack 3, Windows 98, Windows 98 Second Edition, Windows ME, Windows Server 2003, Windows XP Service Pack 2
-// requires Windows Installer 3.0
 // https://www.microsoft.com/en-us/download/details.aspx?id=3387
-
-[CustomMessages]
-vcredist2005_title=Visual C++ 2005 Redistributable (x86)
-vcredist2005_title_x64=Visual C++ 2005 Redistributable (x64)
 
 [Code]
 const
@@ -19,7 +13,7 @@ begin
 	if not msiproductupgrade(GetString(vcredist2005_upgradecode, vcredist2005_upgradecode_x64), minVersion) then begin
 		AddProduct('vcredist2005' + GetArchitectureString() + '.exe',
 			'/q:a /c:"install /qb /l',
-			CustomMessage('vcredist2005_title' + GetArchitectureString()),
+			'Visual C++ 2005 Redistributable' + GetArchitectureTitle,
 			GetString(vcredist2005_url, vcredist2005_url_x64),
 			'', False, False, False);
 	end;

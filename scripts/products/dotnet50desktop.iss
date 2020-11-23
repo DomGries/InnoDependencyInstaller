@@ -1,9 +1,5 @@
 // https://dotnet.microsoft.com/download/dotnet/5.0
 
-[CustomMessages]
-dotnet50desktop_title=.NET Desktop Runtime 5.0 (x86)
-dotnet50desktop_title_x64=.NET Desktop Runtime 5.0 (x64)
-
 [Code]
 const
 	dotnet50desktop_url = 'https://download.visualstudio.microsoft.com/download/pr/b2780d75-e54a-448a-95fc-da9721b2b4c2/62310a9e9f0ba7b18741944cbae9f592/windowsdesktop-runtime-5.0.0-win-x86.exe';
@@ -14,7 +10,7 @@ begin
 	if not netcoreinstalled(Desktop, '5.0.0') then begin
 		AddProduct('dotnet50desktop' + GetArchitectureString() + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-			CustomMessage('dotnet50desktop_title' + GetArchitectureString()),
+			'.NET Desktop Runtime 5.0' + GetArchitectureTitle,
 			GetString(dotnet50desktop_url, dotnet50desktop_url_x64),
 			'', False, False, False);
 	end;

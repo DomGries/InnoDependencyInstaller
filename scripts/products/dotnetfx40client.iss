@@ -1,11 +1,4 @@
-// requires Windows 7, Windows 7 Service Pack 1, Windows Server 2003 Service Pack 2, Windows Server 2008, Windows Server 2008 R2, Windows Server 2008 R2 SP1, Windows Vista Service Pack 1, Windows XP Service Pack 3
-// requires Windows Installer 3.1
-// requires Internet Explorer 5.01
-// express setup (downloads and installs the components depending on your OS) if you want to deploy it locally download the full installer on website below
 // https://www.microsoft.com/downloads/en/details.aspx?FamilyID=5765d7a8-7722-4888-a970-ac39b33fd8ab
-
-[CustomMessages]
-dotnetfx40client_title=.NET Framework 4.0 Client
 
 [Code]
 const
@@ -16,7 +9,7 @@ begin
 	if not dotnetfxinstalled(NetFx40Client, 0) then begin
 		AddProduct('dotNetFx40_Client_setup.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-			CustomMessage('dotnetfx40client_title'),
+			'.NET Framework 4.0',
 			dotnetfx40client_url,
 			'', False, False, False);
 	end;

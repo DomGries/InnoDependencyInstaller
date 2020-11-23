@@ -1,9 +1,4 @@
-// requires Windows 7 Service Pack 1, Windows 8, Windows 8.1, Windows Server 2003, Windows Server 2008 R2 SP1, Windows Server 2008 Service Pack 2, Windows Server 2012, Windows Server 2012 R2, Windows Vista Service Pack 2, Windows XP
 // https://www.microsoft.com/en-us/download/details.aspx?id=40784
-
-[CustomMessages]
-vcredist2013_title=Visual C++ 2013 Redistributable (x86)
-vcredist2013_title_x64=Visual C++ 2013 Redistributable (x64)
 
 [Code]
 const
@@ -18,7 +13,7 @@ begin
 	if not msiproductupgrade(GetString(vcredist2013_upgradecode, vcredist2013_upgradecode_x64), minVersion) then begin
 		AddProduct('vcredist2013' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
-			CustomMessage('vcredist2013_title' + GetArchitectureString()),
+			'Visual C++ 2013 Redistributable' + GetArchitectureTitle,
 			GetString(vcredist2013_url, vcredist2013_url_x64),
 			'', False, False, False);
 	end;

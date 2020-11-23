@@ -1,9 +1,5 @@
 // https://dotnet.microsoft.com/download/dotnet/5.0
 
-[CustomMessages]
-dotnet50asp_title=ASP.NET Core Runtime 5.0 (x86)
-dotnet50asp_title_x64=ASP.NET Core Runtime 5.0 (x64)
-
 [Code]
 const
 	dotnet50asp_url = 'https://download.visualstudio.microsoft.com/download/pr/115edeeb-c883-45be-90f7-8db7b6b3fa2f/6bf92152b2b9fa9c0d0b08a13b60e525/aspnetcore-runtime-5.0.0-win-x86.exe';
@@ -14,7 +10,7 @@ begin
 	if not netcoreinstalled(Asp, '5.0.0') then begin
 		AddProduct('dotnet50asp' + GetArchitectureString() + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-			CustomMessage('dotnet50asp_title' + GetArchitectureString()),
+			'ASP.NET Core Runtime 5.0' + GetArchitectureTitle,
 			GetString(dotnet50asp_url, dotnet50asp_url_x64),
 			'', False, False, False);
 	end;

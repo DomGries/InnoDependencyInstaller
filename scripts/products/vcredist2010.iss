@@ -1,9 +1,4 @@
-// requires Windows 7, Windows Server 2003 R2 (32-Bit x86), Windows Server 2003 Service Pack 2, Windows Server 2008 R2, Windows Server 2008 Service Pack 2, Windows Vista Service Pack 2, Windows XP Service Pack 3
 // https://www.microsoft.com/en-us/download/details.aspx?id=5555
-
-[CustomMessages]
-vcredist2010_title=Visual C++ 2010 Redistributable (x86)
-vcredist2010_title_x64=Visual C++ 2010 Redistributable (x64)
 
 [Code]
 const
@@ -18,7 +13,7 @@ begin
 	if not msiproductupgrade(GetString(vcredist2010_upgradecode, vcredist2010_upgradecode_x64), minVersion) then begin
 		AddProduct('vcredist2010' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
-			CustomMessage('vcredist2010_title' + GetArchitectureString()),
+			'Visual C++ 2010 Redistributable' + GetArchitectureTitle,
 			GetString(vcredist2010_url, vcredist2010_url_x64),
 			'', False, False, False);
 	end;

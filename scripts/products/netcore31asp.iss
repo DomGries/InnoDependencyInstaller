@@ -1,9 +1,4 @@
-// requires Windows 10 Version 1607+, Windows 7 SP1+, Windows 8.1, Windows Server 2012 R2
 // https://dotnet.microsoft.com/download/dotnet-core/3.1
-
-[CustomMessages]
-netcore31asp_title=ASP.NET Core Runtime 3.1.10 (x86)
-netcore31asp_title_x64=ASP.NET Core Runtime 3.1.10 (x64)
 
 [Code]
 const
@@ -15,7 +10,7 @@ begin
 	if not netcoreinstalled(Asp, '3.1.10') then begin
 		AddProduct('netcore31asp' + GetArchitectureString() + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-			CustomMessage('netcore31asp_title' + GetArchitectureString()),
+			'ASP.NET Core Runtime 3.1.10' + GetArchitectureTitle,
 			GetString(netcore31asp_url, netcore31asp_url_x64),
 			'', False, False, False);
 	end;

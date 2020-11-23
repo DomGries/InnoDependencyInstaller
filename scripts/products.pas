@@ -321,7 +321,6 @@ end;
 function GetArchitectureString(): String;
 {
 	Gets the "standard" architecture suffix string.
-	Returns either _x64 or nothing.
 }
 begin
 	if IsX64() then begin
@@ -331,9 +330,21 @@ begin
 	end;
 end;
 
+function GetArchitectureTitle(): String;
+{
+	Gets the "standard" architecture title string.
+}
+begin
+	if IsX64() then begin
+		Result := ' (x64)';
+	end else begin
+		Result := ' (x86)';
+	end;
+end;
+
 procedure SetForceX86(value: Boolean);
 {
-	Forces the setup to use X86 products
+	Forces the setup to use x86 products
 }
 begin
 	isForcedX86 := value;

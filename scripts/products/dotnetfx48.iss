@@ -1,9 +1,4 @@
-// requires Windows 10, Windows 7 Service Pack 1, Windows 8.1, Windows Server 2008 R2 SP1, Windows Server 2012, Windows Server 2012 R2, Windows Server 2016
-// express setup (downloads and installs the components depending on your OS) if you want to deploy it locally download the full installer on website below
 // https://dotnet.microsoft.com/download/dotnet-framework/net48
-
-[CustomMessages]
-dotnetfx48_title=.NET Framework 4.8
 
 [Code]
 const
@@ -14,7 +9,7 @@ begin
 	if dotnetfxspversion(NetFx4x, 0) < minVersion then begin
 		AddProduct('dotnetfx48.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-			CustomMessage('dotnetfx48_title'),
+			'.NET Framework 4.8',
 			dotnetfx48_url,
 			'', False, False, False);
 	end;
