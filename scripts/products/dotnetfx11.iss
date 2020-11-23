@@ -13,7 +13,7 @@ const
 
 procedure dotnetfx11();
 begin
-	if IsX86() and not dotnetfxinstalled(NetFx11, 0) then begin
+	if not IsX64() and not dotnetfxinstalled(NetFx11, 0) then begin
 		AddProduct('dotnetfx11.exe',
 			'/q:a /c:"install /qb /l"',
 			CustomMessage('dotnetfx11_title'),

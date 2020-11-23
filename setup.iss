@@ -1,11 +1,11 @@
-// contribute: https://github.com/DomGho/InnoDependencyInstaller
+// contribute: https://github.com/DomGries/InnoDependencyInstaller
 // official article: https://codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
 
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
-#define MyAppPublisher 'DomGho'
-#define MyAppCopyright 'Copyright © DomGho'
-#define MyAppURL 'https://github.com/DomGho/InnoDependencyInstaller'
+#define MyAppPublisher 'DomGries'
+#define MyAppCopyright 'Copyright © DomGries'
+#define MyAppURL 'https://github.com/DomGries/InnoDependencyInstaller'
 
 [Setup]
 AppName={#MyAppSetupName}
@@ -28,10 +28,9 @@ AllowNoIcons=yes
 
 MinVersion=6.0
 PrivilegesRequired=admin
-ArchitecturesAllowed=x86 x64 ia64
-ArchitecturesInstallIn64BitMode=x64 ia64
+ArchitecturesInstallIn64BitMode=x64
 
-// downloading and installing dependencies will only work if the memo/ready page is enabled (default and current behaviour)
+// dependency installation requires ready page and ready memo to be enabled (default behaviour)
 DisableReadyPage=no
 DisableReadyMemo=no
 
@@ -217,8 +216,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 
 [Files]
 Source: "src\MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsX64; Flags: ignoreversion
-Source: "src\MyProgram-IA64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsIA64; Flags: ignoreversion
-Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion
+Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not IsX64; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"

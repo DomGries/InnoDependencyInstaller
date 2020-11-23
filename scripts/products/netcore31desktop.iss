@@ -15,12 +15,12 @@ const
 
 procedure netcore31desktop();
 begin
-	if not IsIA64() and not netcoreinstalled(Desktop, '3.1.10') then begin
+	if not netcoreinstalled(Desktop, '3.1.10') then begin
 		AddProduct('netcore31desktop' + GetArchitectureString() + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('netcore31desktop_title' + GetArchitectureString()),
 			CustomMessage('netcore31desktop_size' + GetArchitectureString()),
-			GetString(netcore31desktop_url, netcore31desktop_url_x64, ''),
+			GetString(netcore31desktop_url, netcore31desktop_url_x64),
 			'', False, False, False);
 	end;
 end;

@@ -9,26 +9,26 @@ It allows you to install various products during the installation process of you
 
 ## Installation and Usage
 
-1. Download and install [Inno Setup 6.1+](https://www.jrsoftware.org/isinfo.php)
-2. Download and extract [this repository](https://github.com/DomGho/InnoDependencyInstaller/archive/master.zip) or clone it
-3. Open the extracted _setup.iss_ file
-4. Comment out product defines to disable installing them and leave only products that need to be installed 
+1. Download and install [Inno Setup 6.1+](https://www.jrsoftware.org/isinfo.php).
+2. Download and extract [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
+3. Open the extracted _setup.iss_ file.
+4. Comment out product defines to disable installing them and leave only products that need to be installed:
     ```
     #define use_vc2015 <-- will be installed
     ;#define use_vc2015 <-- commented out and will not be installed
     ```
-5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary
-6. Build setup using Inno Setup compiler
+5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary.
+6. Build setup using Inno Setup compiler.
 
 ## Details
 
 ![Ready to Install prompt](https://cloud.githubusercontent.com/assets/10548881/26322032/f8a87e7c-3f31-11e7-960b-1c2942f5851e.jpg)
 
-Most of the time you need to tweak the _setup.iss_ file because of different Windows version checks and the inclusion of your required dependencies.
+Most of the time, you need to tweak the _setup.iss_ file because of different Windows version checks and the inclusion of your required dependencies.
 
-You have a few ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _setup.iss_. Another way is to distribute the 3rd party installers with your own installer by putting them into _.\MyProgramDependencies_ folder. In addition, you may pack the dependency into a single _setup.exe_ file. To do so you need:
+You have a few ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _setup.iss_. Another way is to distribute the 3rd party installers with your own installer by putting them into _.\MyProgramDependencies_ folder. In addition, you may pack the dependency into a single _setup.exe_ file. To do so, you need:
 
-* Include 3rd party installer by defining the source in your _setup.iss_ or in the appropriate _product.iss_ file  
+* Include 3rd party installer by defining the source in your _setup.iss_ or in the appropriate _product.iss_ file:
 
     `Source: "src\dxwebsetup.exe"; Flags: dontcopy`
 
@@ -114,23 +114,23 @@ I wanted to thank the community for sharing many fixes and improvements. To cont
 
 ## History
 
-* Oct, 2007
+* October 2007
     * Initial version
-* Aug, 2008
+* August 2008
     * Now uses dotnetchk.exe to determine which version of .NET Framework and its language pack is installed
     * Added .NET Framework language pack(s) to script
     * Added translation for download page
     * Separated script code into multiple files to make it easier to update the script for different versions of the .NET Framework
-* Jan, 2009
+* January 2009
     * Wrote source code modular (each dependency now has one file)
     * Added code for Windows 2000 Security Update KB835732, .NET Framework 1.1, 2.0 SP1, 3.5, 3.5 SP1 and their language packs
     * Remove usage of dotnetchk.exe again as it only worked for .NET Framework 2.0 and below
-* Sep, 2009
+* September 2009
     * Code for dependencies installation routine was completely rewritten and is now executed before the actual installation of the application. Setup also checks if all dependencies are installed successfully and if not, displays an error page
     * Added support for 32-bit (x86) and 64-bit (x64) OS including Itanium (ia64)
     * Added code for .NET Framework 2.0 SP2 and its language pack
     * Fixed Windows version check bug and language pack check bug
-* Sep, 2011
+* September 2011
     * Added support for .NET Framework 4.0, Windows Installer 4.5, Visual C++ 2010 Redistributable, SQL 2008 Express and SQL 3.5 Compact Edition (community)
     * Added helper functions to determine the installed .NET Framework version which removed redundant code
     * Added version strings parser to fix wrong detection for version numbers above 9
@@ -140,21 +140,21 @@ I wanted to thank the community for sharing many fixes and improvements. To cont
     * Fixed restart on 3010 result code from installers
     * Fixed missing check in Windows 2000 Security Update KB835732
     * Added support for offline files on x64 and IA64 OS
-* Jun, 2014
+* June 2014
     * Added support for .NET Framework 4.5 - 4.5.2
     * Fixed installing WIC before .NET Framework 4.0 (community)
     * Fixed Visual C++ 2010 Redistributable install parameters (community)
     * Fixed KB835732 install parameters (community)
-* Jan, 2015
+* January 2015
     * Added support for Visual C++ 2005, 2008, 2012, 2013 Redistributable
     * Improved Visual C++ Redistributable detection method (community)
     * Fixed installing products with LCID parameter in certain cases (community)
-* Aug, 2015
+* August 2015
     * Added support for Visual C++ 2015 Redistributable (community)
     * Added support for .NET Framework 4.6 and Windows 10 with 4.5.x (community)
     * Fixed download URL for Visual C++ 2012 32-Bit Redistributable (community)
     * Fixed comparing version numbers with different amount of numbers
-* Aug, 2017
+* August 2017
     * Added support for Visual C++ 2017 Redistributable
     * Added support for .NET Framework 4.6.2 and 4.7
     * Added support for DirectX End-User Runtime
@@ -164,14 +164,14 @@ I wanted to thank the community for sharing many fixes and improvements. To cont
     * Improved formatting on ready to install page (community)
     * Improved and fixed some localizations (community)
     * Improved and normalized file sections
-* Oct, 2017
+* October 2017
     * Added skippable error message if dependency failed to install to be able to continue on errors
     * Fixed detecting C++ Redistributable 2008 in rare cases
     * Fixed encoding of languages relying on Unicode
     * Fixed missing diacritics after last update
     * Fixed incorrectly installing non-supported .NET Framework language packs
     * Disabled download confirmation dialog
-* Aug, 2020
+* August 2020
     * Added support for .NET 5 (Microsoft)
     * Added support for .NET Core 3.1 (Microsoft)
     * Added support for .NET Framework 4.7.2 and 4.8 (community)
@@ -183,7 +183,7 @@ I wanted to thank the community for sharing many fixes and improvements. To cont
     * Fixed Inno Setup 6+ warnings
     * Fixed Italian localization (community)
     * Removed old unsupported dependencies which targetted end-of-life Windows versions
-* Nov, 2020
+* November 2020
     * Added native Inno Setup 6.1+ downloader instead of isxdl
     * Added .NET Core 3.1.10 version support
     * Added ability to not check dependencies directory

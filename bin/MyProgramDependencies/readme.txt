@@ -44,5 +44,5 @@ vcredist2017[*1].exe
 vcredist2019[*1].exe
 
 
-[*1] = "_x64" for 64-bit OS, "_ia64" for Itanium OS or "" (empty) for 32-bit OS
+[*1] = "_x64" for 64-bit OS or "" (empty) for 32-bit OS
 [*2] = 2 letter language name ... e.g. "en", "de", "fr", "sp", ...

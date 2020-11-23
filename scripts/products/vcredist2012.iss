@@ -18,12 +18,12 @@ const
 
 procedure vcredist2012(minVersion: String);
 begin
-	if not IsIA64() and not msiproductupgrade(GetString(vcredist2012_upgradecode, vcredist2012_upgradecode_x64, ''), minVersion) then begin
+	if not msiproductupgrade(GetString(vcredist2012_upgradecode, vcredist2012_upgradecode_x64), minVersion) then begin
 		AddProduct('vcredist2012' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
 			CustomMessage('vcredist2012_title' + GetArchitectureString()),
 			CustomMessage('vcredist2012_size' + GetArchitectureString()),
-			GetString(vcredist2012_url, vcredist2012_url_x64, ''),
+			GetString(vcredist2012_url, vcredist2012_url_x64),
 			'', False, False, False);
 	end;
 end;

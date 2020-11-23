@@ -10,7 +10,7 @@ de.dotnetfx11lp_url=https://download.microsoft.com/download/6/8/2/6821e687-526a-
 [Code]
 procedure dotnetfx11lp();
 begin
-	if (CustomMessage('dotnetfx11lp_url') <> '') and IsX86() and not dotnetfxinstalled(NetFx11, GetUILanguage) then begin
+	if (CustomMessage('dotnetfx11lp_url') <> '') and not IsX64() and not dotnetfxinstalled(NetFx11, GetUILanguage) then begin
 		AddProduct('dotnetfx11' + ActiveLanguage() + '.exe',
 			'/q:a /c:"inst.exe /qb /l"',
 			CustomMessage('dotnetfx11lp_title'),

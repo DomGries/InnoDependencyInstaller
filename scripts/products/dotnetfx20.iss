@@ -13,7 +13,6 @@ dotnetfx20_size=23 MB
 const
 	dotnetfx20_url = 'https://download.microsoft.com/download/5/6/7/567758a3-759e-473e-bf8f-52154438565a/dotnetfx.exe';
 	dotnetfx20_url_x64 = 'https://download.microsoft.com/download/a/3/f/a3f1bf98-18f3-4036-9b68-8e6de530ce0a/NetFx64.exe';
-	dotnetfx20_url_ia64 = 'https://download.microsoft.com/download/f/8/6/f86148a4-e8f7-4d08-a484-b4107f238728/NetFx64.exe';
 
 procedure dotnetfx20();
 begin
@@ -22,7 +21,7 @@ begin
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20_title'),
 			CustomMessage('dotnetfx20_size'),
-			GetString(dotnetfx20_url, dotnetfx20_url_x64, dotnetfx20_url_ia64),
+			GetString(dotnetfx20_url, dotnetfx20_url_x64),
 			'', False, False, False);
 	end;
 end;
