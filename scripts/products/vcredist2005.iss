@@ -1,9 +1,9 @@
 // https://www.microsoft.com/en-us/download/details.aspx?id=3387
 
 [Code]
-procedure vcredist2005(MinVersion: String);
+procedure vcredist2005;
 begin
-	if not msiproductupgrade(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), MinVersion) then begin
+	if not msiproductupgrade(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), '6') then begin
 		AddProduct('vcredist2005' + GetArchitectureSuffix + '.exe',
 			'/q:a /c:"install /qb /l',
 			'Visual C++ 2005 Redistributable' + GetArchitectureTitle,

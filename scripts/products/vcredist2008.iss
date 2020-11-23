@@ -1,9 +1,9 @@
 // https://www.microsoft.com/en-us/download/details.aspx?id=29
 
 [Code]
-procedure vcredist2008(MinVersion: String);
+procedure vcredist2008;
 begin
-	if not msiproductupgrade(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), MinVersion) and not msiproductupgrade('{AA783A14-A7A3-3D33-95F0-9A351D530011}', MinVersion) then begin
+	if not msiproductupgrade(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9') and not msiproductupgrade('{AA783A14-A7A3-3D33-95F0-9A351D530011}', '9') then begin
 		AddProduct('vcredist2008' + GetArchitectureSuffix + '.exe',
 			'/q',
 			'Visual C++ 2008 Redistributable' + GetArchitectureTitle,

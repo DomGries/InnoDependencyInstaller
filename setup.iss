@@ -209,7 +209,7 @@ DependenciesDir=MyProgramDependencies
 function InitializeSetup: Boolean;
 begin
 #ifdef use_msi45
-	msi45('4.5'); // install if version < 4.5
+	msi45;
 #endif
 
 #ifdef use_dotnetfx11
@@ -258,30 +258,30 @@ begin
 #endif
 
 #ifdef use_vc2005
-	vcredist2005('6'); // install if version < 6.0
+	vcredist2005;
 #endif
 #ifdef use_vc2008
-	vcredist2008('9'); // install if version < 9.0
+	vcredist2008;
 #endif
 #ifdef use_vc2010
-	vcredist2010('10'); // install if version < 10.0
+	vcredist2010;
 #endif
 #ifdef use_vc2012
-	vcredist2012('11'); // install if version < 11.0
+	vcredist2012;
 #endif
 #ifdef use_vc2013
 	//SetForceX86(True); // force 32-bit install of next products
-	vcredist2013('12'); // install if version < 12.0
+	vcredist2013;
 	//SetForceX86(False); // disable forced 32-bit install again
 #endif
 #ifdef use_vc2015
-	vcredist2015('14'); // install if version < 14.0
+	vcredist2015;
 #endif
 #ifdef use_vc2017
-	vcredist2017('14.10'); // install if version < 14.10
+	vcredist2017;
 #endif
 #ifdef use_vc2019
-	vcredist2019('14.20'); // install if version < 14.20
+	vcredist2019;
 #endif
 
 #ifdef use_directxruntime

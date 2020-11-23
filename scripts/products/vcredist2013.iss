@@ -1,9 +1,9 @@
 // https://www.microsoft.com/en-us/download/details.aspx?id=40784
 
 [Code]
-procedure vcredist2013(MinVersion: String);
+procedure vcredist2013;
 begin
-	if not msiproductupgrade(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), MinVersion) then begin
+	if not msiproductupgrade(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), '12') then begin
 		AddProduct('vcredist2013' + GetArchitectureSuffix + '.exe',
 			'/passive /norestart',
 			'Visual C++ 2013 Redistributable' + GetArchitectureTitle,

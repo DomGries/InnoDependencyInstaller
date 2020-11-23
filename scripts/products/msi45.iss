@@ -1,9 +1,9 @@
 [Code]
-procedure msi45(MinVersion: String);
+procedure msi45;
 var
 	Version: String;
 begin
-	if GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), Version) and (compareversion(Version, MinVersion) < 0) then begin
+	if GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), Version) and (compareversion(Version, '4.5') < 0) then begin
 		AddProduct('msi45' + GetArchitectureSuffix + '.msu',
 			'/quiet /norestart',
 			'Windows Installer 4.5',
