@@ -3,7 +3,7 @@
 ![Ready to Install page](https://cloud.githubusercontent.com/assets/10548881/26322035/f8abb420-3f31-11e7-8be7-5a73aa29194b.jpg)
 ![Download page](https://cloud.githubusercontent.com/assets/10548881/26322034/f8aa3ec4-3f31-11e7-8092-868814ea3d2b.jpg)
 
-**Inno Setup Dependency Installer** can download and install dependencies such as any .NET or Visual C++ Redistributable during the installation process of your application. In addition, it is easy to add your own dependencie as well.
+**Inno Setup Dependency Installer** can download and install dependencies such as any .NET or Visual C++ Redistributable during the installation process of your application. In addition, it is easy to add your own dependencies as well.
 
 ## Installation and Usage
 
@@ -37,40 +37,39 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
 ## Dependencies
 
 * .NET
-    * .NET Framework 1.1 (dotnetfx11.iss)
-    * .NET Framework 1.1 Service Pack 1 (dotnetfx11sp1.iss)
-    * .NET Framework 2.0 + Service Pack 2 (dotnetfx20.iss)
-    * .NET Framework 3.5 + Service Pack 1 (dotnetfx35.iss)
-    * .NET Framework 3.5 Language Pack (dotnetfx35lp.iss)
-    * .NET Framework 4.0 Client (dotnetfx40client.iss)
-    * .NET Framework 4.0 Full (dotnetfx40full.iss)
-    * .NET Framework 4.5.2 (dotnetfx45.iss)
-    * .NET Framework 4.6.2 (dotnetfx46.iss)
-    * .NET Framework 4.7.2 (dotnetfx47.iss)
-    * .NET Framework 4.8 (dotnetfx47.iss)
-    * .NET Core Runtime 3.1 (netcore31.iss)
-    * ASP.NET Core Runtime 3.1 (netcore31asp.iss)
-    * .NET Desktop Runtime 3.1 (netcore31desktop.iss)
-    * .NET Runtime 5.0 (dotnet50.iss)
-    * ASP.NET Core Runtime 5.0 (dotnet50asp.iss)
-    * .NET Desktop Runtime 5.0 (dotnet50desktop.iss)
+    * .NET Framework 1.1
+    * .NET Framework 1.1 Service Pack 1
+    * .NET Framework 2.0 + Service Pack 2
+    * .NET Framework 3.5 + Service Pack 1
+    * .NET Framework 4.0 Client
+    * .NET Framework 4.0 Full
+    * .NET Framework 4.5.2
+    * .NET Framework 4.6.2
+    * .NET Framework 4.7.2
+    * .NET Framework 4.8
+    * .NET Core Runtime 3.1
+    * ASP.NET Core Runtime 3.1
+    * .NET Desktop Runtime 3.1
+    * .NET Runtime 5.0
+    * ASP.NET Core Runtime 5.0
+    * .NET Desktop Runtime 5.0
 
 * C++ Redistributable
-    * Visual C++ 2005 Redistributable (vcredist2005.iss)
-    * Visual C++ 2008 Redistributable (vcredist2008.iss)
-    * Visual C++ 2010 Redistributable (vcredist2010.iss)
-    * Visual C++ 2012 Redistributable (vcredist2012.iss)
-    * Visual C++ 2013 Redistributable (vcredist2013.iss)
-    * Visual C++ 2015 Redistributable (vcredist2015.iss)
-    * Visual C++ 2017 Redistributable (vcredist2017.iss)
-    * Visual C++ 2015-2019 Redistributable (vcredist2019.iss)
+    * Visual C++ 2005 Redistributable
+    * Visual C++ 2008 Redistributable
+    * Visual C++ 2010 Redistributable
+    * Visual C++ 2012 Redistributable
+    * Visual C++ 2013 Redistributable
+    * Visual C++ 2015 Redistributable
+    * Visual C++ 2017 Redistributable
+    * Visual C++ 2015-2019 Redistributable
 
 * SQL Server
-    * SQL Server 2008 Express R2 (sql2008express.iss)
-    * SQL Server Compact 3.5 + Service Pack 2 (sqlcompact35sp2.iss)
+    * SQL Server 2008 Express R2
+    * SQL Server Compact 3.5 + Service Pack 2
 
-* Windows Installer 4.5 (msi45.iss)
-* DirectX End-User Runtime (directxruntime.iss)
+* Windows Installer 4.5
+* DirectX End-User Runtime
 
 ## Credits
 
@@ -98,7 +97,7 @@ I wanted to thank the community for sharing many fixes and improvements. To cont
     * Added version strings parser to fix wrong detection for version numbers above 9
     * Added delayed and forced mid-install restart support
     * Added usage of #define in setup.iss (community)
-    * Added Unicode version of Inno Setup as default for better multilanguage support
+    * Added Unicode version of Inno Setup as default for better multi-language support
     * Fixed restart on 3010 result code from installers
     * Fixed missing check in Windows 2000 Security Update KB835732
     * Added support for offline files on x64 and IA64 OS
@@ -144,7 +143,7 @@ I wanted to thank the community for sharing many fixes and improvements. To cont
     * Fixed duplicate .NET registry checks
     * Fixed Inno Setup 6+ warnings
     * Fixed Italian localization (community)
-    * Removed old unsupported dependencies which targetted end-of-life Windows versions
+    * Removed old unsupported dependencies which targeted end-of-life Windows versions
 * November 2020
     * Added native Inno Setup 6.1+ downloader instead of isxdl
     * Added .NET Core 3.1.10 version support
