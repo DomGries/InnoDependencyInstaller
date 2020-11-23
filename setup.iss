@@ -90,7 +90,6 @@ Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 // helper functions
 #include "scripts\products\stringversion.iss"
-#include "scripts\products\winversion.iss"
 
 // actual products
 #ifdef use_msi45
