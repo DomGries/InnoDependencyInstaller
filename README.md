@@ -1,6 +1,5 @@
 # Inno Setup Dependency Installer
 
-![Ready to Install page](https://cloud.githubusercontent.com/assets/10548881/26322035/f8abb420-3f31-11e7-8be7-5a73aa29194b.jpg)
 ![Download page](https://cloud.githubusercontent.com/assets/10548881/26322034/f8aa3ec4-3f31-11e7-8092-868814ea3d2b.jpg)
 
 **Inno Setup Dependency Installer** can download and install dependencies such as any .NET or Visual C++ Redistributable during the installation process of your application. In addition, it is easy to add your own dependencies as well.
@@ -20,7 +19,7 @@
 
 ## Details
 
-![Ready to Install prompt](https://cloud.githubusercontent.com/assets/10548881/26322032/f8a87e7c-3f31-11e7-960b-1c2942f5851e.jpg)
+![Ready to Install page](https://cloud.githubusercontent.com/assets/10548881/26322035/f8abb420-3f31-11e7-8be7-5a73aa29194b.jpg)
 
 You have two ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _setup.iss_. Another way is to pack the dependency into a single _setup.exe_ file. To do so, you need:
 
@@ -68,12 +67,12 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * SQL Server 2008 Express R2
     * SQL Server Compact 3.5 + Service Pack 2
 
-* Windows Installer 4.5
 * DirectX End-User Runtime
+* Windows Installer 4.5
 
 ## Credits
 
-I wanted to thank the community for sharing many fixes and improvements. To contribute please create a pull request on this repository.
+Thanks to the community for sharing many fixes and improvements. To contribute please create a pull request on this repository.
 
 ## History
 
@@ -160,4 +159,4 @@ I wanted to thank the community for sharing many fixes and improvements. To cont
 
 ## License
 
-[The Code Project Open License (CPOL) 1.02](https://github.com/stfx/innodependencyinstaller/blob/master/LICENSE.md)
+[The Code Project Open License (CPOL) 1.02](https://github.com/DomGries/InnoDependencyInstaller/blob/master/LICENSE.md)

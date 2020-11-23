@@ -14,7 +14,7 @@
 #define InstallDotNet47
 #define InstallDotNet48
 
-// requires netcorecheck.exe and netcorecheck_x64.exe in src dir
+// requires netcorecheck.exe and netcorecheck_x64.exe in src directory
 #define InstallNetCoreCheck
 #define InstallNetCore31
 #define InstallNetCore31asp
@@ -33,17 +33,18 @@
 #define InstallVC2017
 #define InstallVC2019
 
-// requires dxwebsetup.exe in src dir
+// requires dxwebsetup.exe in src directory
 //#define InstallDirectX
 
 #define InstallSqlCompact35
 #define InstallSql2008Express
 
 
+// custom setup info
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
-#define MyAppPublisher 'DomGries'
-#define MyAppCopyright 'Copyright Â© DomGries'
+#define MyAppPublisher 'Dom Gries'
+#define MyAppCopyright 'Copyright © Dom Gries'
 #define MyAppURL 'https://github.com/DomGries/InnoDependencyInstaller'
 
 [Setup]
@@ -401,7 +402,6 @@ begin
   Result := CompareInnerVersion(Temp1, Temp2);
 end;
 
-
 #ifdef InstallNetCoreCheck
 // https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
 // download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
@@ -422,7 +422,6 @@ begin
   Result := Exec(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureSuffix + '.exe', Version, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
 end;
 #endif
-
 
 #ifdef InstallMsiProduct
 function MsiEnumRelatedProducts(UpgradeCode: String; Reserved: DWORD; Index: DWORD; ProductCode: String): Integer;
@@ -450,26 +449,17 @@ begin
 end;
 #endif
 
-
 #ifdef InstallDirectX
 [Files]
 Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif
 
 
-// content
+// custom setup content
 [Languages]
-Name: "en"; MessagesFile: "compiler:Default.isl"
-Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
-Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
-Name: "de"; MessagesFile: "compiler:Languages\German.isl"
-Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
-Name: "pt"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
-Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
-Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"
-
-[Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
+Name: en; MessagesFile: "compiler:Default.isl"
+Name: nl; MessagesFile: "compiler:Languages\Dutch.isl"
+Name: de; MessagesFile: "compiler:Languages\German.isl"
 
 [Files]
 Source: "MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsX64; Flags: ignoreversion
@@ -480,9 +470,11 @@ Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"
 Name: "{group}\{cm:UninstallProgram,{#MyAppSetupName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"; Tasks: desktopicon
 
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
+
 [Run]
 Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
-
 
 [Code]
 function InitializeSetup: Boolean;
