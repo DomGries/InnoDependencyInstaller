@@ -38,6 +38,7 @@ DisableReadyMemo=no
 // comment out product defines to disable installing them
 #define use_msi45
 
+#define use_dotnetfxversion
 #define use_dotnetfx11
 #define use_dotnetfx20
 #define use_dotnetfx35
@@ -91,34 +92,32 @@ Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"
 // helper functions
 #include "scripts\products\stringversion.iss"
 #include "scripts\products\winversion.iss"
-#include "scripts\products\dotnetfxversion.iss"
 
 // actual products
 #ifdef use_msi45
 #include "scripts\products\msi45.iss"
 #endif
 
+#ifdef use_dotnetfxversion
+#include "scripts\products\dotnetfxversion.iss"
+#endif
 #ifdef use_dotnetfx11
 #include "scripts\products\dotnetfx11.iss"
 #include "scripts\products\dotnetfx11sp1.iss"
 #endif
-
 #ifdef use_dotnetfx20
 #include "scripts\products\dotnetfx20.iss"
 #include "scripts\products\dotnetfx20sp1.iss"
 #include "scripts\products\dotnetfx20sp2.iss"
 #endif
-
 #ifdef use_dotnetfx35
 #include "scripts\products\dotnetfx35.iss"
 #include "scripts\products\dotnetfx35sp1.iss"
 #endif
-
 #ifdef use_dotnetfx40
 #include "scripts\products\dotnetfx40client.iss"
 #include "scripts\products\dotnetfx40full.iss"
 #endif
-
 #ifdef use_dotnetfx45
 #include "scripts\products\dotnetfx45.iss"
 #endif
