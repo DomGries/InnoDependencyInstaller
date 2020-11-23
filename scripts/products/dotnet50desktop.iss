@@ -3,7 +3,7 @@
 [Code]
 procedure dotnet50desktop;
 begin
-	if not netcoreinstalled(Desktop, '5.0.0') then begin
+	if not netcoreinstalled('Microsoft.WindowsDesktop.App 5.0.0') then begin
 		AddProduct('dotnet50desktop' + GetArchitectureSuffix + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Desktop Runtime 5.0' + GetArchitectureTitle,

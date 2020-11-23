@@ -3,7 +3,7 @@
 [Code]
 procedure netcore31;
 begin
-	if not netcoreinstalled(Core, '3.1.10') then begin
+	if not netcoreinstalled('Microsoft.NETCore.App 3.1.10') then begin
 		AddProduct('netcore31' + GetArchitectureSuffix + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Core Runtime 3.1.10' + GetArchitectureTitle,

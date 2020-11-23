@@ -3,7 +3,7 @@
 [Code]
 procedure dotnet50;
 begin
-	if not netcoreinstalled(Core, '5.0.0') then begin
+	if not netcoreinstalled('Microsoft.NETCore.App 5.0.0') then begin
 		AddProduct('dotnet50' + GetArchitectureSuffix + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Runtime 5.0' + GetArchitectureTitle,

@@ -3,7 +3,7 @@
 [Code]
 procedure netcore31desktop;
 begin
-	if not netcoreinstalled(Desktop, '3.1.10') then begin
+	if not netcoreinstalled('Microsoft.WindowsDesktop.App 3.1.10') then begin
 		AddProduct('netcore31desktop' + GetArchitectureSuffix + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Desktop Runtime 3.1.10' + GetArchitectureTitle,
