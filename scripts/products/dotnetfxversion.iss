@@ -5,119 +5,119 @@ type
 const
 	netfx11plus_reg = 'Software\Microsoft\NET Framework Setup\NDP\';
 
-function dotnetfxinstalled(version: NetFXType; languageId: Integer): Boolean;
+function dotnetfxinstalled(Version: NetFXType; LanguageId: Integer): Boolean;
 var
-	regVersion: Cardinal;
-	regVersionString: String;
-	lcid: String;
+	RegVersion: Cardinal;
+	RegVersionString: String;
+	LanguagePath: String;
 begin
-	if languageId <> 0 then begin
-		lcid := '\' + IntToStr(languageId);
+	if LanguageId <> 0 then begin
+		LanguagePath := '\' + IntToStr(LanguageId);
 	end else begin
-		lcid := '';
+		LanguagePath := '';
 	end;
 
-	case version of
+	case Version of
 		NetFx10: begin
-			Result := RegQueryStringValue(HKLM, 'Software\Microsoft\.NETFramework\Policy\v1.0\3705', 'Install', regVersionString) and (regVersionString <> '');
+			Result := RegQueryStringValue(HKLM, 'Software\Microsoft\.NETFramework\Policy\v1.0\3705', 'Install', RegVersionString) and (RegVersionString <> '');
 		end;
 		NetFx11: begin
-			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v1.1.4322' + lcid, 'Install', regVersion) and (regVersion <> 0);
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v1.1.4322' + LanguagePath, 'Install', RegVersion) and (RegVersion <> 0);
 		end;
 		NetFx20: begin
-			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v2.0.50727' + lcid, 'Install', regVersion) and (regVersion <> 0);
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v2.0.50727' + LanguagePath, 'Install', RegVersion) and (RegVersion <> 0);
 		end;
 		NetFx30: begin
-			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.0\Setup' + lcid, 'InstallSuccess', regVersion) and (regVersion <> 0);
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.0\Setup' + LanguagePath, 'InstallSuccess', RegVersion) and (RegVersion <> 0);
 		end;
 		NetFx35: begin
-			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.5' + lcid, 'Install', regVersion) and (regVersion <> 0);
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.5' + LanguagePath, 'Install', RegVersion) and (RegVersion <> 0);
 		end;
 		NetFx40Client: begin
-			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Client' + lcid, 'Install', regVersion) and (regVersion <> 0);
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Client' + LanguagePath, 'Install', RegVersion) and (RegVersion <> 0);
 		end;
 		NetFx40Full: begin
-			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Install', regVersion) and (regVersion <> 0);
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + LanguagePath, 'Install', RegVersion) and (RegVersion <> 0);
 		end;
 		NetFx4x: begin
-			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Release', regVersion) and (regVersion >= 378389); // 4.5.0+
+			Result := RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + LanguagePath, 'Release', RegVersion) and (RegVersion >= 378389); // 4.5.0+
 		end;
 	end;
 end;
 
-function dotnetfxspversion(version: NetFXType; languageId: Integer): Integer;
+function dotnetfxspversion(Version: NetFXType; LanguageId: Integer): Integer;
 var
-	regVersion: Cardinal;
-	lcid: String;
+	RegVersion: Cardinal;
+	LanguagePath: String;
 begin
-	if languageId <> 0 then begin
-		lcid := '\' + IntToStr(languageId);
+	if LanguageId <> 0 then begin
+		LanguagePath := '\' + IntToStr(LanguageId);
 	end else begin
-		lcid := '';
+		LanguagePath := '';
 	end;
 
-	case version of
+	case Version of
 		NetFx10: begin
 			// not supported
-			regVersion := -1;
+			RegVersion := -1;
 		end;
 		NetFx11: begin
-			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v1.1.4322' + lcid, 'SP', regVersion) then begin
-				regVersion := -1;
+			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v1.1.4322' + LanguagePath, 'SP', RegVersion) then begin
+				RegVersion := -1;
 			end;
 		end;
 		NetFx20: begin
-			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v2.0.50727' + lcid, 'SP', regVersion) then begin
-				regVersion := -1;
+			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v2.0.50727' + LanguagePath, 'SP', RegVersion) then begin
+				RegVersion := -1;
 			end;
 		end;
 		NetFx30: begin
-			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.0' + lcid, 'SP', regVersion) then begin
-				regVersion := -1;
+			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.0' + LanguagePath, 'SP', RegVersion) then begin
+				RegVersion := -1;
 			end;
 		end;
 		NetFx35: begin
-			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.5' + lcid, 'SP', regVersion) then begin
-				regVersion := -1;
+			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v3.5' + LanguagePath, 'SP', RegVersion) then begin
+				RegVersion := -1;
 			end;
 		end;
 		NetFx40Client: begin
-			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Client' + lcid, 'Servicing', regVersion) then begin
-				regVersion := -1;
+			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Client' + LanguagePath, 'Servicing', RegVersion) then begin
+				RegVersion := -1;
 			end;
 		end;
 		NetFx40Full: begin
-			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Servicing', regVersion) then begin
-				regVersion := -1;
+			if not RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + LanguagePath, 'Servicing', RegVersion) then begin
+				RegVersion := -1;
 			end;
 		end;
 		NetFx4x: begin
-			if RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + lcid, 'Release', regVersion) then begin
-				if regVersion >= 528040 then begin
-					regVersion := 80; // 4.8.0+ 
-				end else if regVersion >= 461808 then begin
-					regVersion := 72; // 4.7.2+
-				end else if regVersion >= 461308 then begin
-					regVersion := 71; // 4.7.1+
-				end else if regVersion >= 460798 then begin
-					regVersion := 70; // 4.7.0+
-				end else if regVersion >= 394802 then begin
-					regVersion := 62; // 4.6.2+
-				end else if regVersion >= 394254 then begin
-					regVersion := 61; // 4.6.1+
-				end else if regVersion >= 393295 then begin
-					regVersion := 60; // 4.6.0+
-				end else if regVersion >= 379893 then begin
-					regVersion := 52; // 4.5.2+
-				end else if regVersion >= 378675 then begin
-					regVersion := 51; // 4.5.1+
-				end else if regVersion >= 378389 then begin
-					regVersion := 50; // 4.5.0+
+			if RegQueryDWordValue(HKLM, netfx11plus_reg + 'v4\Full' + LanguagePath, 'Release', RegVersion) then begin
+				if RegVersion >= 528040 then begin
+					RegVersion := 80; // 4.8.0+ 
+				end else if RegVersion >= 461808 then begin
+					RegVersion := 72; // 4.7.2+
+				end else if RegVersion >= 461308 then begin
+					RegVersion := 71; // 4.7.1+
+				end else if RegVersion >= 460798 then begin
+					RegVersion := 70; // 4.7.0+
+				end else if RegVersion >= 394802 then begin
+					RegVersion := 62; // 4.6.2+
+				end else if RegVersion >= 394254 then begin
+					RegVersion := 61; // 4.6.1+
+				end else if RegVersion >= 393295 then begin
+					RegVersion := 60; // 4.6.0+
+				end else if RegVersion >= 379893 then begin
+					RegVersion := 52; // 4.5.2+
+				end else if RegVersion >= 378675 then begin
+					RegVersion := 51; // 4.5.1+
+				end else if RegVersion >= 378389 then begin
+					RegVersion := 50; // 4.5.0+
 				end else begin
-					regVersion := -1;
+					RegVersion := -1;
 				end;
 			end;
 		end;
 	end;
-	Result := regVersion;
+	Result := RegVersion;
 end;

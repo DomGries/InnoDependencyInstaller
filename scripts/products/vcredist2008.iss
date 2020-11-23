@@ -9,10 +9,10 @@ const
 	vcredist2008_upgradecode_sp1 = '{DE2C306F-A067-38EF-B86C-03DE4B0312F9}';
 	vcredist2008_upgradecode_sp1_x64 = '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}';
 
-procedure vcredist2008(minVersion: String);
+procedure vcredist2008(MinVersion: String);
 begin
-	if not msiproductupgrade(GetString(vcredist2008_upgradecode_sp1, vcredist2008_upgradecode_sp1_x64), minVersion) and not msiproductupgrade(vcredist2008_upgradecode, minVersion) then begin
-		AddProduct('vcredist2008' + GetArchitectureString() + '.exe',
+	if not msiproductupgrade(GetString(vcredist2008_upgradecode_sp1, vcredist2008_upgradecode_sp1_x64), MinVersion) and not msiproductupgrade(vcredist2008_upgradecode, MinVersion) then begin
+		AddProduct('vcredist2008' + GetArchitectureSuffix + '.exe',
 			'/q',
 			'Visual C++ 2008 Redistributable' + GetArchitectureTitle,
 			GetString(vcredist2008_url, vcredist2008_url_x64),

@@ -8,10 +8,10 @@ const
 	vcredist2012_upgradecode = '{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}';
 	vcredist2012_upgradecode_x64 = '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}';
 
-procedure vcredist2012(minVersion: String);
+procedure vcredist2012(MinVersion: String);
 begin
-	if not msiproductupgrade(GetString(vcredist2012_upgradecode, vcredist2012_upgradecode_x64), minVersion) then begin
-		AddProduct('vcredist2012' + GetArchitectureString() + '.exe',
+	if not msiproductupgrade(GetString(vcredist2012_upgradecode, vcredist2012_upgradecode_x64), MinVersion) then begin
+		AddProduct('vcredist2012' + GetArchitectureSuffix + '.exe',
 			'/passive /norestart',
 			'Visual C++ 2012 Redistributable' + GetArchitectureTitle,
 			GetString(vcredist2012_url, vcredist2012_url_x64),

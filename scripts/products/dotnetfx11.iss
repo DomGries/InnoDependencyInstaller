@@ -4,9 +4,9 @@
 const
 	dotnetfx11_url = 'https://download.microsoft.com/download/a/a/c/aac39226-8825-44ce-90e3-bf8203e74006/dotnetfx.exe';
 
-procedure dotnetfx11();
+procedure dotnetfx11;
 begin
-	if not IsX64() and not dotnetfxinstalled(NetFx11, 0) then begin
+	if not IsX64 and not dotnetfxinstalled(NetFx11, 0) then begin
 		AddProduct('dotnetfx11.exe',
 			'/q:a /c:"install /qb /l"',
 			'.NET Framework 1.1',

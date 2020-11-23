@@ -8,10 +8,10 @@ const
 	vcredist2010_upgradecode = '{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}';
 	vcredist2010_upgradecode_x64 = '{5B75F761-BAC8-33BC-A381-464DDDD813A3}';
 
-procedure vcredist2010(minVersion: String);
+procedure vcredist2010(MinVersion: String);
 begin
-	if not msiproductupgrade(GetString(vcredist2010_upgradecode, vcredist2010_upgradecode_x64), minVersion) then begin
-		AddProduct('vcredist2010' + GetArchitectureString() + '.exe',
+	if not msiproductupgrade(GetString(vcredist2010_upgradecode, vcredist2010_upgradecode_x64), MinVersion) then begin
+		AddProduct('vcredist2010' + GetArchitectureSuffix + '.exe',
 			'/passive /norestart',
 			'Visual C++ 2010 Redistributable' + GetArchitectureTitle,
 			GetString(vcredist2010_url, vcredist2010_url_x64),

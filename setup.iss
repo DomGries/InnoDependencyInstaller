@@ -214,32 +214,32 @@ Filename: "{app}\MyProgram.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupNam
 DependenciesDir=MyProgramDependencies
 
 [Code]
-function InitializeSetup(): Boolean;
+function InitializeSetup: Boolean;
 begin
 #ifdef use_msi45
 	msi45('4.5'); // install if version < 4.5
 #endif
 
 #ifdef use_dotnetfx11
-	dotnetfx11();
-	dotnetfx11sp1();
+	dotnetfx11;
+	dotnetfx11sp1;
 #endif
 
 #ifdef use_dotnetfx20
-	//dotnetfx20();
-	//dotnetfx20sp1();
-	dotnetfx20sp2();
+	//dotnetfx20;
+	//dotnetfx20sp1;
+	dotnetfx20sp2;
 #endif
 
 #ifdef use_dotnetfx35
-	//dotnetfx35();
-	dotnetfx35sp1();
+	//dotnetfx35;
+	dotnetfx35sp1;
 #endif
 
 	// if no .netfx 4.0 is found, install the client (smallest)
 #ifdef use_dotnetfx40
 	if not dotnetfxinstalled(NetFx40Client, 0) and not dotnetfxinstalled(NetFx40Full, 0) then begin
-		dotnetfx40client();
+		dotnetfx40client;
 	end;
 #endif
 
@@ -257,22 +257,22 @@ begin
 #endif
 
 #ifdef use_netcore31
-	netcore31();
+	netcore31;
 #endif
 #ifdef use_netcore31asp
-	netcore31asp();
+	netcore31asp;
 #endif
 #ifdef use_netcore31desktop
-	netcore31desktop();
+	netcore31desktop;
 #endif
 #ifdef use_dotnet50
-	dotnet50();
+	dotnet50;
 #endif
 #ifdef use_dotnet50asp
-	dotnet50asp();
+	dotnet50asp;
 #endif
 #ifdef use_dotnet50desktop
-	dotnet50desktop();
+	dotnet50desktop;
 #endif
 
 #ifdef use_vc2005
@@ -303,14 +303,14 @@ begin
 #endif
 
 #ifdef use_directxruntime
-	directxruntime();
+	directxruntime;
 #endif
 
 #ifdef use_sqlcompact35sp2
-	sqlcompact35sp2();
+	sqlcompact35sp2;
 #endif
 #ifdef use_sql2008express
-	sql2008express();
+	sql2008express;
 #endif
 
 	Result := True;

@@ -4,7 +4,7 @@
 const
 	dotnetfx35_url = 'https://download.microsoft.com/download/7/0/3/703455ee-a747-4cc8-bd3e-98a615c3aedb/dotNetFx35setup.exe';
 
-procedure dotnetfx35();
+procedure dotnetfx35;
 begin
 	if not dotnetfxinstalled(NetFx35, 0) then begin
 		AddProduct('dotnetfx35.exe',

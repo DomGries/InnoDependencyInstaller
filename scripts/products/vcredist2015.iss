@@ -8,10 +8,10 @@ const
 	vcredist2015_upgradecode = '{65E5BD06-6392-3027-8C26-853107D3CF1A}';
 	vcredist2015_upgradecode_x64 = '{36F68A90-239C-34DF-B58C-64B30153CE35}';
 
-procedure vcredist2015(minVersion: String);
+procedure vcredist2015(MinVersion: String);
 begin
-	if not msiproductupgrade(GetString(vcredist2015_upgradecode, vcredist2015_upgradecode_x64), minVersion) then begin
-		AddProduct('vcredist2015' + GetArchitectureString() + '.exe',
+	if not msiproductupgrade(GetString(vcredist2015_upgradecode, vcredist2015_upgradecode_x64), MinVersion) then begin
+		AddProduct('vcredist2015' + GetArchitectureSuffix + '.exe',
 			'/passive /norestart',
 			'Visual C++ 2015 Redistributable' + GetArchitectureTitle,
 			GetString(vcredist2015_url, vcredist2015_url_x64),

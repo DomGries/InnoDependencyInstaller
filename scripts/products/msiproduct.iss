@@ -8,34 +8,34 @@ const
 	INSTALLSTATE_ABSENT = 2;		// The product is installed for a different user.
 	INSTALLSTATE_DEFAULT = 5;		// The product is installed for the current user.
 
-function MsiQueryProductState(szProduct: String): INSTALLSTATE;
+function MsiQueryProductState(Product: String): INSTALLSTATE;
 external 'MsiQueryProductStateW@msi.dll stdcall';
 
-function MsiEnumRelatedProducts(szUpgradeCode: String; nReserved: DWORD; nIndex: DWORD; szProductCode: String): Integer;
+function MsiEnumRelatedProducts(UpgradeCode: String; Reserved: DWORD; Index: DWORD; ProductCode: String): Integer;
 external 'MsiEnumRelatedProductsW@msi.dll stdcall';
 
-function MsiGetProductInfo(szProductCode: String; szProperty: String; szValue: String; var nvalueSize: DWORD): Integer;
+function MsiGetProductInfo(ProductCode: String; PropertyName: String; Value: String; var ValueSize: DWORD): Integer;
 external 'MsiGetProductInfoW@msi.dll stdcall';
 
-function msiproduct(productID: String): Boolean;
+function msiproduct(ProductId: String): Boolean;
 begin
-	Result := MsiQueryProductState(productID) = INSTALLSTATE_DEFAULT;
+	Result := MsiQueryProductState(ProductId) = INSTALLSTATE_DEFAULT;
 end;
 
-function msiproductupgrade(upgradeCode: String; minVersion: String): Boolean;
+function msiproductupgrade(UpgradeCode: String; MinVersion: String): Boolean;
 var
-	productCode, version: String;
-	valueSize: DWORD;
+	ProductCode, Version: String;
+	ValueSize: DWORD;
 begin
-	SetLength(productCode, 39);
+	SetLength(ProductCode, 39);
 	Result := False;
 
-	if MsiEnumRelatedProducts(upgradeCode, 0, 0, productCode) = 0 then begin
-		SetLength(version, 39);
-		valueSize := Length(version);
+	if MsiEnumRelatedProducts(UpgradeCode, 0, 0, ProductCode) = 0 then begin
+		SetLength(Version, 39);
+		ValueSize := Length(Version);
 
-		if MsiGetProductInfo(productCode, 'VersionString', version, valueSize) = 0 then begin
-			Result := compareversion(version, minVersion) >= 0;
+		if MsiGetProductInfo(ProductCode, 'VersionString', Version, ValueSize) = 0 then begin
+			Result := compareversion(Version, MinVersion) >= 0;
 		end;
 	end;
 end;

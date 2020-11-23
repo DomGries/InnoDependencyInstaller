@@ -4,7 +4,7 @@
 const
 	dotnetfx40full_url = 'https://download.microsoft.com/download/1/B/E/1BE39E79-7E39-46A3-96FF-047F95396215/dotNetFx40_Full_setup.exe';
 
-procedure dotnetfx40full();
+procedure dotnetfx40full;
 begin
 	if not dotnetfxinstalled(NetFx40Full, 0) then begin
 		AddProduct('dotNetFx40_Full_setup.exe',

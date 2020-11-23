@@ -11,12 +11,12 @@ Source: "src\netcorecheck_x64.exe"; Flags: dontcopy noencryption
 type
 	NetCoreRuntimeType = (Asp, Core, Desktop);
 
-function netcoreinstalled(runtime: NetCoreRuntimeType; version: String): Boolean;
+function netcoreinstalled(Runtime: NetCoreRuntimeType; Version: String): Boolean;
 var
 	netcoreRuntime: String;
-	resultCode: Integer;
+	ResultCode: Integer;
 begin
-	case runtime of
+	case Runtime of
 		Asp: begin
 			netcoreRuntime := 'Microsoft.AspNetCore.App';
 		end;
@@ -28,9 +28,9 @@ begin
 		end;
 	end;
 
-	if not FileExists(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureString() + '.exe') then begin
-		ExtractTemporaryFile('netcorecheck' + GetArchitectureString() + '.exe');
+	if not FileExists(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureSuffix + '.exe') then begin
+		ExtractTemporaryFile('netcorecheck' + GetArchitectureSuffix + '.exe');
 	end;
 
-	Result := Exec(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureString() + '.exe', netcoreRuntime + ' ' + version, '', SW_HIDE, ewWaitUntilTerminated, resultCode) and (resultCode = 0);
+	Result := Exec(ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureSuffix + '.exe', netcoreRuntime + ' ' + Version, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
 end;

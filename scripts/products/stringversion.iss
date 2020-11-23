@@ -1,60 +1,57 @@
 [Code]
-function stringtoversion(var temp: String): Integer;
+function stringtoversion(var Temp: String): Integer;
 var
-	part: String;
-	pos1: Integer;
-
+	Part: String;
+	Pos1: Integer;
 begin
-	if Length(temp) = 0 then begin
+	if Length(Temp) = 0 then begin
 		Result := -1;
 		Exit;
 	end;
 
-	pos1 := Pos('.', temp);
-	if pos1 = 0 then begin
-		Result := StrToInt(temp);
-		temp := '';
+	Pos1 := Pos('.', Temp);
+	if Pos1 = 0 then begin
+		Result := StrToInt(Temp);
+		Temp := '';
 	end else begin
-		part := Copy(temp, 1, pos1 - 1);
-		temp := Copy(temp, pos1 + 1, Length(temp));
-		Result := StrToInt(part);
+		Part := Copy(Temp, 1, Pos1 - 1);
+		Temp := Copy(Temp, Pos1 + 1, Length(Temp));
+		Result := StrToInt(Part);
 	end;
 end;
 
-function compareinnerversion(var x, y: String): Integer;
+function compareinnerversion(var X, Y: String): Integer;
 var
-	num1, num2: Integer;
-
+	Num1, Num2: Integer;
 begin
-	num1 := stringtoversion(x);
-	num2 := stringtoversion(y);
-	if (num1 = -1) and (num2 = -1) then begin
+	Num1 := stringtoversion(X);
+	Num2 := stringtoversion(Y);
+	if (Num1 = -1) and (Num2 = -1) then begin
 		Result := 0;
 		Exit;
 	end;
 
-	if num1 < 0 then begin
-		num1 := 0;
+	if Num1 < 0 then begin
+		Num1 := 0;
 	end;
-	if num2 < 0 then begin
-		num2 := 0;
+	if Num2 < 0 then begin
+		Num2 := 0;
 	end;
 
-	if num1 < num2 then begin
+	if Num1 < Num2 then begin
 		Result := -1;
-	end else if num1 > num2 then begin
+	end else if Num1 > Num2 then begin
 		Result := 1;
 	end else begin
-		Result := compareinnerversion(x, y);
+		Result := compareinnerversion(X, Y);
 	end;
 end;
 
-function compareversion(versionA, versionB: String): Integer;
+function compareversion(VersionA, VersionB: String): Integer;
 var
-  temp1, temp2: String;
-
+	Temp1, Temp2: String;
 begin
-	temp1 := versionA;
-	temp2 := versionB;
-	Result := compareinnerversion(temp1, temp2);
+	Temp1 := VersionA;
+	Temp2 := VersionB;
+	Result := compareinnerversion(Temp1, Temp2);
 end;

@@ -11,65 +11,65 @@ type
 		Parameters: String;
 		ForceSuccess: Boolean;
 		InstallClean: Boolean;
-		MustRebootAfter: Boolean;
+		RebootAfter: Boolean;
 	end;
 
 	InstallResult = (InstallSuccessful, InstallRebootRequired, InstallError);
 
 var
-	installMemo: String;
-	products: array of TProduct;
-	delayedReboot, isForcedX86: Boolean;
+	MemoInstallInfo: String;
+	Products: array of TProduct;
+	DelayedReboot, ForceX86: Boolean;
 	DownloadPage: TDownloadWizardPage;
 
-procedure AddProduct(filename, parameters, title, url, checksum: String; forceSuccess, installClean, mustRebootAfter: Boolean);
+procedure AddProduct(Filename, Parameters, Title, URL, Checksum: String; ForceSuccess, InstallClean, RebootAfter: Boolean);
 {
 	Adds a product to the list of products to download.
 	Parameters:
-		filename: the file name under which to save the file
-		parameters: the parameters with which to run the file
-		title: the product title
-		url: the URL to download from
-		forceSuccess: whether to continue in case of setup failure
-		installClean: whether the product needs a reboot before installing
-		mustRebootAfter: whether the product needs a reboot after installing
+		Filename: the file name under which to save the file
+		Parameters: the Parameters with which to run the file
+		Title: the product title
+		URL: the URL to download from
+		ForceSuccess: whether to continue in case of setup failure
+		InstallClean: whether the product needs a reboot before installing
+		RebootAfter: whether the product needs a reboot after installing
 }
 var
-	product: TProduct;
-	i: Integer;
+	Product: TProduct;
+	I: Integer;
 begin
-	installMemo := installMemo + #13 + '%1' + title;
+	MemoInstallInfo := MemoInstallInfo + #13 + '%1' + Title;
 
-	product.URL := '';
-	product.Filename := '';
-	product.Checksum := checksum;
-	product.Title := title;
-	product.Parameters := parameters;
-	product.ForceSuccess := forceSuccess;
-	product.InstallClean := installClean;
-	product.MustRebootAfter := mustRebootAfter;
+	Product.URL := '';
+	Product.Filename := '';
+	Product.Checksum := Checksum;
+	Product.Title := Title;
+	Product.Parameters := Parameters;
+	Product.ForceSuccess := ForceSuccess;
+	Product.InstallClean := InstallClean;
+	Product.RebootAfter := RebootAfter;
 
 	try
-		product.Path := CustomMessage('DependenciesDir');
+		Product.Path := CustomMessage('DependenciesDir');
 	except
 		// catch exception on undefined custom message
-		product.Path := '';
+		Product.Path := '';
 	end;
 
-	if (product.Path = '') or not FileExists(ExpandConstant('{src}{\}') + product.Path + '\' + filename) then begin
-		product.Path := ExpandConstant('{tmp}{\}') + filename;
+	if (Product.Path = '') or not FileExists(ExpandConstant('{src}{\}') + Product.Path + '\' + Filename) then begin
+		Product.Path := ExpandConstant('{tmp}{\}') + Filename;
 
-		if not FileExists(product.Path) then begin
-			product.URL := url;
-			product.Filename := filename;
+		if not FileExists(Product.Path) then begin
+			Product.URL := URL;
+			Product.Filename := Filename;
 		end;
 	end else begin
-		product.Path := ExpandConstant('{src}{\}') + product.Path + '\' + filename;
+		Product.Path := ExpandConstant('{src}{\}') + Product.Path + '\' + Filename;
 	end;
 
-	i := GetArrayLength(products);
-	SetArrayLength(products, i + 1);
-	products[i] := product;
+	I := GetArrayLength(Products);
+	SetArrayLength(Products, I + 1);
+	Products[I] := Product;
 end;
 
 function PendingReboot: Boolean;
@@ -77,10 +77,10 @@ function PendingReboot: Boolean;
 	Checks whether the machine has a pending reboot.
 }
 var
-	names: String;
+	Names: String;
 begin
-	Result := RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', names) or
-		(RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', names) and (names <> ''));
+	Result := RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', Names) or
+		(RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', Names) and (Names <> ''));
 end;
 
 function InstallProducts: InstallResult;
@@ -88,47 +88,47 @@ function InstallProducts: InstallResult;
 	Installs the downloaded products
 }
 var
-	resultCode, i, productCount, finishCount: Integer;
+	ResultCode, I, ProductCount, FinishCount: Integer;
 begin
 	Result := InstallSuccessful;
-	productCount := GetArrayLength(products);
+	ProductCount := GetArrayLength(Products);
 
-	if productCount > 0 then begin
-		for i := 0 to productCount - 1 do begin
-			if products[i].InstallClean and (delayedReboot or PendingReboot()) then begin
+	if ProductCount > 0 then begin
+		for I := 0 to ProductCount - 1 do begin
+			if Products[I].InstallClean and (DelayedReboot or PendingReboot) then begin
 				Result := InstallRebootRequired;
 				break;
 			end;
 
 			DownloadPage.Show;
-			DownloadPage.SetText(products[i].Title, '');
-			DownloadPage.SetProgress(i + 1, productCount);
+			DownloadPage.SetText(Products[I].Title, '');
+			DownloadPage.SetProgress(I + 1, ProductCount);
 
 			while True do begin
 				// set 0 as used code for shown error if ShellExec fails
-				resultCode := 0;
-				if ShellExec('', products[i].Path, products[i].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, resultCode) then begin
-					// setup executed; resultCode contains the exit code
-					if products[i].MustRebootAfter then begin
+				ResultCode := 0;
+				if ShellExec('', Products[I].Path, Products[I].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+					// setup executed; ResultCode contains the exit code
+					if Products[I].RebootAfter then begin
 						// delay reboot after install if we installed the last dependency anyways
-						if i = productCount - 1 then begin
-							delayedReboot := True;
+						if I = ProductCount - 1 then begin
+							DelayedReboot := True;
 						end else begin
 							Result := InstallRebootRequired;
 						end;
 						break;
-					end else if (resultCode = 0) or products[i].ForceSuccess then begin
-						finishCount := finishCount + 1;
+					end else if (ResultCode = 0) or Products[I].ForceSuccess then begin
+						FinishCount := FinishCount + 1;
 						break;
-					end else if resultCode = 3010 then begin
-						// Windows Installer resultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
-						delayedReboot := True;
-						finishCount := finishCount + 1;
+					end else if ResultCode = 3010 then begin
+						// Windows Installer ResultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
+						DelayedReboot := True;
+						FinishCount := FinishCount + 1;
 						break;
 					end;
 				end;
 
-				case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [products[i].Title, IntToStr(resultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
+				case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Products[I].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
 					IDABORT: begin
 						Result := InstallError;
 						break;
@@ -145,10 +145,10 @@ begin
 		end;
 
 		// only leave not installed products for error message
-		for i := 0 to productCount - finishCount - 1 do begin
-			products[i] := products[i + finishCount];
+		for I := 0 to ProductCount - FinishCount - 1 do begin
+			Products[I] := Products[I + FinishCount];
 		end;
-		SetArrayLength(products, productCount - finishCount);
+		SetArrayLength(Products, ProductCount - FinishCount);
 
 		DownloadPage.Hide;
 	end;
@@ -160,7 +160,7 @@ end;
 	--------------------
 }
 
-procedure InitializeWizard();
+procedure InitializeWizard;
 begin
 	DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 end;
@@ -171,23 +171,20 @@ function PrepareToInstall(var NeedsRestart: Boolean): String;
 	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
 var
-	i: Integer;
-	s: String;
+	I: Integer;
 begin
-	delayedReboot := False;
+	DelayedReboot := False;
 
-	case InstallProducts() of
+	case InstallProducts of
 		InstallError: begin
-			s := SetupMessage(msgReadyMemoTasks);
+			Result := SetupMessage(msgReadyMemoTasks);
 
-			for i := 0 to GetArrayLength(products) - 1 do begin
-				s := s + #13 + '	' + products[i].Title;
+			for I := 0 to GetArrayLength(Products) - 1 do begin
+				Result := Result + #13 + '	' + Products[I].Title;
 			end;
-
-			Result := s;
 		end;
 		InstallRebootRequired: begin
-			Result := products[0].Title;
+			Result := Products[0].Title;
 			NeedsRestart := True;
 
 			// write into the registry that the installer needs to be executed again after restart
@@ -202,7 +199,7 @@ function NeedRestart: Boolean;
 	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
 begin
-	Result := delayedReboot;
+	Result := DelayedReboot;
 end;
 
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
@@ -231,11 +228,11 @@ begin
 		Result := Result + MemoTasksInfo;
 	end;
 
-	if installMemo <> '' then begin
+	if MemoInstallInfo <> '' then begin
 		if MemoTasksInfo = '' then begin
 			Result := Result + SetupMessage(msgReadyMemoTasks);
 		end;
-		Result := Result + FmtMessage(installMemo, [Space]);
+		Result := Result + FmtMessage(MemoInstallInfo, [Space]);
 	end;
 end;
 
@@ -245,38 +242,38 @@ function NextButtonClick(CurPageID: Integer): Boolean;
 	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
 var
-	retry: Boolean;
-	i, productCount: Integer;
+	Retry: Boolean;
+	I, ProductCount: Integer;
 begin
 	Result := True;
 
-	if (CurPageID = wpReady) and (installMemo <> '') then begin
+	if (CurPageID = wpReady) and (MemoInstallInfo <> '') then begin
 		DownloadPage.Show;
 
-		productCount := GetArrayLength(products);
-		for i := 0 to productCount - 1 do begin
-			if products[i].URL <> '' then begin
+		ProductCount := GetArrayLength(Products);
+		for I := 0 to ProductCount - 1 do begin
+			if Products[I].URL <> '' then begin
 				DownloadPage.Clear;
-				DownloadPage.Add(products[i].URL, products[i].Filename, products[i].Checksum);
+				DownloadPage.Add(Products[I].URL, Products[I].Filename, Products[I].Checksum);
 
-				retry := True;
-				while retry do begin
-					retry := False;
+				Retry := True;
+				while Retry do begin
+					Retry := False;
 
 					try
 						DownloadPage.Download;
 					except
 						if GetExceptionMessage = SetupMessage(msgErrorDownloadAborted) then begin
 							Result := False;
-							i := productCount;
+							I := ProductCount;
 						end else begin
 							case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
 								IDABORT: begin
 									Result := False;
-									i := productCount;
+									I := ProductCount;
 								end;
 								IDRETRY: begin
-									retry := True;
+									Retry := True;
 								end;
 							end;
 						end;
@@ -300,7 +297,7 @@ function IsX64: Boolean;
 	Gets whether the computer is x64 (64 bits).
 }
 begin
-	Result := not isForcedX86 and Is64BitInstallMode;
+	Result := not ForceX86 and Is64BitInstallMode;
 end;
 
 function GetString(x86, x64: String): String;
@@ -311,31 +308,31 @@ function GetString(x86, x64: String): String;
 		x64: the string if the computer is x64
 }
 begin
-	if IsX64() and (x64 <> '') then begin
+	if IsX64 and (x64 <> '') then begin
 		Result := x64;
 	end else begin
 		Result := x86;
 	end;
 end;
 
-function GetArchitectureString(): String;
+function GetArchitectureSuffix: String;
 {
-	Gets the "standard" architecture suffix string.
+	Gets the architecture suffix string.
 }
 begin
-	if IsX64() then begin
+	if IsX64 then begin
 		Result := '_x64';
 	end else begin
 		Result := '';
 	end;
 end;
 
-function GetArchitectureTitle(): String;
+function GetArchitectureTitle: String;
 {
-	Gets the "standard" architecture title string.
+	Gets the architecture title string.
 }
 begin
-	if IsX64() then begin
+	if IsX64 then begin
 		Result := ' (x64)';
 	end else begin
 		Result := ' (x86)';
@@ -347,5 +344,5 @@ procedure SetForceX86(value: Boolean);
 	Forces the setup to use x86 products
 }
 begin
-	isForcedX86 := value;
+	ForceX86 := value;
 end;
