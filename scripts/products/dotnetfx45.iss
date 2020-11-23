@@ -1,9 +1,9 @@
 // https://www.microsoft.com/en-us/download/details.aspx?id=42642
 
 [Code]
-procedure dotnetfx45(MinVersion: Integer);
+procedure dotnetfx45;
 begin
-	if dotnetfxspversion(NetFx4x, 0) < MinVersion then begin
+	if not IsDotNetInstalled(net45, 0) then begin
 		AddProduct('dotnetfx45.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Framework 4.5.2',

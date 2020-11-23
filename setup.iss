@@ -38,7 +38,6 @@ DisableReadyMemo=no
 // comment out product defines to disable installing them
 #define use_msi45
 
-#define use_dotnetfxversion
 #define use_dotnetfx11
 #define use_dotnetfx20
 #define use_dotnetfx35
@@ -98,9 +97,6 @@ Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"
 #include "scripts\products\msi45.iss"
 #endif
 
-#ifdef use_dotnetfxversion
-#include "scripts\products\dotnetfxversion.iss"
-#endif
 #ifdef use_dotnetfx11
 #include "scripts\products\dotnetfx11.iss"
 #include "scripts\products\dotnetfx11sp1.iss"
@@ -220,33 +216,26 @@ begin
 	dotnetfx11;
 	dotnetfx11sp1;
 #endif
-
 #ifdef use_dotnetfx20
 	dotnetfx20;
 #endif
-
 #ifdef use_dotnetfx35
 	dotnetfx35;
 #endif
-
-	// if no .netfx 4.0 is found, install the client (smallest)
 #ifdef use_dotnetfx40
-	if not dotnetfxinstalled(NetFx40Client, 0) and not dotnetfxinstalled(NetFx40Full, 0) then begin
-		dotnetfx40client;
-	end;
+	dotnetfx40client;
 #endif
-
 #ifdef use_dotnetfx45
-	dotnetfx45(50); // install if version < 4.5.0
+	dotnetfx45;
 #endif
 #ifdef use_dotnetfx46
-	dotnetfx46(60); // install if version < 4.6.0
+	dotnetfx46;
 #endif
 #ifdef use_dotnetfx47
-	dotnetfx47(70); // install if version < 4.7.0
+	dotnetfx47;
 #endif
 #ifdef use_dotnetfx48
-	dotnetfx48(80); // install if version < 4.8.0
+	dotnetfx48;
 #endif
 
 #ifdef use_netcore31

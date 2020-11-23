@@ -1,9 +1,9 @@
 // https://dotnet.microsoft.com/download/dotnet-framework/net48
 
 [Code]
-procedure dotnetfx48(MinVersion: Integer);
+procedure dotnetfx48;
 begin
-	if dotnetfxspversion(NetFx4x, 0) < MinVersion then begin
+	if not IsDotNetInstalled(net48, 0) then begin
 		AddProduct('dotnetfx48.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Framework 4.8',

@@ -1,9 +1,9 @@
 // https://www.microsoft.com/en-US/download/details.aspx?id=53345
 
 [Code]
-procedure dotnetfx46(MinVersion: Integer);
+procedure dotnetfx46;
 begin
-	if dotnetfxspversion(NetFx4x, 0) < MinVersion then begin
+	if not IsDotNetInstalled(net46, 0) then begin
 		AddProduct('dotnetfx46.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Framework 4.6.2',

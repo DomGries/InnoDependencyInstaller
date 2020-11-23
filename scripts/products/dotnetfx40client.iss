@@ -3,7 +3,7 @@
 [Code]
 procedure dotnetfx40client;
 begin
-	if not dotnetfxinstalled(NetFx40Client, 0) then begin
+	if not IsDotNetInstalled(net4client, 0) and not IsDotNetInstalled(net4full, 0) then begin
 		AddProduct('dotNetFx40_Client_setup.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Framework 4.0',

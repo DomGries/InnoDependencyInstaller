@@ -3,7 +3,7 @@
 [Code]
 procedure dotnetfx11sp1;
 begin
-	if not IsX64 and (dotnetfxspversion(NetFx11, 0) < 1) then begin
+	if not IsX64 and not IsDotNetInstalled(net11, 1) then begin
 		AddProduct('dotnetfx11sp1.exe',
 			'/q',
 			'.NET Framework 1.1 Service Pack 1',

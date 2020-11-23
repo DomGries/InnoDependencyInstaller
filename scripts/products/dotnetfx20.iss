@@ -3,7 +3,7 @@
 [Code]
 procedure dotnetfx20;
 begin
-	if not dotnetfxinstalled(NetFx20, 0) then begin
+	if not IsDotNetInstalled(net20, 0) then begin
 		AddProduct('dotnetfx20' + GetArchitectureSuffix + '.exe',
 			'/passive /norestart /lang:ENU',
 			'.NET Framework 2.0',

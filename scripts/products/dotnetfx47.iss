@@ -1,9 +1,9 @@
 // https://support.microsoft.com/en-us/help/4054531
 
 [Code]
-procedure dotnetfx47(MinVersion: Integer);
+procedure dotnetfx47;
 begin
-	if dotnetfxspversion(NetFx4x, 0) < MinVersion then begin
+	if not IsDotNetInstalled(net47, 0) then begin
 		AddProduct('dotnetfx47.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			'.NET Framework 4.7.2',

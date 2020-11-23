@@ -3,7 +3,7 @@
 [Code]
 procedure dotnetfx11;
 begin
-	if not IsX64 and not dotnetfxinstalled(NetFx11, 0) then begin
+	if not IsX64 and not IsDotNetInstalled(net11, 0) then begin
 		AddProduct('dotnetfx11.exe',
 			'/q:a /c:"install /qb /l"',
 			'.NET Framework 1.1',

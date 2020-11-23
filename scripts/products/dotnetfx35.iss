@@ -3,7 +3,7 @@
 [Code]
 procedure dotnetfx35;
 begin
-	if not dotnetfxinstalled(NetFx35, 0) then begin
+	if not IsDotNetInstalled(net35, 0) then begin
 		AddProduct('dotnetfx35.exe',
 			'/lang:enu /passive /norestart',
 			'.NET Framework 3.5',
