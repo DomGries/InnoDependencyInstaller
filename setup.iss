@@ -107,12 +107,9 @@ Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"
 #endif
 #ifdef use_dotnetfx20
 #include "scripts\products\dotnetfx20.iss"
-#include "scripts\products\dotnetfx20sp1.iss"
-#include "scripts\products\dotnetfx20sp2.iss"
 #endif
 #ifdef use_dotnetfx35
 #include "scripts\products\dotnetfx35.iss"
-#include "scripts\products\dotnetfx35sp1.iss"
 #endif
 #ifdef use_dotnetfx40
 #include "scripts\products\dotnetfx40client.iss"
@@ -225,14 +222,11 @@ begin
 #endif
 
 #ifdef use_dotnetfx20
-	//dotnetfx20;
-	//dotnetfx20sp1;
-	dotnetfx20sp2;
+	dotnetfx20;
 #endif
 
 #ifdef use_dotnetfx35
-	//dotnetfx35;
-	dotnetfx35sp1;
+	dotnetfx35;
 #endif
 
 	// if no .netfx 4.0 is found, install the client (smallest)

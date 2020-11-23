@@ -1,4 +1,4 @@
-// https://www.microsoft.com/downloads/details.aspx?FamilyId=333325FD-AE52-4E35-B531-508D977D32A6
+// https://www.microsoft.com/downloads/details.aspx?FamilyID=ab99342f-5d1a-413d-8319-81da479ab0d7
 
 [Code]
 procedure dotnetfx35;
@@ -7,7 +7,7 @@ begin
 		AddProduct('dotnetfx35.exe',
 			'/lang:enu /passive /norestart',
 			'.NET Framework 3.5',
-			'https://download.microsoft.com/download/7/0/3/703455ee-a747-4cc8-bd3e-98a615c3aedb/dotNetFx35setup.exe',
+			'https://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe',
 			'', False, False, False);
 	end;
 end;
