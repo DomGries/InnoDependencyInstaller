@@ -39,12 +39,8 @@ DisableReadyMemo=no
 #define use_msi45
 
 #define use_dotnetfx11
-#define use_dotnetfx11lp
 #define use_dotnetfx20
-#define use_dotnetfx20lp
 #define use_dotnetfx35
-#define use_dotnetfx35lp
-
 #define use_dotnetfx40
 #define use_dotnetfx45
 #define use_dotnetfx46
@@ -105,29 +101,17 @@ Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"
 #ifdef use_dotnetfx11
 #include "scripts\products\dotnetfx11.iss"
 #include "scripts\products\dotnetfx11sp1.iss"
-#ifdef use_dotnetfx11lp
-#include "scripts\products\dotnetfx11lp.iss"
-#endif
 #endif
 
 #ifdef use_dotnetfx20
 #include "scripts\products\dotnetfx20.iss"
 #include "scripts\products\dotnetfx20sp1.iss"
 #include "scripts\products\dotnetfx20sp2.iss"
-#ifdef use_dotnetfx20lp
-#include "scripts\products\dotnetfx20lp.iss"
-#include "scripts\products\dotnetfx20sp1lp.iss"
-#include "scripts\products\dotnetfx20sp2lp.iss"
-#endif
 #endif
 
 #ifdef use_dotnetfx35
 #include "scripts\products\dotnetfx35.iss"
 #include "scripts\products\dotnetfx35sp1.iss"
-#ifdef use_dotnetfx35lp
-#include "scripts\products\dotnetfx35lp.iss"
-#include "scripts\products\dotnetfx35sp1lp.iss"
-#endif
 #endif
 
 #ifdef use_dotnetfx40
@@ -238,9 +222,6 @@ begin
 
 #ifdef use_dotnetfx11
 	dotnetfx11();
-#ifdef use_dotnetfx11lp
-	dotnetfx11lp();
-#endif
 	dotnetfx11sp1();
 #endif
 
@@ -248,20 +229,11 @@ begin
 	//dotnetfx20();
 	//dotnetfx20sp1();
 	dotnetfx20sp2();
-#ifdef use_dotnetfx20lp
-	//dotnetfx20lp();
-	//dotnetfx20sp1lp();
-	dotnetfx20sp2lp();
-#endif
 #endif
 
 #ifdef use_dotnetfx35
 	//dotnetfx35();
 	dotnetfx35sp1();
-#ifdef use_dotnetfx35lp
-	//dotnetfx35lp();
-	dotnetfx35sp1lp();
-#endif
 #endif
 
 	// if no .netfx 4.0 is found, install the client (smallest)
