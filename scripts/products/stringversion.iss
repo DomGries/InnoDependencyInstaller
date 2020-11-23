@@ -11,12 +11,12 @@ begin
 
 	Pos1 := Pos('.', Temp);
 	if Pos1 = 0 then begin
-		Result := StrToInt(Temp);
+		Result := StrToIntDef(Temp, 0);
 		Temp := '';
 	end else begin
 		Part := Copy(Temp, 1, Pos1 - 1);
 		Temp := Copy(Temp, Pos1 + 1, Length(Temp));
-		Result := StrToInt(Part);
+		Result := StrToIntDef(Part, 0);
 	end;
 end;
 
