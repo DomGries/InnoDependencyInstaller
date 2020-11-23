@@ -1,10 +1,6 @@
 // https://www.microsoft.com/download/en/details.aspx?id=3743
 
 [Code]
-const
-	sql2008express_url = 'https://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR32_x86_ENU.exe';
-	sql2008express_url_x64 = 'https://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR_x64_ENU.exe';
-
 procedure sql2008express;
 var
 	Version: String;
@@ -15,7 +11,7 @@ begin
 		AddProduct('sql2008express' + GetArchitectureSuffix + '.exe',
 			'/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=Install /FEATURES=All /INSTANCENAME=SQLEXPRESS /SQLSVCACCOUNT="NT AUTHORITY\Network Service" /SQLSYSADMINACCOUNTS="builtin\administrators"',
 			'SQL Server 2008 Express R2',
-			GetString(sql2008express_url, sql2008express_url_x64),
+			GetString('https://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR_x64_ENU.exe'),
 			'', False, False, False);
 	end;
 end;
