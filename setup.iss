@@ -61,8 +61,8 @@ OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
 DefaultGroupName={#MyAppSetupName}
 DefaultDirName={autopf}\{#MyAppSetupName}
 UninstallDisplayIcon={app}\MyProgram.exe
-OutputDir=bin
-SourceDir=.
+SourceDir=src
+OutputDir={#SourcePath}\bin
 AllowNoIcons=yes
 
 MinVersion=6.0
@@ -408,8 +408,8 @@ end;
 // download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
 
 [Files]
-Source: "src\netcorecheck.exe"; Flags: dontcopy noencryption
-Source: "src\netcorecheck_x64.exe"; Flags: dontcopy noencryption
+Source: "netcorecheck.exe"; Flags: dontcopy noencryption
+Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
 
 [Code]
 function netcoreinstalled(Version: String): Boolean;
@@ -453,7 +453,7 @@ end;
 
 #ifdef InstallDirectX
 [Files]
-Source: "src\dxwebsetup.exe"; Flags: dontcopy noencryption
+Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif
 
 
@@ -472,8 +472,8 @@ Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 
 [Files]
-Source: "src\MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsX64; Flags: ignoreversion
-Source: "src\MyProgram.exe"; DestDir: "{app}"; Check: not IsX64; Flags: ignoreversion
+Source: "MyProgram-x64.exe"; DestDir: "{app}"; DestName: "MyProgram.exe"; Check: IsX64; Flags: ignoreversion
+Source: "MyProgram.exe"; DestDir: "{app}"; Check: not IsX64; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProgram.exe"
