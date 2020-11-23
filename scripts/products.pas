@@ -62,13 +62,13 @@ begin
 			product.URL := url;
 			product.Filename := filename;
 
-			installMemo := installMemo + '%1' + title + ' (' + size + ')' + #13;
+			installMemo := installMemo + #13 + '%1' + title + ' (' + size + ')';
 		end else begin
-			installMemo := installMemo + '%1' + title + #13;
+			installMemo := installMemo + #13 + '%1' + title;
 		end;
 	end else begin
 		product.Path := ExpandConstant('{src}{\}') + product.Path + '\' + filename;
-		installMemo := installMemo + '%1' + title + #13;
+		installMemo := installMemo + #13 + '%1' + title;
 	end;
 
 	i := GetArrayLength(products);
@@ -215,7 +215,7 @@ function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoType
 	See: https://www.jrsoftware.org/ishelp/index.php?topic=scriptevents
 }
 begin
-	Result := ''
+	Result := '';
 	if MemoUserInfoInfo <> '' then begin
 		Result := Result + MemoUserInfoInfo + Newline + NewLine;
 	end;
@@ -231,8 +231,15 @@ begin
 	if MemoGroupInfo <> '' then begin
 		Result := Result + MemoGroupInfo + Newline + NewLine;
 	end;
-	if (MemoTasksInfo <> '') or (installMemo <> '') then begin
-		Result := Result + MemoTasksInfo + NewLine + FmtMessage(installMemo, [Space]) + NewLine;
+	if MemoTasksInfo <> '' then begin
+		Result := Result + MemoTasksInfo;
+	end;
+
+	if installMemo <> '' then begin
+		if MemoTasksInfo = '' then begin
+			Result := Result + SetupMessage(msgReadyMemoTasks);
+		end;
+		Result := Result + FmtMessage(installMemo, [Space]);
 	end;
 end;
 
