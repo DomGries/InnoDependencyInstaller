@@ -5,9 +5,6 @@
 vcredist2013_title=Visual C++ 2013 Redistributable (x86)
 vcredist2013_title_x64=Visual C++ 2013 Redistributable (x64)
 
-vcredist2013_size=6 MB
-vcredist2013_size_x64=7 MB
-
 [Code]
 const
 	vcredist2013_url = 'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe';
@@ -22,7 +19,6 @@ begin
 		AddProduct('vcredist2013' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
 			CustomMessage('vcredist2013_title' + GetArchitectureString()),
-			CustomMessage('vcredist2013_size' + GetArchitectureString()),
 			GetString(vcredist2013_url, vcredist2013_url_x64),
 			'', False, False, False);
 	end;

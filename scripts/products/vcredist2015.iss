@@ -5,9 +5,6 @@
 vcredist2015_title=Visual C++ 2015 Redistributable (x86)
 vcredist2015_title_x64=Visual C++ 2015 Redistributable (x64)
 
-vcredist2015_size=14 MB
-vcredist2015_size_x64=15 MB
-
 [Code]
 const
 	vcredist2015_url = 'https://download.microsoft.com/download/d/e/c/dec58546-c2f5-40a7-b38e-4df8d60b9764/vc_redist.x86.exe';
@@ -22,7 +19,6 @@ begin
 		AddProduct('vcredist2015' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
 			CustomMessage('vcredist2015_title' + GetArchitectureString()),
-			CustomMessage('vcredist2015_size' + GetArchitectureString()),
 			GetString(vcredist2015_url, vcredist2015_url_x64),
 			'', False, False, False);
 	end;

@@ -6,9 +6,6 @@
 vcredist2008_title=Visual C++ 2008 Redistributable (x86)
 vcredist2008_title_x64=Visual C++ 2008 Redistributable (x64)
 
-vcredist2008_size=4 MB
-vcredist2008_size_x64=5 MB
-
 [Code]
 const
 	vcredist2008_url = 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe';
@@ -24,7 +21,6 @@ begin
 		AddProduct('vcredist2008' + GetArchitectureString() + '.exe',
 			'/q',
 			CustomMessage('vcredist2008_title' + GetArchitectureString()),
-			CustomMessage('vcredist2008_size' + GetArchitectureString()),
 			GetString(vcredist2008_url, vcredist2008_url_x64),
 			'', False, False, False);
 	end;

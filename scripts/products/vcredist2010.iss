@@ -5,9 +5,6 @@
 vcredist2010_title=Visual C++ 2010 Redistributable (x86)
 vcredist2010_title_x64=Visual C++ 2010 Redistributable (x64)
 
-vcredist2010_size=9 MB
-vcredist2010_size_x64=10 MB
-
 [Code]
 const
 	vcredist2010_url = 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe';
@@ -22,7 +19,6 @@ begin
 		AddProduct('vcredist2010' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
 			CustomMessage('vcredist2010_title' + GetArchitectureString()),
-			CustomMessage('vcredist2010_size' + GetArchitectureString()),
 			GetString(vcredist2010_url, vcredist2010_url_x64),
 			'', False, False, False);
 	end;

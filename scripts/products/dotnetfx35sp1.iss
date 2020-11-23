@@ -6,8 +6,6 @@
 [CustomMessages]
 dotnetfx35sp1_title=.NET Framework 3.5 Service Pack 1
 
-dotnetfx35sp1_size=232 MB
-
 [Code]
 const
 	dotnetfx35sp1_url = 'https://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe';
@@ -18,7 +16,6 @@ begin
 		AddProduct('dotnetfx35sp1.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35sp1_title'),
-			CustomMessage('dotnetfx35sp1_size'),
 			dotnetfx35sp1_url,
 			'', False, False, False);
 	end;

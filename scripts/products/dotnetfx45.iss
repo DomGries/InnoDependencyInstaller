@@ -5,8 +5,6 @@
 [CustomMessages]
 dotnetfx45_title=.NET Framework 4.5.2
 
-dotnetfx45_size=68 MB
-
 [Code]
 const
 	dotnetfx45_url = 'https://download.microsoft.com/download/B/4/1/B4119C11-0423-477B-80EE-7A474314B347/NDP452-KB2901954-Web.exe';
@@ -17,7 +15,6 @@ begin
 		AddProduct('dotnetfx45.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('dotnetfx45_title'),
-			CustomMessage('dotnetfx45_size'),
 			dotnetfx45_url,
 			'', False, False, False);
 	end;

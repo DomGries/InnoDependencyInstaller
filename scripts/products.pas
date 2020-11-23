@@ -22,14 +22,13 @@ var
 	delayedReboot, isForcedX86: Boolean;
 	DownloadPage: TDownloadWizardPage;
 
-procedure AddProduct(filename, parameters, title, size, url, checksum: String; forceSuccess, installClean, mustRebootAfter: Boolean);
+procedure AddProduct(filename, parameters, title, url, checksum: String; forceSuccess, installClean, mustRebootAfter: Boolean);
 {
 	Adds a product to the list of products to download.
 	Parameters:
 		filename: the file name under which to save the file
 		parameters: the parameters with which to run the file
 		title: the product title
-		size: the file size
 		url: the URL to download from
 		forceSuccess: whether to continue in case of setup failure
 		installClean: whether the product needs a reboot before installing
@@ -39,6 +38,8 @@ var
 	product: TProduct;
 	i: Integer;
 begin
+	installMemo := installMemo + #13 + '%1' + title;
+
 	product.URL := '';
 	product.Filename := '';
 	product.Checksum := checksum;
@@ -61,14 +62,9 @@ begin
 		if not FileExists(product.Path) then begin
 			product.URL := url;
 			product.Filename := filename;
-
-			installMemo := installMemo + #13 + '%1' + title + ' (' + size + ')';
-		end else begin
-			installMemo := installMemo + #13 + '%1' + title;
 		end;
 	end else begin
 		product.Path := ExpandConstant('{src}{\}') + product.Path + '\' + filename;
-		installMemo := installMemo + #13 + '%1' + title;
 	end;
 
 	i := GetArrayLength(products);

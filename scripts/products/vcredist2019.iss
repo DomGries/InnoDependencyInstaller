@@ -5,9 +5,6 @@
 vcredist2019_title=Visual C++ 2015-2019 Redistributable (x86)
 vcredist2019_title_x64=Visual C++ 2015-2019 Redistributable (x64)
 
-vcredist2019_size=14 MB
-vcredist2019_size_x64=14 MB
-
 [Code]
 const
 	vcredist2019_url = 'https://aka.ms/vs/16/release/vc_redist.x86.exe';
@@ -22,7 +19,6 @@ begin
 		AddProduct('vcredist2019' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
 			CustomMessage('vcredist2019_title' + GetArchitectureString()),
-			CustomMessage('vcredist2019_size' + GetArchitectureString()),
 			GetString(vcredist2019_url, vcredist2019_url_x64),
 			'', False, False, False);
 	end;

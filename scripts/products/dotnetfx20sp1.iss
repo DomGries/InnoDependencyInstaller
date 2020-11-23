@@ -5,8 +5,6 @@
 [CustomMessages]
 dotnetfx20sp1_title=.NET Framework 2.0 Service Pack 1
 
-dotnetfx20sp1_size=24 MB
-
 [Code]
 const
 	dotnetfx20sp1_url = 'https://download.microsoft.com/download/0/8/c/08c19fa4-4c4f-4ffb-9d6c-150906578c9e/NetFx20SP1_x86.exe';
@@ -18,7 +16,6 @@ begin
 		AddProduct('dotnetfx20sp1' + GetArchitectureString() + '.exe',
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20sp1_title'),
-			CustomMessage('dotnetfx20sp1_size'),
 			GetString(dotnetfx20sp1_url, dotnetfx20sp1_url_x64),
 			'', False, False, False);
 	end;

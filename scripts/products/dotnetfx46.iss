@@ -5,8 +5,6 @@
 [CustomMessages]
 dotnetfx46_title=.NET Framework 4.6.2
 
-dotnetfx46_size=59 MB
-
 [Code]
 const
 	dotnetfx46_url = 'https://download.microsoft.com/download/D/5/C/D5C98AB0-35CC-45D9-9BA5-B18256BA2AE6/NDP462-KB3151802-Web.exe';
@@ -17,7 +15,6 @@ begin
 		AddProduct('dotnetfx46.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('dotnetfx46_title'),
-			CustomMessage('dotnetfx46_size'),
 			dotnetfx46_url,
 			'', False, False, False);
 	end;

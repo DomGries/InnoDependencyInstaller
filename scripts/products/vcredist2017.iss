@@ -5,9 +5,6 @@
 vcredist2017_title=Visual C++ 2017 Redistributable (x86)
 vcredist2017_title_x64=Visual C++ 2017 Redistributable (x64)
 
-vcredist2017_size=14 MB
-vcredist2017_size_x64=15 MB
-
 [Code]
 const
 	vcredist2017_url = 'https://download.microsoft.com/download/1/f/e/1febbdb2-aded-4e14-9063-39fb17e88444/vc_redist.x86.exe';
@@ -22,7 +19,6 @@ begin
 		AddProduct('vcredist2017' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
 			CustomMessage('vcredist2017_title' + GetArchitectureString()),
-			CustomMessage('vcredist2017_size' + GetArchitectureString()),
 			GetString(vcredist2017_url, vcredist2017_url_x64),
 			'', False, False, False);
 	end;

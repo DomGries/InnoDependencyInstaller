@@ -7,8 +7,6 @@
 [CustomMessages]
 dotnetfx20_title=.NET Framework 2.0
 
-dotnetfx20_size=23 MB
-
 [Code]
 const
 	dotnetfx20_url = 'https://download.microsoft.com/download/5/6/7/567758a3-759e-473e-bf8f-52154438565a/dotnetfx.exe';
@@ -20,7 +18,6 @@ begin
 		AddProduct('dotnetfx20' + GetArchitectureString() + '.exe',
 			'/passive /norestart /lang:ENU',
 			CustomMessage('dotnetfx20_title'),
-			CustomMessage('dotnetfx20_size'),
 			GetString(dotnetfx20_url, dotnetfx20_url_x64),
 			'', False, False, False);
 	end;

@@ -4,8 +4,6 @@
 [CustomMessages]
 directxruntime_title=DirectX End-User Runtime
 
-directxruntime_size=96 MB
-
 [Files]
 Source: "src\dxwebsetup.exe"; Flags: dontcopy noencryption
 
@@ -20,7 +18,6 @@ begin
 	AddProduct('dxwebsetup.exe',
 		'/Q',
 		CustomMessage('directxruntime_title'),
-		CustomMessage('directxruntime_size'),
 		directxruntime_url,
 		'', True, False, False);
 end;

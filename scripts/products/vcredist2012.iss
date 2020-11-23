@@ -5,9 +5,6 @@
 vcredist2012_title=Visual C++ 2012 Redistributable (x86)
 vcredist2012_title_x64=Visual C++ 2012 Redistributable (x64)
 
-vcredist2012_size=6 MB
-vcredist2012_size_x64=7 MB
-
 [Code]
 const
 	vcredist2012_url = 'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe';
@@ -22,7 +19,6 @@ begin
 		AddProduct('vcredist2012' + GetArchitectureString() + '.exe',
 			'/passive /norestart',
 			CustomMessage('vcredist2012_title' + GetArchitectureString()),
-			CustomMessage('vcredist2012_size' + GetArchitectureString()),
 			GetString(vcredist2012_url, vcredist2012_url_x64),
 			'', False, False, False);
 	end;

@@ -6,8 +6,6 @@
 [CustomMessages]
 dotnetfx35_title=.NET Framework 3.5
 
-dotnetfx35_size=197 MB
-
 [Code]
 const
 	dotnetfx35_url = 'https://download.microsoft.com/download/7/0/3/703455ee-a747-4cc8-bd3e-98a615c3aedb/dotNetFx35setup.exe';
@@ -18,7 +16,6 @@ begin
 		AddProduct('dotnetfx35.exe',
 			'/lang:enu /passive /norestart',
 			CustomMessage('dotnetfx35_title'),
-			CustomMessage('dotnetfx35_size'),
 			dotnetfx35_url,
 			'', False, False, False);
 	end;

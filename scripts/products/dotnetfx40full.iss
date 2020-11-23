@@ -7,8 +7,6 @@
 [CustomMessages]
 dotnetfx40full_title=.NET Framework 4.0 Full
 
-dotnetfx40full_size=197 MB
-
 [Code]
 const
 	dotnetfx40full_url = 'https://download.microsoft.com/download/1/B/E/1BE39E79-7E39-46A3-96FF-047F95396215/dotNetFx40_Full_setup.exe';
@@ -19,7 +17,6 @@ begin
 		AddProduct('dotNetFx40_Full_setup.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('dotnetfx40full_title'),
-			CustomMessage('dotnetfx40full_size'),
 			dotnetfx40full_url,
 			'', False, False, False);
 	end;

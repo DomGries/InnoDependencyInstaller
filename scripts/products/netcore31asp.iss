@@ -5,9 +5,6 @@
 netcore31asp_title=ASP.NET Core Runtime 3.1.10 (x86)
 netcore31asp_title_x64=ASP.NET Core Runtime 3.1.10 (x64)
 
-netcore31asp_size=7 MB
-netcore31asp_size_x64=7 MB
-
 [Code]
 const
 	netcore31asp_url = 'https://download.visualstudio.microsoft.com/download/pr/c0a1f953-81d3-4a1a-a584-a627b518c434/16e1af0d3ebe6edacde1eab155dd4d90/aspnetcore-runtime-3.1.10-win-x86.exe';
@@ -19,7 +16,6 @@ begin
 		AddProduct('netcore31asp' + GetArchitectureString() + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('netcore31asp_title' + GetArchitectureString()),
-			CustomMessage('netcore31asp_size' + GetArchitectureString()),
 			GetString(netcore31asp_url, netcore31asp_url_x64),
 			'', False, False, False);
 	end;

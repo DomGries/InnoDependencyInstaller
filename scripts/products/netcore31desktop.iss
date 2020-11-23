@@ -5,9 +5,6 @@
 netcore31desktop_title=.NET Desktop Runtime 3.1.10 (x86)
 netcore31desktop_title_x64=.NET Desktop Runtime 3.1.10 (x64)
 
-netcore31desktop_size=46 MB
-netcore31desktop_size_x64=52 MB
-
 [Code]
 const
 	netcore31desktop_url = 'https://download.visualstudio.microsoft.com/download/pr/865d0be5-16e2-4b3d-a990-f4c45acd280c/ec867d0a4793c0b180bae85bc3a4f329/windowsdesktop-runtime-3.1.10-win-x86.exe';
@@ -19,7 +16,6 @@ begin
 		AddProduct('netcore31desktop' + GetArchitectureString() + '.exe',
 			'/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
 			CustomMessage('netcore31desktop_title' + GetArchitectureString()),
-			CustomMessage('netcore31desktop_size' + GetArchitectureString()),
 			GetString(netcore31desktop_url, netcore31desktop_url_x64),
 			'', False, False, False);
 	end;
