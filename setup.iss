@@ -38,7 +38,6 @@
 // requires dxwebsetup.exe (see download link below)
 //#define UseDirectX
 
-#define UseSqlCompact35
 #define UseSql2008Express
 
 
@@ -724,17 +723,6 @@ begin
     'DirectX Runtime',
     'https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe',
     '', True, False, False);
-#endif
-
-#ifdef UseSqlCompact35
-  // https://www.microsoft.com/en-US/download/details.aspx?id=5783
-  if not IsX64 and not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server Compact Edition\v3.5') then begin
-    AddDependency('sqlcompact35sp2.msi',
-      '/qb',
-      'SQL Server Compact 3.5',
-      'https://download.microsoft.com/download/E/C/1/EC1B2340-67A0-4B87-85F0-74D987A27160/SSCERuntime-ENU.exe',
-      '', False, False, False);
-  end;
 #endif
 
 #ifdef UseSql2008Express
