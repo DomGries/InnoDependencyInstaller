@@ -324,7 +324,7 @@ end;
 
 function GetString(x86, x64: String): String;
 begin
-  if IsX64 and (x64 <> '') then begin
+  if IsX64 then begin
     Result := x64;
   end else begin
     Result := x86;
@@ -762,6 +762,7 @@ begin
 #endif
 
 #ifdef UseSqlCompact35
+  // https://www.microsoft.com/en-US/download/details.aspx?id=5783
   if not IsX64 and not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server Compact Edition\v3.5') then begin
     AddDependency('sqlcompact35sp2.msi',
       '/qb',
@@ -772,12 +773,13 @@ begin
 #endif
 
 #ifdef UseSql2008Express
+  // https://www.microsoft.com/en-US/download/details.aspx?id=30438
   if (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.5') < 0)) and
     (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLEXPRESS\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.5') < 0)) then begin
     AddDependency('sql2008express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=Install /FEATURES=All /INSTANCENAME=SQLEXPRESS /SQLSVCACCOUNT="NT AUTHORITY\Network Service" /SQLSYSADMINACCOUNTS="builtin\administrators"',
       'SQL Server 2008 Express',
-      GetString('https://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/5/1/A/51A153F6-6B08-4F94-A7B2-BA1AD482BC75/SQLEXPR_x64_ENU.exe'),
+      GetString('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe'),
       '', False, False, False);
   end;
 #endif
