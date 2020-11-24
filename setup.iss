@@ -39,6 +39,11 @@
 //#define UseDirectX
 
 #define UseSql2008Express
+#define UseSql2012Express
+#define UseSql2014Express
+#define UseSql2016Express
+#define UseSql2017Express
+#define UseSql2019Express
 
 
 // custom setup info
@@ -727,12 +732,66 @@ begin
 
 #ifdef UseSql2008Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=30438
-  if (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.5') < 0)) and
-    (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLEXPRESS\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.5') < 0)) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.50') < 0) then begin
     AddDependency('sql2008express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2008 Express',
       GetString('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe'),
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseSql2012Express
+  // https://www.microsoft.com/en-US/download/details.aspx?id=56042
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '11') < 0) then begin
+    AddDependency('sql2012express' + GetArchitectureSuffix + '.exe',
+      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
+      'SQL Server 2012 Express',
+      GetString('https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe'),
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseSql2014Express
+  // https://www.microsoft.com/en-US/download/details.aspx?id=57473
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '12') < 0) then begin
+    AddDependency('sql2014express' + GetArchitectureSuffix + '.exe',
+      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
+      'SQL Server 2014 Express',
+      GetString('https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe'),
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseSql2016Express
+  // https://www.microsoft.com/en-US/download/details.aspx?id=56840
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '13') < 0) then begin
+    AddDependency('sql2016express' + GetArchitectureSuffix + '.exe',
+      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
+      'SQL Server 2016 Express',
+      'https://download.microsoft.com/download/3/7/6/3767D272-76A1-4F31-8849-260BD37924E4/SQLServer2016-SSEI-Expr.exe',
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseSql2017Express
+  // https://www.microsoft.com/en-US/download/details.aspx?id=55994
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '14') < 0) then begin
+    AddDependency('sql2017express' + GetArchitectureSuffix + '.exe',
+      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
+      'SQL Server 2017 Express',
+      'https://download.microsoft.com/download/5/E/9/5E9B18CC-8FD5-467E-B5BF-BADE39C51F73/SQLServer2017-SSEI-Expr.exe',
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseSql2019Express
+  // https://www.microsoft.com/en-us/download/details.aspx?id=101064
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '15') < 0) then begin
+    AddDependency('sql2019express' + GetArchitectureSuffix + '.exe',
+      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
+      'SQL Server 2019 Express',
+      'https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe',
       '', False, False, False);
   end;
 #endif

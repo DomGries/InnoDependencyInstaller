@@ -2,7 +2,7 @@
 
 ![Download page](https://cloud.githubusercontent.com/assets/10548881/26322034/f8aa3ec4-3f31-11e7-8092-868814ea3d2b.jpg)
 
-**Inno Setup Dependency Installer** can download and install dependencies such as any .NET or Visual C++ Redistributable during the installation process of your application. In addition, it is easy to add your own dependencies as well.
+**Inno Setup Dependency Installer** can download and install any dependency such as .NET, Visual C++ or SQL Server Express Redistributable during your application's installation process! In addition, it is easy to add your own dependencies as well.
 
 ## Installation and Usage
 
@@ -53,7 +53,7 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * ASP.NET Core Runtime 5.0
     * .NET Desktop Runtime 5.0
 
-* C++ Redistributable
+* C++
     * Visual C++ 2005 Redistributable
     * Visual C++ 2008 Redistributable
     * Visual C++ 2010 Redistributable
@@ -61,9 +61,13 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * Visual C++ 2013 Redistributable
     * Visual C++ 2015-2019 Redistributable
 
-* SQL Server
-    * SQL Server 2008 Express R2
-    * SQL Server Compact 3.5 + Service Pack 2
+* SQL
+    * SQL Server 2008 Express R2 + Service Pack 2
+    * SQL Server 2012 Express + Service Pack 4
+    * SQL Server 2014 Express + Service Pack 3
+    * SQL Server 2016 Express + Service Pack 2
+    * SQL Server 2017 Express
+    * SQL Server 2019 Express
 
 * DirectX End-User Runtime
 * Windows Installer 4.5
