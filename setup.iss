@@ -2,42 +2,46 @@
 // official article: https://codeproject.com/Articles/20868/Inno-Setup-Dependency-Installer
 
 // comment out dependency defines to disable installing them
-#define InstallMsi45
+#define UseMsi45
 
-#define InstallDotNet11
-#define InstallDotNet20
-#define InstallDotNet35
-#define InstallDotNet40Client
-#define InstallDotNet40Full
-#define InstallDotNet45
-#define InstallDotNet46
-#define InstallDotNet47
-#define InstallDotNet48
+#define UseDotNet11
+#define UseDotNet20
+#define UseDotNet35
+#define UseDotNet40Client
+#define UseDotNet40Full
+#define UseDotNet45
+#define UseDotNet46
+#define UseDotNet47
+#define UseDotNet48
 
-// requires netcorecheck.exe and netcorecheck_x64.exe in src directory
-#define InstallNetCoreCheck
-#define InstallNetCore31
-#define InstallNetCore31asp
-#define InstallNetCore31desktop
-#define InstallDotNet50
-#define InstallDotNet50asp
-#define InstallDotNet50desktop
+// requires netcorecheck.exe and netcorecheck_x64.exe
+#define UseNetCoreCheck
+#ifdef UseNetCoreCheck
+#define UseNetCore31
+#define UseNetCore31asp
+#define UseNetCore31desktop
+#define UseDotNet50
+#define UseDotNet50asp
+#define UseDotNet50desktop
+#endif
 
-#define InstallMsiProduct
-#define InstallVC2005
-#define InstallVC2008
-#define InstallVC2010
-#define InstallVC2012
-#define InstallVC2013
-#define InstallVC2015
-#define InstallVC2017
-#define InstallVC2019
+#define UseMsiProduct
+#ifdef UseMsiProduct
+#define UseVC2005
+#define UseVC2008
+#define UseVC2010
+#define UseVC2012
+#define UseVC2013
+#define UseVC2015
+#define UseVC2017
+#define UseVC2019
+#endif
 
-// requires dxwebsetup.exe in src directory
-//#define InstallDirectX
+// requires dxwebsetup.exe
+//#define UseDirectX
 
-#define InstallSqlCompact35
-#define InstallSql2008Express
+#define UseSqlCompact35
+#define UseSql2008Express
 
 
 // custom setup info
@@ -125,12 +129,12 @@ begin
   Dependencies[I] := Dependency;
 end;
 
-function PendingReboot: Boolean;
+function IsPendingReboot: Boolean;
 var
-  Names: String;
+  Value: String;
 begin
-  Result := RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', Names) or
-    (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', Names) and (Names <> ''));
+  Result := RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', Value) or
+    (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', Value) and (Value <> ''));
 end;
 
 function InstallProducts: InstallResult;
@@ -142,7 +146,7 @@ begin
 
   if ProductCount > 0 then begin
     for I := 0 to ProductCount - 1 do begin
-      if Dependencies[I].InstallClean and (DelayedReboot or PendingReboot) then begin
+      if Dependencies[I].InstallClean and (DelayedReboot or IsPendingReboot) then begin
         Result := InstallRebootRequired;
         break;
       end;
@@ -329,20 +333,12 @@ end;
 
 function GetArchitectureSuffix: String;
 begin
-  if IsX64 then begin
-    Result := '_x64';
-  end else begin
-    Result := '';
-  end;
+  Result := GetString('', '_x64');
 end;
 
 function GetArchitectureTitle: String;
 begin
-  if IsX64 then begin
-    Result := ' (x64)';
-  end else begin
-    Result := ' (x86)';
-  end;
+  Result := GetString(' (x86)', ' (x64)');
 end;
 
 function StringToVersion(var Temp: String): Integer;
@@ -402,7 +398,7 @@ begin
   Result := CompareInnerVersion(Temp1, Temp2);
 end;
 
-#ifdef InstallNetCoreCheck
+#ifdef UseNetCoreCheck
 // https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
 // download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
 // download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
@@ -412,7 +408,7 @@ Source: "netcorecheck.exe"; Flags: dontcopy noencryption
 Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
 
 [Code]
-function netcoreinstalled(Version: String): Boolean;
+function IsNetCoreInstalled(Version: String): Boolean;
 var
   ResultCode: Integer;
 begin
@@ -423,14 +419,14 @@ begin
 end;
 #endif
 
-#ifdef InstallMsiProduct
+#ifdef UseMsiProduct
 function MsiEnumRelatedProducts(UpgradeCode: String; Reserved: DWORD; Index: DWORD; ProductCode: String): Integer;
 external 'MsiEnumRelatedProductsW@msi.dll stdcall';
 
 function MsiGetProductInfo(ProductCode: String; PropertyName: String; Value: String; var ValueSize: DWORD): Integer;
 external 'MsiGetProductInfoW@msi.dll stdcall';
 
-function MsiProductUpgrade(UpgradeCode: String; MinVersion: String): Boolean;
+function IsMsiProductInstalled(UpgradeCode: String; MinVersion: String): Boolean;
 var
   ProductCode, Version: String;
   ValueSize: DWORD;
@@ -449,7 +445,7 @@ begin
 end;
 #endif
 
-#ifdef InstallDirectX
+#ifdef UseDirectX
 [Files]
 Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif
@@ -481,7 +477,7 @@ function InitializeSetup: Boolean;
 var
   Version: String;
 begin
-#ifdef InstallMsi45
+#ifdef UseMsi45
   if GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), Version) and (CompareVersion(Version, '4.5') < 0) then begin
     AddDependency('msi45' + GetArchitectureSuffix + '.msu',
       '/quiet /norestart',
@@ -491,7 +487,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet11
+#ifdef UseDotNet11
   // https://www.microsoft.com/downloads/details.aspx?FamilyID=262d25e3-f589-4842-8157-034d1e7cf3a3
   if not IsX64 and not IsDotNetInstalled(net11, 0) then begin
     AddDependency('dotnetfx11.exe',
@@ -511,7 +507,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet20
+#ifdef UseDotNet20
   // https://www.microsoft.com/downloads/details.aspx?familyid=5B2C0358-915B-4EB5-9B1D-10E506DA9D0F
   if not IsDotNetInstalled(net20, 0) then begin
     AddDependency('dotnetfx20' + GetArchitectureSuffix + '.exe',
@@ -522,7 +518,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet35
+#ifdef UseDotNet35
   // https://www.microsoft.com/downloads/details.aspx?FamilyID=ab99342f-5d1a-413d-8319-81da479ab0d7
   if not IsDotNetInstalled(net35, 0) then begin
     AddDependency('dotnetfx35.exe',
@@ -533,7 +529,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet40Client
+#ifdef UseDotNet40Client
   // https://www.microsoft.com/downloads/en/details.aspx?FamilyID=5765d7a8-7722-4888-a970-ac39b33fd8ab
   if not IsDotNetInstalled(net4client, 0) and not IsDotNetInstalled(net4full, 0) then begin
     AddDependency('dotNetFx40_Client_setup.exe',
@@ -544,7 +540,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet40Full
+#ifdef UseDotNet40Full
   // https://www.microsoft.com/downloads/en/details.aspx?FamilyID=9cfb2d51-5ff4-4491-b0e5-b386f32c0992
   if not IsDotNetInstalled(net4full, 0) then begin
     AddDependency('dotNetFx40_Full_setup.exe',
@@ -555,7 +551,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet45
+#ifdef UseDotNet45
   // https://www.microsoft.com/en-us/download/details.aspx?id=42642
   if not IsDotNetInstalled(net45, 0) then begin
     AddDependency('dotnetfx45.exe',
@@ -566,7 +562,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet46
+#ifdef UseDotNet46
   // https://www.microsoft.com/en-US/download/details.aspx?id=53345
   if not IsDotNetInstalled(net46, 0) then begin
     AddDependency('dotnetfx46.exe',
@@ -577,7 +573,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet47
+#ifdef UseDotNet47
   // https://support.microsoft.com/en-us/help/4054531
   if not IsDotNetInstalled(net47, 0) then begin
     AddDependency('dotnetfx47.exe',
@@ -588,7 +584,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet48
+#ifdef UseDotNet48
   // https://dotnet.microsoft.com/download/dotnet-framework/net48
   if not IsDotNetInstalled(net48, 0) then begin
     AddDependency('dotnetfx48.exe',
@@ -599,9 +595,9 @@ begin
   end;
 #endif
 
-#ifdef InstallNetCore31
+#ifdef UseNetCore31
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not netcoreinstalled('Microsoft.NETCore.App 3.1.0') then begin
+  if not IsNetCoreInstalled('Microsoft.NETCore.App 3.1.0') then begin
     AddDependency('netcore31' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Core Runtime 3.1.10' + GetArchitectureTitle,
@@ -610,9 +606,9 @@ begin
   end;
 #endif
 
-#ifdef InstallNetCore31asp
+#ifdef UseNetCore31asp
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not netcoreinstalled('Microsoft.AspNetCore.App 3.1.0') then begin
+  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.0') then begin
     AddDependency('netcore31asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 3.1.10' + GetArchitectureTitle,
@@ -621,9 +617,9 @@ begin
   end;
 #endif
 
-#ifdef InstallNetCore31desktop
+#ifdef UseNetCore31desktop
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not netcoreinstalled('Microsoft.WindowsDesktop.App 3.1.0') then begin
+  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.0') then begin
     AddDependency('netcore31desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 3.1.10' + GetArchitectureTitle,
@@ -632,9 +628,9 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet50
+#ifdef UseDotNet50
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not netcoreinstalled('Microsoft.NETCore.App 5.0.0') then begin
+  if not IsNetCoreInstalled('Microsoft.NETCore.App 5.0.0') then begin
     AddDependency('dotnet50' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Runtime 5.0' + GetArchitectureTitle,
@@ -643,9 +639,9 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet50asp
+#ifdef UseDotNet50asp
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not netcoreinstalled('Microsoft.AspNetCore.App 5.0.0') then begin
+  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.0') then begin
     AddDependency('dotnet50asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 5.0' + GetArchitectureTitle,
@@ -654,9 +650,9 @@ begin
   end;
 #endif
 
-#ifdef InstallDotNet50desktop
+#ifdef UseDotNet50desktop
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not netcoreinstalled('Microsoft.WindowsDesktop.App 5.0.0') then begin
+  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.0') then begin
     AddDependency('dotnet50desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 5.0' + GetArchitectureTitle,
@@ -665,9 +661,9 @@ begin
   end;
 #endif
 
-#ifdef InstallVC2005
+#ifdef UseVC2005
   // https://www.microsoft.com/en-us/download/details.aspx?id=3387
-  if not MsiProductUpgrade(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), '6') then begin
+  if not IsMsiProductInstalled(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), '6') then begin
     AddDependency('vcredist2005' + GetArchitectureSuffix + '.exe',
       '/q:a /c:"install /qb /l',
       'Visual C++ 2005 Redistributable' + GetArchitectureTitle,
@@ -676,9 +672,9 @@ begin
   end;
 #endif
 
-#ifdef InstallVC2008
+#ifdef UseVC2008
   // https://www.microsoft.com/en-us/download/details.aspx?id=29
-  if not MsiProductUpgrade(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9') and not MsiProductUpgrade('{AA783A14-A7A3-3D33-95F0-9A351D530011}', '9') then begin
+  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9') and not IsMsiProductInstalled('{AA783A14-A7A3-3D33-95F0-9A351D530011}', '9') then begin
     AddDependency('vcredist2008' + GetArchitectureSuffix + '.exe',
       '/q',
       'Visual C++ 2008 Redistributable' + GetArchitectureTitle,
@@ -687,9 +683,9 @@ begin
   end;
 #endif
 
-#ifdef InstallVC2010
+#ifdef UseVC2010
   // https://www.microsoft.com/en-us/download/details.aspx?id=5555
-  if not MsiProductUpgrade(GetString('{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}'), '10') then begin
+  if not IsMsiProductInstalled(GetString('{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}'), '10') then begin
     AddDependency('vcredist2010' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2010 Redistributable' + GetArchitectureTitle,
@@ -698,9 +694,9 @@ begin
   end;
 #endif
 
-#ifdef InstallVC2012
+#ifdef UseVC2012
   // https://www.microsoft.com/en-us/download/details.aspx?id=30679
-  if not MsiProductUpgrade(GetString('{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}'), '11') then begin
+  if not IsMsiProductInstalled(GetString('{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}'), '11') then begin
     AddDependency('vcredist2012' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2012 Redistributable' + GetArchitectureTitle,
@@ -709,10 +705,10 @@ begin
   end;
 #endif
 
-#ifdef InstallVC2013
+#ifdef UseVC2013
   //ForceX86 := True; // force 32-bit install of next dependencies
   // https://www.microsoft.com/en-us/download/details.aspx?id=40784
-  if not MsiProductUpgrade(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), '12') then begin
+  if not IsMsiProductInstalled(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), '12') then begin
     AddDependency('vcredist2013' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2013 Redistributable' + GetArchitectureTitle,
@@ -722,9 +718,9 @@ begin
   //ForceX86 := False; // disable forced 32-bit install again
 #endif
 
-#ifdef InstallVC2015
+#ifdef UseVC2015
   // https://www.microsoft.com/en-us/download/details.aspx?id=48145
-  if not MsiProductUpgrade(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14') then begin
+  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14') then begin
     AddDependency('vcredist2015' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2015 Redistributable' + GetArchitectureTitle,
@@ -733,9 +729,9 @@ begin
   end;
 #endif
 
-#ifdef InstallVC2017
+#ifdef UseVC2017
   // https://www.visualstudio.com/en-us/downloads/
-  if not MsiProductUpgrade(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.10') then begin
+  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.10') then begin
     AddDependency('vcredist2017' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2017 Redistributable' + GetArchitectureTitle,
@@ -744,9 +740,9 @@ begin
   end;
 #endif
 
-#ifdef InstallVC2019
+#ifdef UseVC2019
   // https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
-  if not MsiProductUpgrade(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.20') then begin
+  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.20') then begin
     AddDependency('vcredist2019' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2015-2019 Redistributable' + GetArchitectureTitle,
@@ -755,7 +751,7 @@ begin
   end;
 #endif
 
-#ifdef InstallDirectX
+#ifdef UseDirectX
   // https://www.microsoft.com/en-US/download/details.aspx?id=35
   ExtractTemporaryFile('dxwebsetup.exe');
   AddDependency('dxwebsetup.exe',
@@ -765,7 +761,7 @@ begin
     '', True, False, False);
 #endif
 
-#ifdef InstallSqlCompact35
+#ifdef UseSqlCompact35
   if not IsX64 and not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server Compact Edition\v3.5') then begin
     AddDependency('sqlcompact35sp2.msi',
       '/qb',
@@ -775,7 +771,7 @@ begin
   end;
 #endif
 
-#ifdef InstallSql2008Express
+#ifdef UseSql2008Express
   if (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.5') < 0)) and
     (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLEXPRESS\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.5') < 0)) then begin
     AddDependency('sql2008express' + GetArchitectureSuffix + '.exe',
