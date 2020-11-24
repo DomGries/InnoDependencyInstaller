@@ -32,9 +32,7 @@
 #define UseVC2010
 #define UseVC2012
 #define UseVC2013
-#define UseVC2015
-#define UseVC2017
-#define UseVC2019
+#define UseVC2015To2019
 #endif
 
 // requires dxwebsetup.exe
@@ -718,29 +716,7 @@ begin
   //ForceX86 := False; // disable forced 32-bit install again
 #endif
 
-#ifdef UseVC2015
-  // https://www.microsoft.com/en-us/download/details.aspx?id=48145
-  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14') then begin
-    AddDependency('vcredist2015' + GetArchitectureSuffix + '.exe',
-      '/passive /norestart',
-      'Visual C++ 2015 Redistributable' + GetArchitectureTitle,
-      GetString('https://download.microsoft.com/download/d/e/c/dec58546-c2f5-40a7-b38e-4df8d60b9764/vc_redist.x86.exe', 'https://download.microsoft.com/download/2/c/6/2c675af0-2155-4961-b32e-289d7addfcec/vc_redist.x64.exe'),
-      '', False, False, False);
-  end;
-#endif
-
-#ifdef UseVC2017
-  // https://www.visualstudio.com/en-us/downloads/
-  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.10') then begin
-    AddDependency('vcredist2017' + GetArchitectureSuffix + '.exe',
-      '/passive /norestart',
-      'Visual C++ 2017 Redistributable' + GetArchitectureTitle,
-      GetString('https://download.microsoft.com/download/1/f/e/1febbdb2-aded-4e14-9063-39fb17e88444/vc_redist.x86.exe', 'https://download.microsoft.com/download/3/b/f/3bf6e759-c555-4595-8973-86b7b4312927/vc_redist.x64.exe'),
-      '', False, False, False);
-  end;
-#endif
-
-#ifdef UseVC2019
+#ifdef UseVC2015To2019
   // https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
   if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.20') then begin
     AddDependency('vcredist2019' + GetArchitectureSuffix + '.exe',
