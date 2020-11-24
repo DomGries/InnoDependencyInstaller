@@ -14,28 +14,28 @@
 #define UseDotNet47
 #define UseDotNet48
 
-// requires netcorecheck.exe and netcorecheck_x64.exe
+// requires netcorecheck.exe and netcorecheck_x64.exe (see download link below)
 #define UseNetCoreCheck
 #ifdef UseNetCoreCheck
-#define UseNetCore31
-#define UseNetCore31asp
-#define UseNetCore31desktop
-#define UseDotNet50
-#define UseDotNet50asp
-#define UseDotNet50desktop
+  #define UseNetCore31
+  #define UseNetCore31Asp
+  #define UseNetCore31Desktop
+  #define UseDotNet50
+  #define UseDotNet50Asp
+  #define UseDotNet50Desktop
 #endif
 
-#define UseMsiProduct
-#ifdef UseMsiProduct
-#define UseVC2005
-#define UseVC2008
-#define UseVC2010
-#define UseVC2012
-#define UseVC2013
-#define UseVC2015To2019
+#define UseMsiProductCheck
+#ifdef UseMsiProductCheck
+  #define UseVC2005
+  #define UseVC2008
+  #define UseVC2010
+  #define UseVC2012
+  #define UseVC2013
+  #define UseVC2015To2019
 #endif
 
-// requires dxwebsetup.exe
+// requires dxwebsetup.exe (see download link below)
 //#define UseDirectX
 
 #define UseSqlCompact35
@@ -100,7 +100,7 @@ var
   DelayedReboot, ForceX86: Boolean;
   DownloadPage: TDownloadWizardPage;
 
-procedure AddDependency(Filename, Parameters, Title, URL, Checksum: String; ForceSuccess, InstallClean, RebootAfter: Boolean);
+procedure AddDependency(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, InstallClean, RebootAfter: Boolean);
 var
   Dependency: TDependency;
   I: Integer;
@@ -238,7 +238,7 @@ begin
   Result := DelayedReboot;
 end;
 
-function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
+function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
   Result := '';
   if MemoUserInfoInfo <> '' then begin
@@ -268,7 +268,7 @@ begin
   end;
 end;
 
-function NextButtonClick(CurPageID: Integer): Boolean;
+function NextButtonClick(const CurPageID: Integer): Boolean;
 var
   I, ProductCount: Integer;
   Retry: Boolean;
@@ -320,7 +320,7 @@ begin
   Result := not ForceX86 and Is64BitInstallMode;
 end;
 
-function GetString(x86, x64: String): String;
+function GetString(const x86, x64: String): String;
 begin
   if IsX64 then begin
     Result := x64;
@@ -387,26 +387,18 @@ begin
   end;
 end;
 
-function CompareVersion(VersionA, VersionB: String): Integer;
+function CompareVersion(const Version1, Version2: String): Integer;
 var
   Temp1, Temp2: String;
 begin
-  Temp1 := VersionA;
-  Temp2 := VersionB;
+  Temp1 := Version1;
+  Temp2 := Version2;
   Result := CompareInnerVersion(Temp1, Temp2);
 end;
 
 #ifdef UseNetCoreCheck
 // https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
-// download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
-// download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
-
-[Files]
-Source: "netcorecheck.exe"; Flags: dontcopy noencryption
-Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
-
-[Code]
-function IsNetCoreInstalled(Version: String): Boolean;
+function IsNetCoreInstalled(const Version: String): Boolean;
 var
   ResultCode: Integer;
 begin
@@ -417,14 +409,14 @@ begin
 end;
 #endif
 
-#ifdef UseMsiProduct
-function MsiEnumRelatedProducts(UpgradeCode: String; Reserved: DWORD; Index: DWORD; ProductCode: String): Integer;
+#ifdef UseMsiProductCheck
+function MsiEnumRelatedProducts(UpgradeCode: String; Reserved, Index: DWORD; ProductCode: String): Integer;
 external 'MsiEnumRelatedProductsW@msi.dll stdcall';
 
-function MsiGetProductInfo(ProductCode: String; PropertyName: String; Value: String; var ValueSize: DWORD): Integer;
+function MsiGetProductInfo(ProductCode, PropertyName, Value: String; var ValueSize: DWORD): Integer;
 external 'MsiGetProductInfoW@msi.dll stdcall';
 
-function IsMsiProductInstalled(UpgradeCode: String; MinVersion: String): Boolean;
+function IsMsiProductInstalled(const UpgradeCode, MinVersion: String): Boolean;
 var
   ProductCode, Version: String;
   ValueSize: DWORD;
@@ -443,10 +435,6 @@ begin
 end;
 #endif
 
-#ifdef UseDirectX
-[Files]
-Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
-#endif
 
 
 // custom setup content
@@ -458,6 +446,17 @@ Name: de; MessagesFile: "compiler:Languages\German.isl"
 [Files]
 Source: "MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: IsX64; Flags: ignoreversion
 Source: "MyProg.exe"; DestDir: "{app}"; Check: not IsX64; Flags: ignoreversion
+
+#ifdef UseNetCoreCheck
+// download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
+// download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
+Source: "netcorecheck.exe"; Flags: dontcopy noencryption
+Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
+#endif
+
+#ifdef UseDirectX
+Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
+#endif
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProg.exe"
@@ -532,7 +531,7 @@ begin
   if not IsDotNetInstalled(net4client, 0) and not IsDotNetInstalled(net4full, 0) then begin
     AddDependency('dotNetFx40_Client_setup.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Framework 4.0',
+      '.NET Framework 4.0 Client',
       'https://download.microsoft.com/download/7/B/6/7B629E05-399A-4A92-B5BC-484C74B5124B/dotNetFx40_Client_setup.exe',
       '', False, False, False);
   end;
@@ -604,7 +603,7 @@ begin
   end;
 #endif
 
-#ifdef UseNetCore31asp
+#ifdef UseNetCore31Asp
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
   if not IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.0') then begin
     AddDependency('netcore31asp' + GetArchitectureSuffix + '.exe',
@@ -615,7 +614,7 @@ begin
   end;
 #endif
 
-#ifdef UseNetCore31desktop
+#ifdef UseNetCore31Desktop
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
   if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.0') then begin
     AddDependency('netcore31desktop' + GetArchitectureSuffix + '.exe',
@@ -637,7 +636,7 @@ begin
   end;
 #endif
 
-#ifdef UseDotNet50asp
+#ifdef UseDotNet50Asp
   // https://dotnet.microsoft.com/download/dotnet/5.0
   if not IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.0') then begin
     AddDependency('dotnet50asp' + GetArchitectureSuffix + '.exe',
@@ -648,7 +647,7 @@ begin
   end;
 #endif
 
-#ifdef UseDotNet50desktop
+#ifdef UseDotNet50Desktop
   // https://dotnet.microsoft.com/download/dotnet/5.0
   if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.0') then begin
     AddDependency('dotnet50desktop' + GetArchitectureSuffix + '.exe',

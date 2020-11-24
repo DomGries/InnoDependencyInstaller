@@ -59,8 +59,6 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * Visual C++ 2010 Redistributable
     * Visual C++ 2012 Redistributable
     * Visual C++ 2013 Redistributable
-    * Visual C++ 2015 Redistributable
-    * Visual C++ 2017 Redistributable
     * Visual C++ 2015-2019 Redistributable
 
 * SQL Server
