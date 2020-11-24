@@ -419,9 +419,6 @@ Name: nl; MessagesFile: "compiler:Languages\Dutch.isl"
 Name: de; MessagesFile: "compiler:Languages\German.isl"
 
 [Files]
-Source: "MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: IsX64; Flags: ignoreversion
-Source: "MyProg.exe"; DestDir: "{app}"; Check: not IsX64; Flags: ignoreversion
-
 #ifdef UseNetCoreCheck
 // download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
 // download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
@@ -432,6 +429,9 @@ Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
 #ifdef UseDirectX
 Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif
+
+Source: "MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: IsX64; Flags: ignoreversion
+Source: "MyProg.exe"; DestDir: "{app}"; Check: not IsX64; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProg.exe"
