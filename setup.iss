@@ -334,61 +334,42 @@ begin
   Result := GetString(' (x86)', ' (x64)');
 end;
 
-function StringToVersion(var Temp: String): Integer;
+function CompareVersion(Version1, Version2: String): Integer;
 var
-  Part: String;
-  Pos1: Integer;
+  Position, Number1, Number2: Integer;
 begin
-  if Length(Temp) = 0 then begin
-    Result := -1;
-    Exit;
-  end;
+  Result := 0;
+  while (Version1 <> '') or (Version2 <> '') do begin
+    Position := Pos('.', Version1);
+    if Position > 0 then begin
+      Number1 := StrToIntDef(Copy(Version1, 1, Position - 1), 0);
+      Delete(Version1, 1, Position);
+    end else if Version1 <> '' then begin
+      Number1 := StrToIntDef(Version1, 0);
+      Version1 := '';
+    end else begin
+      Number1 := 0;
+    end;
 
-  Pos1 := Pos('.', Temp);
-  if Pos1 = 0 then begin
-    Result := StrToIntDef(Temp, 0);
-    Temp := '';
-  end else begin
-    Part := Copy(Temp, 1, Pos1 - 1);
-    Temp := Copy(Temp, Pos1 + 1, Length(Temp));
-    Result := StrToIntDef(Part, 0);
-  end;
-end;
+    Position := Pos('.', Version2);
+    if Position > 0 then begin
+      Number2 := StrToIntDef(Copy(Version2, 1, Position - 1), 0);
+      Delete(Version2, 1, Position);
+    end else if Version2 <> '' then begin
+      Number2 := StrToIntDef(Version2, 0);
+      Version2 := '';
+    end else begin
+      Number2 := 0;
+    end;
 
-function CompareInnerVersion(var X, Y: String): Integer;
-var
-  Num1, Num2: Integer;
-begin
-  Num1 := StringToVersion(X);
-  Num2 := StringToVersion(Y);
-  if (Num1 = -1) and (Num2 = -1) then begin
-    Result := 0;
-    Exit;
+    if Number1 < Number2 then begin
+      Result := -1;
+      break;
+    end else if Number1 > Number2 then begin
+      Result := 1;
+      break;
+    end;
   end;
-
-  if Num1 < 0 then begin
-    Num1 := 0;
-  end;
-  if Num2 < 0 then begin
-    Num2 := 0;
-  end;
-
-  if Num1 < Num2 then begin
-    Result := -1;
-  end else if Num1 > Num2 then begin
-    Result := 1;
-  end else begin
-    Result := CompareInnerVersion(X, Y);
-  end;
-end;
-
-function CompareVersion(const Version1, Version2: String): Integer;
-var
-  Temp1, Temp2: String;
-begin
-  Temp1 := Version1;
-  Temp2 := Version2;
-  Result := CompareInnerVersion(Temp1, Temp2);
 end;
 
 #ifdef UseNetCoreCheck
