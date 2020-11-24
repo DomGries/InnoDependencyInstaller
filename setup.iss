@@ -179,11 +179,11 @@ begin
         case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependencies[I].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
           IDABORT: begin
             Result := InstallError;
-            MemoInstallInfo := MemoInstallInfo + #13#10#9 + Dependencies[I].Title;
+            MemoInstallInfo := MemoInstallInfo + #13#10 + '      ' + Dependencies[I].Title;
             break;
           end;
           IDIGNORE: begin
-            MemoInstallInfo := MemoInstallInfo + #13#10#9 + Dependencies[I].Title;
+            MemoInstallInfo := MemoInstallInfo + #13#10 + '      ' + Dependencies[I].Title;
             break;
           end;
         end;
@@ -427,7 +427,6 @@ end;
 #endif
 
 
-
 // custom setup content
 [Languages]
 Name: en; MessagesFile: "compiler:Default.isl"
@@ -466,7 +465,7 @@ var
   Version: String;
 begin
 #ifdef UseMsi45
-  if GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), Version) and (CompareVersion(Version, '4.5') < 0) then begin
+  if not GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), Version) or (CompareVersion(Version, '4.5') < 0) then begin
     AddDependency('msi45' + GetArchitectureSuffix + '.msu',
       '/quiet /norestart',
       'Windows Installer 4.5',
@@ -479,7 +478,7 @@ begin
   // https://www.microsoft.com/downloads/details.aspx?FamilyID=262d25e3-f589-4842-8157-034d1e7cf3a3
   if not IsX64 and not IsDotNetInstalled(net11, 0) then begin
     AddDependency('dotnetfx11.exe',
-      '/q:a /c:"install /qb /l"',
+      '/q',
       '.NET Framework 1.1',
       'https://download.microsoft.com/download/a/a/c/aac39226-8825-44ce-90e3-bf8203e74006/dotnetfx.exe',
       '', False, False, False);
@@ -499,7 +498,7 @@ begin
   // https://www.microsoft.com/downloads/details.aspx?familyid=5B2C0358-915B-4EB5-9B1D-10E506DA9D0F
   if not IsDotNetInstalled(net20, 0) then begin
     AddDependency('dotnetfx20' + GetArchitectureSuffix + '.exe',
-      '/lang:ENU /passive /norestart',
+      '/lang:enu /passive /norestart',
       '.NET Framework 2.0',
       GetString('https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x86.exe', 'https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x64.exe'),
       '', False, False, False);
@@ -510,7 +509,7 @@ begin
   // https://www.microsoft.com/downloads/details.aspx?FamilyID=ab99342f-5d1a-413d-8319-81da479ab0d7
   if not IsDotNetInstalled(net35, 0) then begin
     AddDependency('dotnetfx35.exe',
-      '/lang:ENU /passive /norestart',
+      '/lang:enu /passive /norestart',
       '.NET Framework 3.5',
       'https://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe',
       '', False, False, False);
@@ -653,7 +652,7 @@ begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=3387
   if not IsMsiProductInstalled(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), '6') then begin
     AddDependency('vcredist2005' + GetArchitectureSuffix + '.exe',
-      '/q:a /c:"install /qb /l',
+      '/q',
       'Visual C++ 2005 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x86.EXE', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.EXE'),
       '', False, False, False);
@@ -743,7 +742,7 @@ begin
   if (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.5') < 0)) and
     (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\SQLEXPRESS\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.5') < 0)) then begin
     AddDependency('sql2008express' + GetArchitectureSuffix + '.exe',
-      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=Install /FEATURES=All /INSTANCENAME=SQLEXPRESS /SQLSVCACCOUNT="NT AUTHORITY\Network Service" /SQLSYSADMINACCOUNTS="builtin\administrators"',
+      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2008 Express',
       GetString('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe'),
       '', False, False, False);
