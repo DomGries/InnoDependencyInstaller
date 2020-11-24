@@ -10,10 +10,8 @@
 2. Download and extract [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
 3. Open the extracted _setup.iss_ file.
 4. Comment out dependency defines to disable installing them and leave only dependencies that need to be installed:
-    ```
-    #define UseVC2015 <-- will be installed
-    ;#define UseVC2015 <-- commented out and will not be installed
-    ```
+    - `#define UseVC2015 <-- will be installed`
+    - `;#define UseVC2015 <-- commented out and will not be installed`
 5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary.
 6. Build setup using Inno Setup compiler.
 
@@ -25,9 +23,9 @@ You have two ways to distribute the dependency installers. By default, the depen
 
 * Include the dependency setup file by defining the source:
 
-    `Source: "src\dxwebsetup.exe"; Flags: dontcopy`
+    `Source: "dxwebsetup.exe"; Flags: dontcopy noencryption`
 
-* Call the ExtractTemporaryFile() function before AddDependency()  
+* Call the _ExtractTemporaryFile()_ function before _AddDependency()_  
 
     `ExtractTemporaryFile('dxwebsetup.exe');`
 
