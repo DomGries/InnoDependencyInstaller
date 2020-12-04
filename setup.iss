@@ -50,7 +50,7 @@
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
 #define MyAppPublisher 'Dom Gries'
-#define MyAppCopyright 'Copyright © Dom Gries'
+#define MyAppCopyright 'Copyright Â© Dom Gries'
 #define MyAppURL 'https://github.com/DomGries/InnoDependencyInstaller'
 
 [Setup]
@@ -334,7 +334,7 @@ begin
   Result := GetString(' (x86)', ' (x64)');
 end;
 
-function CompareVersion(Version1, Version2: String): Integer;
+function CompareVersion(const Version1, Version2: String): Integer;
 var
   Position, Number1, Number2: Integer;
 begin
@@ -450,6 +450,7 @@ var
   Version: String;
 begin
 #ifdef UseMsi45
+  // https://www.microsoft.com/en-US/download/details.aspx?id=8483
   if not GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), Version) or (CompareVersion(Version, '4.5') < 0) then begin
     AddDependency('msi45' + GetArchitectureSuffix + '.msu',
       '/quiet /norestart',
@@ -460,7 +461,7 @@ begin
 #endif
 
 #ifdef UseDotNet11
-  // https://www.microsoft.com/downloads/details.aspx?FamilyID=262d25e3-f589-4842-8157-034d1e7cf3a3
+  // https://www.microsoft.com/en-US/download/details.aspx?id=26
   if not IsX64 and not IsDotNetInstalled(net11, 0) then begin
     AddDependency('dotnetfx11.exe',
       '/q',
@@ -469,7 +470,7 @@ begin
       '', False, False, False);
   end;
 
-  // https://www.microsoft.com/downloads/details.aspx?familyid=A8F5654F-088E-40B2-BBDB-A83353618B38
+  // https://www.microsoft.com/en-US/download/details.aspx?id=33
   if not IsX64 and not IsDotNetInstalled(net11, 1) then begin
     AddDependency('dotnetfx11sp1.exe',
       '/q',
@@ -480,7 +481,7 @@ begin
 #endif
 
 #ifdef UseDotNet20
-  // https://www.microsoft.com/downloads/details.aspx?familyid=5B2C0358-915B-4EB5-9B1D-10E506DA9D0F
+  // https://www.microsoft.com/en-US/download/details.aspx?id=1639
   if not IsDotNetInstalled(net20, 0) then begin
     AddDependency('dotnetfx20' + GetArchitectureSuffix + '.exe',
       '/lang:enu /passive /norestart',
@@ -491,7 +492,7 @@ begin
 #endif
 
 #ifdef UseDotNet35
-  // https://www.microsoft.com/downloads/details.aspx?FamilyID=ab99342f-5d1a-413d-8319-81da479ab0d7
+  // https://www.microsoft.com/en-US/download/details.aspx?id=22
   if not IsDotNetInstalled(net35, 0) then begin
     AddDependency('dotnetfx35.exe',
       '/lang:enu /passive /norestart',
@@ -502,7 +503,7 @@ begin
 #endif
 
 #ifdef UseDotNet40Client
-  // https://www.microsoft.com/downloads/en/details.aspx?FamilyID=5765d7a8-7722-4888-a970-ac39b33fd8ab
+  // https://www.microsoft.com/en-US/download/details.aspx?id=24872
   if not IsDotNetInstalled(net4client, 0) and not IsDotNetInstalled(net4full, 0) then begin
     AddDependency('dotNetFx40_Client_setup.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
@@ -513,7 +514,7 @@ begin
 #endif
 
 #ifdef UseDotNet40Full
-  // https://www.microsoft.com/downloads/en/details.aspx?FamilyID=9cfb2d51-5ff4-4491-b0e5-b386f32c0992
+  // https://www.microsoft.com/en-US/download/details.aspx?id=17718
   if not IsDotNetInstalled(net4full, 0) then begin
     AddDependency('dotNetFx40_Full_setup.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
@@ -524,7 +525,7 @@ begin
 #endif
 
 #ifdef UseDotNet45
-  // https://www.microsoft.com/en-us/download/details.aspx?id=42642
+  // https://www.microsoft.com/en-US/download/details.aspx?id=42643
   if not IsDotNetInstalled(net45, 0) then begin
     AddDependency('dotnetfx45.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
@@ -546,7 +547,7 @@ begin
 #endif
 
 #ifdef UseDotNet47
-  // https://support.microsoft.com/en-us/help/4054531
+  // https://support.microsoft.com/en-US/help/4054531
   if not IsDotNetInstalled(net47, 0) then begin
     AddDependency('dotnetfx47.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
@@ -634,7 +635,7 @@ begin
 #endif
 
 #ifdef UseVC2005
-  // https://www.microsoft.com/en-us/download/details.aspx?id=3387
+  // https://www.microsoft.com/en-US/download/details.aspx?id=26347
   if not IsMsiProductInstalled(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), '6') then begin
     AddDependency('vcredist2005' + GetArchitectureSuffix + '.exe',
       '/q',
@@ -645,8 +646,8 @@ begin
 #endif
 
 #ifdef UseVC2008
-  // https://www.microsoft.com/en-us/download/details.aspx?id=29
-  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9') and not IsMsiProductInstalled('{AA783A14-A7A3-3D33-95F0-9A351D530011}', '9') then begin
+  // https://www.microsoft.com/en-US/download/details.aspx?id=26368
+  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9') and (IsX64 or not IsMsiProductInstalled('{AA783A14-A7A3-3D33-95F0-9A351D530011}', '9')) then begin
     AddDependency('vcredist2008' + GetArchitectureSuffix + '.exe',
       '/q',
       'Visual C++ 2008 Redistributable' + GetArchitectureTitle,
@@ -656,7 +657,7 @@ begin
 #endif
 
 #ifdef UseVC2010
-  // https://www.microsoft.com/en-us/download/details.aspx?id=5555
+  // https://www.microsoft.com/en-US/download/details.aspx?id=8328
   if not IsMsiProductInstalled(GetString('{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}'), '10') then begin
     AddDependency('vcredist2010' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
@@ -667,7 +668,7 @@ begin
 #endif
 
 #ifdef UseVC2012
-  // https://www.microsoft.com/en-us/download/details.aspx?id=30679
+  // https://www.microsoft.com/en-US/download/details.aspx?id=30679
   if not IsMsiProductInstalled(GetString('{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}'), '11') then begin
     AddDependency('vcredist2012' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
@@ -679,7 +680,7 @@ begin
 
 #ifdef UseVC2013
   //ForceX86 := True; // force 32-bit install of next dependencies
-  // https://www.microsoft.com/en-us/download/details.aspx?id=40784
+  // https://www.microsoft.com/en-US/download/details.aspx?id=40784
   if not IsMsiProductInstalled(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), '12') then begin
     AddDependency('vcredist2013' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
@@ -691,7 +692,7 @@ begin
 #endif
 
 #ifdef UseVC2015To2019
-  // https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
+  // https://support.microsoft.com/en-US/help/2977003/the-latest-supported-visual-c-downloads
   if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.20') then begin
     AddDependency('vcredist2019' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
@@ -767,7 +768,7 @@ begin
 #endif
 
 #ifdef UseSql2019Express
-  // https://www.microsoft.com/en-us/download/details.aspx?id=101064
+  // https://www.microsoft.com/en-US/download/details.aspx?id=101064
   if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '15') < 0) then begin
     AddDependency('sql2019express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
