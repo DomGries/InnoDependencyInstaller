@@ -52,10 +52,10 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * .NET Desktop Runtime 5.0
 
 * C++
-    * Visual C++ 2005 Redistributable
-    * Visual C++ 2008 Redistributable
-    * Visual C++ 2010 Redistributable
-    * Visual C++ 2012 Redistributable
+    * Visual C++ 2005 Redistributable + Service Pack 1
+    * Visual C++ 2008 Redistributable + Service Pack 1
+    * Visual C++ 2010 Redistributable + Service Pack 1
+    * Visual C++ 2012 Redistributable + Service Pack 4
     * Visual C++ 2013 Redistributable
     * Visual C++ 2015-2019 Redistributable
 
