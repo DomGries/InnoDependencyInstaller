@@ -606,8 +606,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.NETCore.App 5.0.0') then begin
     AddDependency('dotnet50' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Runtime 5.0' + GetArchitectureTitle,
-      GetString('https://download.visualstudio.microsoft.com/download/pr/a7e15da3-7a15-43c2-a481-cf50bf305214/c69b951e8b47101e90b1289c387bb01a/dotnet-runtime-5.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/36a9dc4e-1745-4f17-8a9c-f547a12e3764/ae25e38f20a4854d5e015a88659a22f9/dotnet-runtime-5.0.0-win-x64.exe'),
+      '.NET Runtime 5.0.1' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2151355', 'https://go.microsoft.com/fwlink/?linkid=2150971'),
       '', False, False, False);
   end;
 #endif
@@ -617,8 +617,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.0') then begin
     AddDependency('dotnet50asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 5.0' + GetArchitectureTitle,
-      GetString('https://download.visualstudio.microsoft.com/download/pr/115edeeb-c883-45be-90f7-8db7b6b3fa2f/6bf92152b2b9fa9c0d0b08a13b60e525/aspnetcore-runtime-5.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/92866d29-a298-4cab-b501-a65e43820f97/88d287b9fb4a12cfcdf4a6be85f4a638/aspnetcore-runtime-5.0.0-win-x64.exe'),
+      'ASP.NET Core Runtime 5.0.1' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2151353', 'https://go.microsoft.com/fwlink/?linkid=2150969'),
       '', False, False, False);
   end;
 #endif
@@ -628,8 +628,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.0') then begin
     AddDependency('dotnet50desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 5.0' + GetArchitectureTitle,
-      GetString('https://download.visualstudio.microsoft.com/download/pr/b2780d75-e54a-448a-95fc-da9721b2b4c2/62310a9e9f0ba7b18741944cbae9f592/windowsdesktop-runtime-5.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/1b3a8899-127a-4465-a3c2-7ce5e4feb07b/1e153ad470768baa40ed3f57e6e7a9d8/windowsdesktop-runtime-5.0.0-win-x64.exe'),
+      '.NET Desktop Runtime 5.0.1' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2151354', 'https://go.microsoft.com/fwlink/?linkid=2150970'),
       '', False, False, False);
   end;
 #endif
