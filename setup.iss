@@ -74,6 +74,8 @@ AllowNoIcons=yes
 
 MinVersion=6.0
 PrivilegesRequired=admin
+
+// remove next line if you only deploy 32-bit binaries and dependencies
 ArchitecturesInstallIn64BitMode=x64
 
 // dependency installation requires ready page and ready memo to be enabled (default behaviour)
@@ -373,7 +375,7 @@ begin
 end;
 
 #ifdef UseNetCoreCheck
-// https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
+// source code: https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
 function IsNetCoreInstalled(const Version: String): Boolean;
 var
   ResultCode: Integer;
@@ -706,7 +708,7 @@ begin
   // https://www.microsoft.com/en-US/download/details.aspx?id=35
   ExtractTemporaryFile('dxwebsetup.exe');
   AddDependency('dxwebsetup.exe',
-    '/Q',
+    '/q',
     'DirectX Runtime',
     'https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe',
     '', True, False, False);
