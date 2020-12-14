@@ -572,7 +572,7 @@ begin
 
 #ifdef UseNetCore31
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not IsNetCoreInstalled('Microsoft.NETCore.App 3.1.0') then begin
+  if not IsNetCoreInstalled('Microsoft.NETCore.App 3.1.10') then begin
     AddDependency('netcore31' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Core Runtime 3.1.10' + GetArchitectureTitle,
@@ -583,7 +583,7 @@ begin
 
 #ifdef UseNetCore31Asp
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.0') then begin
+  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.10') then begin
     AddDependency('netcore31asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 3.1.10' + GetArchitectureTitle,
@@ -594,7 +594,7 @@ begin
 
 #ifdef UseNetCore31Desktop
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.0') then begin
+  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.10') then begin
     AddDependency('netcore31desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 3.1.10' + GetArchitectureTitle,
@@ -605,7 +605,7 @@ begin
 
 #ifdef UseDotNet50
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not IsNetCoreInstalled('Microsoft.NETCore.App 5.0.0') then begin
+  if not IsNetCoreInstalled('Microsoft.NETCore.App 5.0.1') then begin
     AddDependency('dotnet50' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Runtime 5.0.1' + GetArchitectureTitle,
@@ -616,7 +616,7 @@ begin
 
 #ifdef UseDotNet50Asp
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.0') then begin
+  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.1') then begin
     AddDependency('dotnet50asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 5.0.1' + GetArchitectureTitle,
@@ -627,7 +627,7 @@ begin
 
 #ifdef UseDotNet50Desktop
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.0') then begin
+  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.1') then begin
     AddDependency('dotnet50desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 5.0.1' + GetArchitectureTitle,
