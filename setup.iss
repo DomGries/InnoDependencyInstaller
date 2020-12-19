@@ -4,7 +4,7 @@
 // comment out dependency defines to disable installing them
 #define UseMsi45
 
-#define UseDotNet11
+//#define UseDotNet11
 #define UseDotNet20
 #define UseDotNet35
 #define UseDotNet40Client
@@ -464,7 +464,7 @@ begin
 
 #ifdef UseDotNet11
   // https://www.microsoft.com/en-US/download/details.aspx?id=26
-  if not IsX64 and not IsDotNetInstalled(net11, 0) then begin
+  if not IsDotNetInstalled(net11, 0) then begin
     AddDependency('dotnetfx11.exe',
       '/q',
       '.NET Framework 1.1',
@@ -473,7 +473,7 @@ begin
   end;
 
   // https://www.microsoft.com/en-US/download/details.aspx?id=33
-  if not IsX64 and not IsDotNetInstalled(net11, 1) then begin
+  if not IsDotNetInstalled(net11, 1) then begin
     AddDependency('dotnetfx11sp1.exe',
       '/q',
       '.NET Framework 1.1 Service Pack 1',
