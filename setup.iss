@@ -649,7 +649,7 @@ begin
 
 #ifdef UseVC2008
   // https://www.microsoft.com/en-US/download/details.aspx?id=26368
-  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9.0.3.30729.6161') then begin
+  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9.0.30729.6161') then begin
     AddDependency('vcredist2008' + GetArchitectureSuffix + '.exe',
       '/q',
       'Visual C++ 2008 Service Pack 1 Redistributable' + GetArchitectureTitle,
