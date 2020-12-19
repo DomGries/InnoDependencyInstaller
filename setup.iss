@@ -682,12 +682,12 @@ begin
 
 #ifdef UseVC2013
   //ForceX86 := True; // force 32-bit install of next dependencies
-  // https://www.microsoft.com/en-US/download/details.aspx?id=40784
+  // https://support.microsoft.com/en-US/help/4032938
   if not IsMsiProductInstalled(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), '12') then begin
     AddDependency('vcredist2013' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2013 Redistributable' + GetArchitectureTitle,
-      GetString('https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x86.exe', 'https://download.microsoft.com/download/2/E/6/2E61CFA4-993B-4DD4-91DA-3737CD5CD6E3/vcredist_x64.exe'),
+      GetString('https://download.visualstudio.microsoft.com/download/pr/10912113/5da66ddebb0ad32ebd4b922fd82e8e25/vcredist_x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe'),
       '', False, False, False);
   end;
   //ForceX86 := False; // disable forced 32-bit install again
