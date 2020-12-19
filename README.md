@@ -2,7 +2,7 @@
 
 ![Download page](https://user-images.githubusercontent.com/341158/100111336-4727c100-2e6e-11eb-9d80-2c8696718c55.PNG)
 
-**Inno Setup Dependency Installer** can download and install any dependency such as .NET, Visual C++ or SQL Server Express Redistributable during your application's installation process! In addition, it is easy to add your own dependencies as well.
+**Inno Setup Dependency Installer** can download and install any dependency such as .NET, Visual C++ or SQL Server during your application's installation. In addition, it is easy to add your own dependencies as well.
 
 ## Installation and Usage
 
@@ -10,8 +10,8 @@
 2. Download and extract [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
 3. Open the extracted _setup.iss_ file.
 4. Comment out dependency defines to disable installing them and leave only dependencies that need to be installed:
-    - `#define UseVC2015 <-- will be installed`
-    - `;#define UseVC2015 <-- commented out and will not be installed`
+    - `#define UseVC2013 <-- will be installed`
+    - `//#define UseVC2013 <-- commented out and will not be installed`
 5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary.
 6. Build setup using Inno Setup compiler.
 
@@ -35,9 +35,9 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
 
 * .NET
     * .NET Framework 1.1
-    * .NET Framework 1.1 Service Pack 1
-    * .NET Framework 2.0 + Service Pack 2
-    * .NET Framework 3.5 + Service Pack 1
+    * .NET Framework 1.1 Service Pack 1 (Patch)
+    * .NET Framework 2.0 Service Pack 2
+    * .NET Framework 3.5 Service Pack 1
     * .NET Framework 4.0 Client
     * .NET Framework 4.0 Full
     * .NET Framework 4.5.2
@@ -52,18 +52,18 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * .NET Desktop Runtime 5.0
 
 * C++
-    * Visual C++ 2005 Redistributable + Service Pack 1
-    * Visual C++ 2008 Redistributable + Service Pack 1
-    * Visual C++ 2010 Redistributable + Service Pack 1
-    * Visual C++ 2012 Redistributable + Service Pack 4
-    * Visual C++ 2013 Redistributable
+    * Visual C++ 2005 Service Pack 1 Redistributable
+    * Visual C++ 2008 Service Pack 1 Redistributable
+    * Visual C++ 2010 Service Pack 1 Redistributable
+    * Visual C++ 2012 Update 4 Redistributable
+    * Visual C++ 2013 Update 5 Redistributable
     * Visual C++ 2015-2019 Redistributable
 
 * SQL
-    * SQL Server 2008 Express R2 + Service Pack 2
-    * SQL Server 2012 Express + Service Pack 4
-    * SQL Server 2014 Express + Service Pack 3
-    * SQL Server 2016 Express + Service Pack 2
+    * SQL Server 2008 R2 Service Pack 2 Express
+    * SQL Server 2012 Service Pack 4 Express
+    * SQL Server 2014 Service Pack 3 Express
+    * SQL Server 2016 Service Pack 2 Express
     * SQL Server 2017 Express
     * SQL Server 2019 Express
 
