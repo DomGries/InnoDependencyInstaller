@@ -484,10 +484,10 @@ begin
 
 #ifdef UseDotNet20
   // https://www.microsoft.com/en-US/download/details.aspx?id=1639
-  if not IsDotNetInstalled(net20, 0) then begin
+  if not IsDotNetInstalled(net20, 2) then begin
     AddDependency('dotnetfx20' + GetArchitectureSuffix + '.exe',
       '/lang:enu /passive /norestart',
-      '.NET Framework 2.0',
+      '.NET Framework 2.0 Service Pack 2',
       GetString('https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x86.exe', 'https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x64.exe'),
       '', False, False, False);
   end;
@@ -495,10 +495,10 @@ begin
 
 #ifdef UseDotNet35
   // https://www.microsoft.com/en-US/download/details.aspx?id=22
-  if not IsDotNetInstalled(net35, 0) then begin
+  if not IsDotNetInstalled(net35, 1) then begin
     AddDependency('dotnetfx35.exe',
       '/lang:enu /passive /norestart',
-      '.NET Framework 3.5',
+      '.NET Framework 3.5 Service Pack 1',
       'https://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe',
       '', False, False, False);
   end;
@@ -528,7 +528,7 @@ begin
 
 #ifdef UseDotNet45
   // https://www.microsoft.com/en-US/download/details.aspx?id=42643
-  if not IsDotNetInstalled(net45, 0) then begin
+  if not IsDotNetInstalled(net452, 0) then begin
     AddDependency('dotnetfx45.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.5.2',
@@ -539,7 +539,7 @@ begin
 
 #ifdef UseDotNet46
   // https://www.microsoft.com/en-US/download/details.aspx?id=53345
-  if not IsDotNetInstalled(net46, 0) then begin
+  if not IsDotNetInstalled(net462, 0) then begin
     AddDependency('dotnetfx46.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.6.2',
@@ -550,7 +550,7 @@ begin
 
 #ifdef UseDotNet47
   // https://support.microsoft.com/en-US/help/4054531
-  if not IsDotNetInstalled(net47, 0) then begin
+  if not IsDotNetInstalled(net472, 0) then begin
     AddDependency('dotnetfx47.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.7.2',
@@ -638,10 +638,10 @@ begin
 
 #ifdef UseVC2005
   // https://www.microsoft.com/en-US/download/details.aspx?id=26347
-  if not IsMsiProductInstalled(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), '6') then begin
+  if not IsMsiProductInstalled(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), '8.0.61000') then begin
     AddDependency('vcredist2005' + GetArchitectureSuffix + '.exe',
       '/q',
-      'Visual C++ 2005 Redistributable' + GetArchitectureTitle,
+      'Visual C++ 2005 Service Pack 1 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x86.EXE', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.EXE'),
       '', False, False, False);
   end;
@@ -649,21 +649,21 @@ begin
 
 #ifdef UseVC2008
   // https://www.microsoft.com/en-US/download/details.aspx?id=26368
-  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9') and (IsX64 or not IsMsiProductInstalled('{AA783A14-A7A3-3D33-95F0-9A351D530011}', '9')) then begin
+  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9.0.3.30729.6161') then begin
     AddDependency('vcredist2008' + GetArchitectureSuffix + '.exe',
       '/q',
-      'Visual C++ 2008 Redistributable' + GetArchitectureTitle,
+      'Visual C++ 2008 Service Pack 1 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe', 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe'),
       '', False, False, False);
   end;
 #endif
 
 #ifdef UseVC2010
-  // https://www.microsoft.com/en-US/download/details.aspx?id=8328
-  if not IsMsiProductInstalled(GetString('{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}'), '10') then begin
+  // https://www.microsoft.com/en-US/download/details.aspx?id=26999
+  if not IsMsiProductInstalled(GetString('{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}'), '10.0.40219') then begin
     AddDependency('vcredist2010' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
-      'Visual C++ 2010 Redistributable' + GetArchitectureTitle,
+      'Visual C++ 2010 Service Pack 1 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe', 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe'),
       '', False, False, False);
   end;
@@ -671,10 +671,10 @@ begin
 
 #ifdef UseVC2012
   // https://www.microsoft.com/en-US/download/details.aspx?id=30679
-  if not IsMsiProductInstalled(GetString('{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}'), '11') then begin
+  if not IsMsiProductInstalled(GetString('{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}'), '11.0.61030') then begin
     AddDependency('vcredist2012' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
-      'Visual C++ 2012 Redistributable' + GetArchitectureTitle,
+      'Visual C++ 2012 Update 4 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe', 'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe'),
       '', False, False, False);
   end;
@@ -683,10 +683,10 @@ begin
 #ifdef UseVC2013
   //ForceX86 := True; // force 32-bit install of next dependencies
   // https://support.microsoft.com/en-US/help/4032938
-  if not IsMsiProductInstalled(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), '12') then begin
+  if not IsMsiProductInstalled(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), '12.0.40664') then begin
     AddDependency('vcredist2013' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
-      'Visual C++ 2013 Redistributable' + GetArchitectureTitle,
+      'Visual C++ 2013 Update 5 Redistributable' + GetArchitectureTitle,
       GetString('https://download.visualstudio.microsoft.com/download/pr/10912113/5da66ddebb0ad32ebd4b922fd82e8e25/vcredist_x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe'),
       '', False, False, False);
   end;
@@ -695,7 +695,7 @@ begin
 
 #ifdef UseVC2015To2019
   // https://support.microsoft.com/en-US/help/2977003/the-latest-supported-visual-c-downloads
-  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.20') then begin
+  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.28.29325') then begin
     AddDependency('vcredist2019' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2015-2019 Redistributable' + GetArchitectureTitle,
@@ -716,10 +716,10 @@ begin
 
 #ifdef UseSql2008Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=30438
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.50') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.50.4000') < 0) then begin
     AddDependency('sql2008express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2008 Express',
+      'SQL Server 2008 R2 Service Pack 2 Express',
       GetString('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe'),
       '', False, False, False);
   end;
@@ -727,10 +727,10 @@ begin
 
 #ifdef UseSql2012Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=56042
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '11') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '11.0.7001') < 0) then begin
     AddDependency('sql2012express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2012 Express',
+      'SQL Server 2012 Service Pack 4 Express',
       GetString('https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe'),
       '', False, False, False);
   end;
@@ -738,10 +738,10 @@ begin
 
 #ifdef UseSql2014Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=57473
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '12') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '12.0.6024') < 0) then begin
     AddDependency('sql2014express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2014 Express',
+      'SQL Server 2014 Service Pack 3 Express',
       GetString('https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe'),
       '', False, False, False);
   end;
@@ -749,10 +749,10 @@ begin
 
 #ifdef UseSql2016Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=56840
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '13') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '13.0.5026') < 0) then begin
     AddDependency('sql2016express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2016 Express',
+      'SQL Server 2016 Service Pack 2 Express',
       'https://download.microsoft.com/download/3/7/6/3767D272-76A1-4F31-8849-260BD37924E4/SQLServer2016-SSEI-Expr.exe',
       '', False, False, False);
   end;
