@@ -45,6 +45,11 @@
 #define UseSql2017Express
 #define UseSql2019Express
 
+#define UseSql2012NativeClient
+#define UseSqlOleDBDriver
+#define UseSqlODBCDriver
+#define UseAccess2013Runtime
+#define UseMicrosoft365AccessRuntime
 
 // custom setup info
 #define MyAppSetupName 'MyProgram'
@@ -776,6 +781,68 @@ begin
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2019 Express',
       'https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe',
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseSql2012NativeClient
+  // https://www.microsoft.com/en-us/download/details.aspx?id=56041
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server Native Client 11.0\CurrentVersion', 'Version', Version) or (CompareVersion(Version, '11.4.7001.0') < 0) then begin
+    AddDependency('sqlncli' + GetArchitectureSuffix + '.msi',
+      '/qb iacceptsqlnclilicenseterms=yes',
+      'SQL Server 2012 Native Client' + GetArchitectureTitle,
+      GetString('https://download.microsoft.com/download/F/3/C/F3C64941-22A0-47E9-BC9B-1A19B4CA3E88/ENU/x86/sqlncli.msi',
+      'https://download.microsoft.com/download/F/3/C/F3C64941-22A0-47E9-BC9B-1A19B4CA3E88/ENU/x64/sqlncli.msi'), 
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseSqlOleDBDriver
+  // https://docs.microsoft.com/en-us/sql/connect/oledb/oledb-driver-for-sql-server
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft OLE DB Driver for SQL Server\CurrentVersion', 'Version', Version) or (CompareVersion(Version, '18.5.0.0') < 0) then begin
+    AddDependency('msoledbsql' + GetArchitectureSuffix + '.msi',
+      '/qb iacceptmsoledbsqllicenseterms=yes',
+      'SQL Server OLE DB Driver' + GetArchitectureTitle,
+      GetString('https://download.microsoft.com/download/A/9/8/A98CF446-A38E-4B0A-A967-F93FAB474AE0/en-US/18.5.0.0/x86/msoledbsql.msi',
+      'https://download.microsoft.com/download/A/9/8/A98CF446-A38E-4B0A-A967-F93FAB474AE0/en-US/18.5.0.0/x64/msoledbsql.msi'), 
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseSqlODBCDriver
+  // https://docs.microsoft.com/de-de/sql/connect/odbc/microsoft-odbc-driver-for-sql-server
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft ODBC Driver 17 for SQL Server\CurrentVersion', 'Version', Version) or (CompareVersion(Version, '17.6.1.1') < 0) then begin
+    AddDependency('msodbcsql' + GetArchitectureSuffix + '.msi',
+      '/qb iacceptmsodbcsqllicenseterms=yes',
+      'SQL Server ODBC Driver' + GetArchitectureTitle,
+      GetString('https://download.microsoft.com/download/6/b/3/6b3dd05c-678c-4e6b-b503-1d66e16ef23d/en-US/17.6.1.1/x86/msodbcsql.msi',
+      'https://download.microsoft.com/download/6/b/3/6b3dd05c-678c-4e6b-b503-1d66e16ef23d/en-US/17.6.1.1/x64/msodbcsql.msi'), 
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseAccess2013Runtime
+  // https://www.microsoft.com/de-DE/download/details.aspx?id=39358
+  if ((IsX64) and (not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Office\15.0\Common\InstalledPackages\90150000-001C-0000-1000-0000000FF1CE', 'ProductVersion', Version) or (CompareVersion(Version, '15.0.4569.1506') < 0))) or
+  ((not IsX64) and (not RegQueryStringValue(HKLM, 'SOFTWARE\WOW6432Node\Microsoft\Office\15.0\Common\InstalledPackages\90150000-001C-0000-0000-0000000FF1CE', 'ProductVersion', Version) or (CompareVersion(Version, '15.0.4569.1506') < 0))) then begin
+    AddDependency('Access2013Runtime' + GetArchitectureSuffix + '.exe',
+      '/passive /norestart',
+      'Microsoft Access 2013-Runtime' + GetArchitectureTitle,
+      GetString('https://download.microsoft.com/download/5/E/A/5EA6017B-E7FE-40CA-8C3E-57387259F3BF/AccessRuntime_x86_en-us.exe',
+      'https://download.microsoft.com/download/5/E/A/5EA6017B-E7FE-40CA-8C3E-57387259F3BF/AccessRuntime_x64_en-us.exe'), 
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseMicrosoft365AccessRuntime
+  // https://support.microsoft.com/en-us/office/download-and-install-microsoft-365-access-runtime-185c5a32-8ba9-491e-ac76-91cbe3ea09c9
+  if ((IsX64) and (not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Office\ClickToRun\ProductReleaseIDs\9300E5D0-370E-4FB9-A495-20802042A70D\AccessRuntimeRetail.16')) or
+  ((not IsX64) and (not RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\Microsoft\Office\ClickToRun\ProductReleaseIDs\9300E5D0-370E-4FB9-A495-20802042A70D\AccessRuntimeRetail.16'))) then begin
+    AddDependency('Microsoft365AccessRuntime' + GetArchitectureSuffix + '.exe',
+      '',
+      'Microsoft 365 Access Runtime' + GetArchitectureTitle,
+      GetString('https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=AccessRuntimeRetail&language=en-us&platform=x86',
+      'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=AccessRuntimeRetail&language=en-us&platform=x64'), 
       '', False, False, False);
   end;
 #endif
