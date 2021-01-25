@@ -45,6 +45,7 @@
 #define UseSql2017Express
 #define UseSql2019Express
 
+#define UseWebView2
 
 // custom setup info
 #define MyAppSetupName 'MyProgram'
@@ -776,6 +777,17 @@ begin
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2019 Express',
       'https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe',
+      '', False, False, False);
+  end;
+#endif
+
+#ifdef UseWebView2
+  // https://docs.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution#online-only-deployment
+  if ( (IsX64 and not RegQueryStringValue(HKLM, 'SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', Version)) or not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', Version)) then begin
+    AddDependency('MicrosoftEdgeWebview2Setup.exe',
+      '/install',
+      'Microsoft Edge WebView2 Runtime',
+      'https://go.microsoft.com/fwlink/p/?LinkId=2124703',
       '', False, False, False);
   end;
 #endif
