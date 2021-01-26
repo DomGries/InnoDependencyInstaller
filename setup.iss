@@ -575,8 +575,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.NETCore.App 3.1.10') then begin
     AddDependency('netcore31' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Core Runtime 3.1.10' + GetArchitectureTitle,
-      GetString('https://download.visualstudio.microsoft.com/download/pr/abb3fb5d-4e82-4ca8-bc03-ac13e988e608/b34036773a72b30c5dc5520ee6a2768f/dotnet-runtime-3.1.10-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/9845b4b0-fb52-48b6-83cf-4c431558c29b/41025de7a76639eeff102410e7015214/dotnet-runtime-3.1.10-win-x64.exe'),
+      '.NET Core Runtime 3.1.11' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2153351', 'https://go.microsoft.com/fwlink/?linkid=2153460'),
       '', False, False, False);
   end;
 #endif
@@ -586,8 +586,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.10') then begin
     AddDependency('netcore31asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 3.1.10' + GetArchitectureTitle,
-      GetString('https://download.visualstudio.microsoft.com/download/pr/c0a1f953-81d3-4a1a-a584-a627b518c434/16e1af0d3ebe6edacde1eab155dd4d90/aspnetcore-runtime-3.1.10-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/c1ea0601-abe4-4c6d-96ed-131764bf5129/a1823d8ff605c30af412776e2e617a36/aspnetcore-runtime-3.1.10-win-x64.exe'),
+      'ASP.NET Core Runtime 3.1.11' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2153349', 'https://go.microsoft.com/fwlink/?linkid=2153348'),
       '', False, False, False);
   end;
 #endif
@@ -597,8 +597,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.10') then begin
     AddDependency('netcore31desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 3.1.10' + GetArchitectureTitle,
-      GetString('https://download.visualstudio.microsoft.com/download/pr/865d0be5-16e2-4b3d-a990-f4c45acd280c/ec867d0a4793c0b180bae85bc3a4f329/windowsdesktop-runtime-3.1.10-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/513acf37-8da2-497d-bdaa-84d6e33c1fee/eb7b010350df712c752f4ec4b615f89d/windowsdesktop-runtime-3.1.10-win-x64.exe'),
+      '.NET Desktop Runtime 3.1.11' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2153350', 'https://go.microsoft.com/fwlink/?linkid=2153459'),
       '', False, False, False);
   end;
 #endif
@@ -608,8 +608,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.NETCore.App 5.0.1') then begin
     AddDependency('dotnet50' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Runtime 5.0.1' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2151355', 'https://go.microsoft.com/fwlink/?linkid=2150971'),
+      '.NET Runtime 5.0.2' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2153463', 'https://go.microsoft.com/fwlink/?linkid=2153354'),
       '', False, False, False);
   end;
 #endif
@@ -619,8 +619,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.1') then begin
     AddDependency('dotnet50asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 5.0.1' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2151353', 'https://go.microsoft.com/fwlink/?linkid=2150969'),
+      'ASP.NET Core Runtime 5.0.2' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2153461', 'https://go.microsoft.com/fwlink/?linkid=2153352'),
       '', False, False, False);
   end;
 #endif
@@ -630,8 +630,8 @@ begin
   if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.1') then begin
     AddDependency('dotnet50desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 5.0.1' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2151354', 'https://go.microsoft.com/fwlink/?linkid=2150970'),
+      '.NET Desktop Runtime 5.0.2' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2153462', 'https://go.microsoft.com/fwlink/?linkid=2153353'),
       '', False, False, False);
   end;
 #endif
