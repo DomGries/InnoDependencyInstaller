@@ -211,8 +211,6 @@ begin
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
-var
-  I: Integer;
 begin
   DelayedReboot := False;
 
