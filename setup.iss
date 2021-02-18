@@ -570,66 +570,66 @@ begin
 
 #ifdef UseNetCore31
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not IsNetCoreInstalled('Microsoft.NETCore.App 3.1.11') then begin
+  if not IsNetCoreInstalled('Microsoft.NETCore.App 3.1.12') then begin
     AddDependency('netcore31' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Core Runtime 3.1.11' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2153351', 'https://go.microsoft.com/fwlink/?linkid=2153460'),
+      '.NET Core Runtime 3.1.12' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2155262', 'https://go.microsoft.com/fwlink/?linkid=2155351'),
       '', False, False, False);
   end;
 #endif
 
 #ifdef UseNetCore31Asp
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.11') then begin
+  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.12') then begin
     AddDependency('netcore31asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 3.1.11' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2153349', 'https://go.microsoft.com/fwlink/?linkid=2153348'),
+      'ASP.NET Core Runtime 3.1.12' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2155260', 'https://go.microsoft.com/fwlink/?linkid=2155349'),
       '', False, False, False);
   end;
 #endif
 
 #ifdef UseNetCore31Desktop
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.11') then begin
+  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.12') then begin
     AddDependency('netcore31desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 3.1.11' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2153350', 'https://go.microsoft.com/fwlink/?linkid=2153459'),
+      '.NET Desktop Runtime 3.1.12' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2155261', 'https://go.microsoft.com/fwlink/?linkid=2155350'),
       '', False, False, False);
   end;
 #endif
 
 #ifdef UseDotNet50
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not IsNetCoreInstalled('Microsoft.NETCore.App 5.0.2') then begin
+  if not IsNetCoreInstalled('Microsoft.NETCore.App 5.0.3') then begin
     AddDependency('dotnet50' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Runtime 5.0.2' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2153463', 'https://go.microsoft.com/fwlink/?linkid=2153354'),
+      '.NET Runtime 5.0.3' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2155348', 'https://go.microsoft.com/fwlink/?linkid=2155259'),
       '', False, False, False);
   end;
 #endif
 
 #ifdef UseDotNet50Asp
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.2') then begin
+  if not IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.3') then begin
     AddDependency('dotnet50asp' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 5.0.2' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2153461', 'https://go.microsoft.com/fwlink/?linkid=2153352'),
+      'ASP.NET Core Runtime 5.0.3' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2155346', 'https://go.microsoft.com/fwlink/?linkid=2155257'),
       '', False, False, False);
   end;
 #endif
 
 #ifdef UseDotNet50Desktop
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.2') then begin
+  if not IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.3') then begin
     AddDependency('dotnet50desktop' + GetArchitectureSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 5.0.2' + GetArchitectureTitle,
-      GetString('https://go.microsoft.com/fwlink/?linkid=2153462', 'https://go.microsoft.com/fwlink/?linkid=2153353'),
+      '.NET Desktop Runtime 5.0.3' + GetArchitectureTitle,
+      GetString('https://go.microsoft.com/fwlink/?linkid=2155347', 'https://go.microsoft.com/fwlink/?linkid=2155258'),
       '', False, False, False);
   end;
 #endif
