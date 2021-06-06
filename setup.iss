@@ -25,15 +25,12 @@
   #define UseDotNet50Desktop
 #endif
 
-#define UseMsiProductCheck
-#ifdef UseMsiProductCheck
-  #define UseVC2005
-  #define UseVC2008
-  #define UseVC2010
-  #define UseVC2012
-  #define UseVC2013
-  #define UseVC2015To2019
-#endif
+#define UseVC2005
+#define UseVC2008
+#define UseVC2010
+#define UseVC2012
+#define UseVC2013
+#define UseVC2015To2019
 
 // requires dxwebsetup.exe (see download link below)
 //#define UseDirectX
@@ -286,7 +283,7 @@ begin
           try
             DownloadPage.Download;
           except
-            if GetExceptionMessage = SetupMessage(msgErrorDownloadAborted) then begin
+            if DownloadPage.AbortedByUser then begin
               Result := False;
               I := ProductCount;
             end else begin
@@ -334,44 +331,6 @@ begin
   Result := GetString(' (x86)', ' (x64)');
 end;
 
-function CompareVersion(const Version1, Version2: String): Integer;
-var
-  Position, Number1, Number2: Integer;
-begin
-  Result := 0;
-  while (Version1 <> '') or (Version2 <> '') do begin
-    Position := Pos('.', Version1);
-    if Position > 0 then begin
-      Number1 := StrToIntDef(Copy(Version1, 1, Position - 1), 0);
-      Delete(Version1, 1, Position);
-    end else if Version1 <> '' then begin
-      Number1 := StrToIntDef(Version1, 0);
-      Version1 := '';
-    end else begin
-      Number1 := 0;
-    end;
-
-    Position := Pos('.', Version2);
-    if Position > 0 then begin
-      Number2 := StrToIntDef(Copy(Version2, 1, Position - 1), 0);
-      Delete(Version2, 1, Position);
-    end else if Version2 <> '' then begin
-      Number2 := StrToIntDef(Version2, 0);
-      Version2 := '';
-    end else begin
-      Number2 := 0;
-    end;
-
-    if Number1 < Number2 then begin
-      Result := -1;
-      break;
-    end else if Number1 > Number2 then begin
-      Result := 1;
-      break;
-    end;
-  end;
-end;
-
 #ifdef UseNetCoreCheck
 // source code: https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
 function IsNetCoreInstalled(const Version: String): Boolean;
@@ -382,32 +341,6 @@ begin
     ExtractTemporaryFile('netcorecheck' + GetArchitectureSuffix + '.exe');
   end;
   Result := ShellExec('', ExpandConstant('{tmp}{\}') + 'netcorecheck' + GetArchitectureSuffix + '.exe', Version, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
-end;
-#endif
-
-#ifdef UseMsiProductCheck
-function MsiEnumRelatedProducts(UpgradeCode: String; Reserved, Index: DWORD; ProductCode: String): Integer;
-external 'MsiEnumRelatedProductsW@msi.dll stdcall';
-
-function MsiGetProductInfo(ProductCode, PropertyName, Value: String; var ValueSize: DWORD): Integer;
-external 'MsiGetProductInfoW@msi.dll stdcall';
-
-function IsMsiProductInstalled(const UpgradeCode, MinVersion: String): Boolean;
-var
-  ProductCode, Version: String;
-  ValueSize: DWORD;
-begin
-  SetLength(ProductCode, 39);
-  Result := False;
-
-  if MsiEnumRelatedProducts(UpgradeCode, 0, 0, ProductCode) = 0 then begin
-    SetLength(Version, 39);
-    ValueSize := Length(Version);
-
-    if MsiGetProductInfo(ProductCode, 'VersionString', Version, ValueSize) = 0 then begin
-      Result := CompareVersion(Version, MinVersion) >= 0;
-    end;
-  end;
 end;
 #endif
 
@@ -448,10 +381,11 @@ Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}
 function InitializeSetup: Boolean;
 var
   Version: String;
+  PackedVersion: Int64;
 begin
 #ifdef UseMsi45
   // https://www.microsoft.com/en-US/download/details.aspx?id=8483
-  if not GetVersionNumbersString(ExpandConstant('{sys}{\}msi.dll'), Version) or (CompareVersion(Version, '4.5') < 0) then begin
+  if not GetPackedVersion(ExpandConstant('{sys}{\}msi.dll'), PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(4, 5, 0, 0)) < 0) then begin
     AddDependency('msi45' + GetArchitectureSuffix + '.msu',
       '/quiet /norestart',
       'Windows Installer 4.5',
@@ -636,7 +570,7 @@ begin
 
 #ifdef UseVC2005
   // https://www.microsoft.com/en-US/download/details.aspx?id=26347
-  if not IsMsiProductInstalled(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), '8.0.61000') then begin
+  if not IsMsiProductInstalled(GetString('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), PackVersionComponents(8, 0, 61000, 0)) then begin
     AddDependency('vcredist2005' + GetArchitectureSuffix + '.exe',
       '/q',
       'Visual C++ 2005 Service Pack 1 Redistributable' + GetArchitectureTitle,
@@ -647,7 +581,7 @@ begin
 
 #ifdef UseVC2008
   // https://www.microsoft.com/en-US/download/details.aspx?id=26368
-  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), '9.0.30729.6161') then begin
+  if not IsMsiProductInstalled(GetString('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), PackVersionComponents(9, 0, 30729, 6161)) then begin
     AddDependency('vcredist2008' + GetArchitectureSuffix + '.exe',
       '/q',
       'Visual C++ 2008 Service Pack 1 Redistributable' + GetArchitectureTitle,
@@ -658,7 +592,7 @@ begin
 
 #ifdef UseVC2010
   // https://www.microsoft.com/en-US/download/details.aspx?id=26999
-  if not IsMsiProductInstalled(GetString('{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}'), '10.0.40219') then begin
+  if not IsMsiProductInstalled(GetString('{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}'), PackVersionComponents(10, 0, 40219, 0)) then begin
     AddDependency('vcredist2010' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2010 Service Pack 1 Redistributable' + GetArchitectureTitle,
@@ -669,7 +603,7 @@ begin
 
 #ifdef UseVC2012
   // https://www.microsoft.com/en-US/download/details.aspx?id=30679
-  if not IsMsiProductInstalled(GetString('{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}'), '11.0.61030') then begin
+  if not IsMsiProductInstalled(GetString('{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}'), PackVersionComponents(11, 0, 61030, 0)) then begin
     AddDependency('vcredist2012' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2012 Update 4 Redistributable' + GetArchitectureTitle,
@@ -681,7 +615,7 @@ begin
 #ifdef UseVC2013
   //ForceX86 := True; // force 32-bit install of next dependencies
   // https://support.microsoft.com/en-US/help/4032938
-  if not IsMsiProductInstalled(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), '12.0.40664') then begin
+  if not IsMsiProductInstalled(GetString('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), PackVersionComponents(12, 0, 40664, 0)) then begin
     AddDependency('vcredist2013' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2013 Update 5 Redistributable' + GetArchitectureTitle,
@@ -693,7 +627,7 @@ begin
 
 #ifdef UseVC2015To2019
   // https://support.microsoft.com/en-US/help/2977003/the-latest-supported-visual-c-downloads
-  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), '14.28.29325') then begin
+  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 28, 29325, 0)) then begin
     AddDependency('vcredist2019' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2015-2019 Redistributable' + GetArchitectureTitle,
@@ -714,7 +648,7 @@ begin
 
 #ifdef UseSql2008Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=30438
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '10.50.4000') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(10, 50, 4000, 0)) < 0) then begin
     AddDependency('sql2008express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2008 R2 Service Pack 2 Express',
@@ -725,7 +659,7 @@ begin
 
 #ifdef UseSql2012Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=56042
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '11.0.7001') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(11, 0, 7001, 0)) < 0) then begin
     AddDependency('sql2012express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2012 Service Pack 4 Express',
@@ -736,7 +670,7 @@ begin
 
 #ifdef UseSql2014Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=57473
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '12.0.6024') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(12, 0, 6024, 0)) < 0) then begin
     AddDependency('sql2014express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2014 Service Pack 3 Express',
@@ -747,7 +681,7 @@ begin
 
 #ifdef UseSql2016Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=56840
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '13.0.5026') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(13, 0, 5026, 0)) < 0) then begin
     AddDependency('sql2016express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2016 Service Pack 2 Express',
@@ -758,7 +692,7 @@ begin
 
 #ifdef UseSql2017Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=55994
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '14') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(14, 0, 0, 0)) < 0) then begin
     AddDependency('sql2017express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2017 Express',
@@ -769,7 +703,7 @@ begin
 
 #ifdef UseSql2019Express
   // https://www.microsoft.com/en-US/download/details.aspx?id=101064
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or (CompareVersion(Version, '15') < 0) then begin
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(15, 0, 0, 0)) < 0) then begin
     AddDependency('sql2019express' + GetArchitectureSuffix + '.exe',
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2019 Express',
