@@ -8,7 +8,7 @@
 
 1. Download and install [Inno Setup 6.1+](https://www.jrsoftware.org/isinfo.php).
 2. Download and extract [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
-3. Open the extracted _setup.iss_ file.
+3. Open the extracted _CodeDependencies.iss_ file.
 4. Comment out dependency defines to disable installing them and leave only dependencies that need to be installed:
     - `#define UseVC2013 <-- will be installed`
     - `//#define UseVC2013 <-- commented out and will not be installed`
@@ -19,7 +19,7 @@
 
 ![Ready to Install page](https://user-images.githubusercontent.com/341158/100111333-468f2a80-2e6e-11eb-91f5-7a35bba5f5a9.PNG)
 
-You have two ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _setup.iss_. Another way is to pack the dependency into a single _setup.exe_ file. To do so, you need:
+You have two ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _CodeDependencies.iss_. Another way is to pack the dependency into a single executable setup. To do so, you need:
 
 * Include the dependency setup file by defining the source:
 
