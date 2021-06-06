@@ -632,7 +632,7 @@ begin
 
 #ifdef UseVC2015To2019
   // https://support.microsoft.com/en-US/help/2977003/the-latest-supported-visual-c-downloads
-  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 28, 29325, 0)) then begin
+  if not IsMsiProductInstalled(GetString('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 29, 30037, 0)) then begin
     AddDependency('vcredist2019' + GetArchitectureSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2015-2019 Redistributable' + GetArchitectureTitle,
