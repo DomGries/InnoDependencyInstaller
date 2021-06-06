@@ -161,7 +161,7 @@ begin
       end;
 
       DownloadPage.SetText(Dependencies[I].Title, '');
-      DownloadPage.SetProgress(I + 1, ProductCount);
+      DownloadPage.SetProgress(I + 1, ProductCount + 1);
 
       while True do begin
         ResultCode := 0;
