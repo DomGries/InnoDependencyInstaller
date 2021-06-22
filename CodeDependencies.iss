@@ -80,10 +80,6 @@ PrivilegesRequired=admin
 // remove next line if you only deploy 32-bit binaries and dependencies
 ArchitecturesInstallIn64BitMode=x64
 
-// dependency installation requires ready page and ready memo to be enabled (default behaviour)
-DisableReadyPage=no
-DisableReadyMemo=no
-
 
 // shared code for installing the dependencies
 [Code]
@@ -213,19 +209,63 @@ begin
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  I, ProductCount: Integer;
+  Retry: Boolean;
 begin
+  Result := '';
   DelayedReboot := False;
 
-  case InstallProducts of
-    InstallError: begin
-      Result := MemoInstallInfo;
-    end;
-    InstallRebootRequired: begin
-      Result := MemoInstallInfo;
-      NeedsRestart := True;
+  if (MemoInstallInfo <> '') then begin
+    DownloadPage.Show;
 
-      // write into the registry that the installer needs to be executed again after restart
-      RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
+    ProductCount := GetArrayLength(Dependencies);
+    for I := 0 to ProductCount - 1 do begin
+      if Dependencies[I].URL <> '' then begin
+        DownloadPage.Clear;
+        DownloadPage.Add(Dependencies[I].URL, Dependencies[I].Filename, Dependencies[I].Checksum);
+
+        Retry := True;
+        while Retry do begin
+          Retry := False;
+
+          try
+            DownloadPage.Download;
+          except
+            if DownloadPage.AbortedByUser then begin
+              Result := Dependencies[I].Title;
+              I := ProductCount;
+            end else begin
+              case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
+                IDABORT: begin
+                  Result := Dependencies[I].Title;
+                  I := ProductCount;
+                end;
+                IDRETRY: begin
+                  Retry := True;
+                end;
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+
+    DownloadPage.Hide;
+  end;
+
+  if Result = '' then begin
+    case InstallProducts of
+      InstallError: begin
+        Result := MemoInstallInfo;
+      end;
+      InstallRebootRequired: begin
+        Result := MemoInstallInfo;
+        NeedsRestart := True;
+
+        // write into the registry that the installer needs to be executed again after restart
+        RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
+      end;
     end;
   end;
 end;
@@ -262,52 +302,6 @@ begin
       Result := Result + SetupMessage(msgReadyMemoTasks);
     end;
     Result := Result + FmtMessage(MemoInstallInfo, [Space]);
-  end;
-end;
-
-function NextButtonClick(const CurPageID: Integer): Boolean;
-var
-  I, ProductCount: Integer;
-  Retry: Boolean;
-begin
-  Result := True;
-
-  if (CurPageID = wpReady) and (MemoInstallInfo <> '') then begin
-    DownloadPage.Show;
-
-    ProductCount := GetArrayLength(Dependencies);
-    for I := 0 to ProductCount - 1 do begin
-      if Dependencies[I].URL <> '' then begin
-        DownloadPage.Clear;
-        DownloadPage.Add(Dependencies[I].URL, Dependencies[I].Filename, Dependencies[I].Checksum);
-
-        Retry := True;
-        while Retry do begin
-          Retry := False;
-
-          try
-            DownloadPage.Download;
-          except
-            if DownloadPage.AbortedByUser then begin
-              Result := False;
-              I := ProductCount;
-            end else begin
-              case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
-                IDABORT: begin
-                  Result := False;
-                  I := ProductCount;
-                end;
-                IDRETRY: begin
-                  Retry := True;
-                end;
-              end;
-            end;
-          end;
-        end;
-      end;
-    end;
-
-    DownloadPage.Hide;
   end;
 end;
 
