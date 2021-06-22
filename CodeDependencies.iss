@@ -93,18 +93,16 @@ type
     Checksum: String;
     ForceSuccess: Boolean;
     InstallClean: Boolean;
-    RebootAfter: Boolean;
+    RestartAfter: Boolean;
   end;
-
-  InstallResult = (InstallSuccessful, InstallRebootRequired, InstallError);
 
 var
   MemoInstallInfo: String;
   Dependencies: array of TDependency;
-  DelayedReboot, ForceX86: Boolean;
+  DelayedRestart, ForceX86: Boolean;
   DownloadPage: TDownloadWizardPage;
 
-procedure AddDependency(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, InstallClean, RebootAfter: Boolean);
+procedure AddDependency(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, InstallClean, RestartAfter: Boolean);
 var
   Dependency: TDependency;
   I: Integer;
@@ -124,82 +122,11 @@ begin
   Dependency.Checksum := Checksum;
   Dependency.ForceSuccess := ForceSuccess;
   Dependency.InstallClean := InstallClean;
-  Dependency.RebootAfter := RebootAfter;
+  Dependency.RestartAfter := RestartAfter;
 
   I := GetArrayLength(Dependencies);
   SetArrayLength(Dependencies, I + 1);
   Dependencies[I] := Dependency;
-end;
-
-function IsPendingReboot: Boolean;
-var
-  Value: String;
-begin
-  Result := RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', Value) or
-    (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', Value) and (Value <> ''));
-end;
-
-function InstallProducts: InstallResult;
-var
-  ResultCode, I, ProductCount: Integer;
-begin
-  Result := InstallSuccessful;
-  ProductCount := GetArrayLength(Dependencies);
-  MemoInstallInfo := SetupMessage(msgReadyMemoTasks);
-
-  if ProductCount > 0 then begin
-    DownloadPage.Show;
-
-    for I := 0 to ProductCount - 1 do begin
-      if Dependencies[I].InstallClean and (DelayedReboot or IsPendingReboot) then begin
-        Result := InstallRebootRequired;
-        break;
-      end;
-
-      DownloadPage.SetText(Dependencies[I].Title, '');
-      DownloadPage.SetProgress(I + 1, ProductCount + 1);
-
-      while True do begin
-        ResultCode := 0;
-        if ShellExec('', ExpandConstant('{tmp}{\}') + Dependencies[I].Filename, Dependencies[I].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
-          if Dependencies[I].RebootAfter then begin
-            // delay reboot after install if we installed the last dependency anyways
-            if I = ProductCount - 1 then begin
-              DelayedReboot := True;
-            end else begin
-              Result := InstallRebootRequired;
-              MemoInstallInfo := Dependencies[I].Title;
-            end;
-            break;
-          end else if (ResultCode = 0) or Dependencies[I].ForceSuccess then begin
-            break;
-          end else if ResultCode = 3010 then begin
-            // Windows Installer ResultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
-            DelayedReboot := True;
-            break;
-          end;
-        end;
-
-        case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependencies[I].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
-          IDABORT: begin
-            Result := InstallError;
-            MemoInstallInfo := MemoInstallInfo + #13#10 + '      ' + Dependencies[I].Title;
-            break;
-          end;
-          IDIGNORE: begin
-            MemoInstallInfo := MemoInstallInfo + #13#10 + '      ' + Dependencies[I].Title;
-            break;
-          end;
-        end;
-      end;
-
-      if Result <> InstallSuccessful then begin
-        break;
-      end;
-    end;
-
-    DownloadPage.Hide;
-  end;
 end;
 
 // Inno Setup event functions
@@ -210,16 +137,15 @@ end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
-  I, ProductCount: Integer;
+  ProductCount, I, ResultCode: Integer;
   Retry: Boolean;
+  Value: String;
 begin
-  Result := '';
-  DelayedReboot := False;
+  ProductCount := GetArrayLength(Dependencies);
 
-  if (MemoInstallInfo <> '') then begin
+  if ProductCount > 0 then begin
     DownloadPage.Show;
 
-    ProductCount := GetArrayLength(Dependencies);
     for I := 0 to ProductCount - 1 do begin
       if Dependencies[I].URL <> '' then begin
         DownloadPage.Clear;
@@ -251,28 +177,66 @@ begin
       end;
     end;
 
-    DownloadPage.Hide;
-  end;
+    if Result = '' then begin
+      for I := 0 to ProductCount - 1 do begin
+        if Dependencies[I].InstallClean and (DelayedRestart or RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', Value) or (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', Value) and (Value <> ''))) then begin
+          NeedsRestart := True;
+          break;
+        end;
 
-  if Result = '' then begin
-    case InstallProducts of
-      InstallError: begin
-        Result := MemoInstallInfo;
+        DownloadPage.SetText(Dependencies[I].Title, '');
+        DownloadPage.SetProgress(I + 1, ProductCount + 1);
+
+        while True do begin
+          ResultCode := 0;
+          if ShellExec('', ExpandConstant('{tmp}{\}') + Dependencies[I].Filename, Dependencies[I].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+            if Dependencies[I].RestartAfter then begin
+              // delay restart after install if we installed the last dependency anyways
+              if I = ProductCount - 1 then begin
+                DelayedRestart := True;
+              end else begin
+                NeedsRestart := True;
+                Result := Dependencies[I].Title;
+              end;
+              break;
+            end else if (ResultCode = 0) or Dependencies[I].ForceSuccess then begin
+              break;
+            end else if ResultCode = 3010 then begin
+              // Windows Installer ResultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
+              DelayedRestart := True;
+              break;
+            end;
+          end;
+
+          case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependencies[I].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
+            IDABORT: begin
+              Result := Dependencies[I].Title;
+              break;
+            end;
+            IDIGNORE: begin
+              break;
+            end;
+          end;
+        end;
+
+        if Result <> '' then begin
+          break;
+        end;
       end;
-      InstallRebootRequired: begin
-        Result := MemoInstallInfo;
-        NeedsRestart := True;
 
+      if NeedsRestart then begin
         // write into the registry that the installer needs to be executed again after restart
         RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
       end;
     end;
+
+    DownloadPage.Hide;
   end;
 end;
 
 function NeedRestart: Boolean;
 begin
-  Result := DelayedReboot;
+  Result := DelayedRestart;
 end;
 
 function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
