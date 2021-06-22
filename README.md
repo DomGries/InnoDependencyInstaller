@@ -116,7 +116,7 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
 
 ## Credits
 
-Thanks to the community for sharing many fixes and improvements. To contribute please create a pull request on [this repository](https://github.com/DomGries/InnoDependencyInstaller).
+Thanks to the community for sharing many fixes and improvements. To contribute please [create a pull request](https://github.com/DomGries/InnoDependencyInstaller/pulls).
 
 ## License
 
