@@ -19,14 +19,14 @@
 
 ## Integration
 
-You can include _CodeDependencies.iss_ file into your setup, disable compilation of the example setup, and call the dependency install functions as needed:
+You can include _CodeDependencies.iss_ file into your setup, disable compilation of the example setup, forward the required Inno Setup functions to the shared dependency code, and call the dependency install functions as needed:
 
 ```iss
 #define Dependency_NoExampleSetup
 #include "CodeDependencies.iss"
 
 [Setup]
-...
+; ...
 
 [Code]
 procedure InitializeWizard;
@@ -53,7 +53,7 @@ function InitializeSetup: Boolean;
 begin
   // add the dependencies you need
   Dependency_AddVC2013;
-  ...
+  // ...
 end;
 ```
 
