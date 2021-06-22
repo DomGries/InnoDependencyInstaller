@@ -184,7 +184,6 @@ begin
           ResultCode := 0;
           if ShellExec('', ExpandConstant('{tmp}{\}') + Dependencies[I].Filename, Dependencies[I].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
             if Dependencies[I].RestartAfter then begin
-              // delay restart after install if we installed the last dependency anyways
               if I = ProductCount - 1 then begin
                 DelayedRestart := True;
               end else begin
@@ -192,10 +191,13 @@ begin
                 Result := Dependencies[I].Title;
               end;
               break;
-            end else if (ResultCode = 0) or Dependencies[I].ForceSuccess then begin
+            end else if (ResultCode = 0) or Dependencies[I].ForceSuccess then begin // ERROR_SUCCESS (0)
               break;
-            end else if ResultCode = 3010 then begin
-              // Windows Installer ResultCode 3010: ERROR_SUCCESS_REBOOT_REQUIRED
+            end else if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
+              NeedsRestart := True;
+              Result := Dependencies[I].Title;
+              break;
+            end else if ResultCode = 3010 then begin // ERROR_SUCCESS_REBOOT_REQUIRED (3010)
               DelayedRestart := True;
               break;
             end;
@@ -218,7 +220,6 @@ begin
       end;
 
       if NeedsRestart then begin
-        // write into the registry that the installer needs to be executed again after restart
         RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
       end;
     end;
