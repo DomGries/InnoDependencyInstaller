@@ -600,7 +600,7 @@ begin
     '/q',
     'DirectX Runtime',
     'https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe',
-    '', True, False, False);
+    '', True, False);
 #endif
 
 #ifdef UseSql2008Express
