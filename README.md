@@ -1,6 +1,6 @@
 # Inno Setup Dependency Installer
 
-![Download page](https://user-images.githubusercontent.com/341158/100111336-4727c100-2e6e-11eb-9d80-2c8696718c55.PNG)
+![Inno Setup Dependency Installer](https://user-images.githubusercontent.com/341158/122873592-3e2e9d80-d332-11eb-8055-8a4c6064ac4e.gif)
 
 **Inno Setup Dependency Installer** can download and install any dependency such as .NET, Visual C++ or SQL Server during your application's installation. In addition, it is easy to add your own dependencies as well.
 
@@ -16,8 +16,6 @@
 6. Build setup using Inno Setup compiler.
 
 ## Details
-
-![Ready to Install page](https://user-images.githubusercontent.com/341158/100111333-468f2a80-2e6e-11eb-91f5-7a35bba5f5a9.PNG)
 
 You have two ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _CodeDependencies.iss_ file. Another way is to pack the dependency into a single executable setup. To do so, you need:
 
