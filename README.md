@@ -9,11 +9,53 @@
 1. Download and install [Inno Setup 6.2+](https://www.jrsoftware.org/isinfo.php).
 2. Download and extract [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
 3. Open the extracted _CodeDependencies.iss_ file.
-4. Comment out dependency defines to disable installing them and leave only dependencies that need to be installed:
-    - `#define UseVC2013 <-- will be installed`
-    - `;#define UseVC2013 <-- commented out and will not be installed`
+4. Comment out dependency defines to disable installing them in the example setup and leave only dependencies that need to be installed:
+    ```iss
+    #define UseVC2013 <-- installed in example setup
+    ;#define UseVC2013 <-- commented out and not installed in example setup
+    ```
 5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary.
 6. Build setup using Inno Setup compiler.
+
+## Integration
+
+You can include _CodeDependencies.iss_ file into your setup, disable compilation of the example setup, and call the dependency install functions as needed:
+
+```iss
+#define Dependency_NoExampleSetup
+#include "CodeDependencies.iss"
+
+[Setup]
+...
+
+[Code]
+procedure InitializeWizard;
+begin
+  Dependency_InitializeWizard;
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  Result := Dependency_PrepareToInstall(NeedsRestart);
+end;
+
+function NeedRestart: Boolean;
+begin
+  Result := Dependency_NeedRestart;
+end;
+
+function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
+begin
+  Result := Dependency_UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo);
+end;
+
+function InitializeSetup: Boolean;
+begin
+  // add the dependencies you need
+  Dependency_AddVC2013;
+  ...
+end;
+```
 
 ## Details
 
@@ -21,11 +63,15 @@ You have two ways to distribute the dependency installers. By default, the depen
 
 * Include the dependency setup file by defining the source:
 
-    `Source: "dxwebsetup.exe"; Flags: dontcopy noencryption`
+    ```iss
+    Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
+    ```
 
 * Call _ExtractTemporaryFile()_ before the corresponding _Dependency_Add_ function
 
-    `ExtractTemporaryFile('dxwebsetup.exe');`
+    ```iss
+    ExtractTemporaryFile('dxwebsetup.exe');
+    ```
 
 The installation routine of the dependencies is automatic, and in quiet or semi quiet mode. Therefore no user interaction is needed.
 
