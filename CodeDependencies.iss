@@ -92,7 +92,6 @@ type
     URL: String;
     Checksum: String;
     ForceSuccess: Boolean;
-    InstallClean: Boolean;
     RestartAfter: Boolean;
   end;
 
@@ -102,7 +101,7 @@ var
   DelayedRestart, ForceX86: Boolean;
   DownloadPage: TDownloadWizardPage;
 
-procedure AddDependency(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, InstallClean, RestartAfter: Boolean);
+procedure AddDependency(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, RestartAfter: Boolean);
 var
   Dependency: TDependency;
   I: Integer;
@@ -121,7 +120,6 @@ begin
 
   Dependency.Checksum := Checksum;
   Dependency.ForceSuccess := ForceSuccess;
-  Dependency.InstallClean := InstallClean;
   Dependency.RestartAfter := RestartAfter;
 
   I := GetArrayLength(Dependencies);
@@ -179,11 +177,6 @@ begin
 
     if Result = '' then begin
       for I := 0 to ProductCount - 1 do begin
-        if Dependencies[I].InstallClean and (DelayedRestart or RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'PendingFileRenameOperations', Value) or (RegQueryMultiStringValue(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Control\Session Manager', 'SetupExecute', Value) and (Value <> ''))) then begin
-          NeedsRestart := True;
-          break;
-        end;
-
         DownloadPage.SetText(Dependencies[I].Title, '');
         DownloadPage.SetProgress(I + 1, ProductCount + 1);
 
@@ -353,7 +346,7 @@ begin
       '/quiet /norestart',
       'Windows Installer 4.5',
       GetString('https://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/Windows6.0-KB942288-v2-x86.msu', 'https://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/Windows6.0-KB942288-v2-x64.msu'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -364,7 +357,7 @@ begin
       '/q',
       '.NET Framework 1.1',
       'https://download.microsoft.com/download/a/a/c/aac39226-8825-44ce-90e3-bf8203e74006/dotnetfx.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 
   // https://www.microsoft.com/en-US/download/details.aspx?id=33
@@ -373,7 +366,7 @@ begin
       '/q',
       '.NET Framework 1.1 Service Pack 1',
       'https://download.microsoft.com/download/8/b/4/8b4addd8-e957-4dea-bdb8-c4e00af5b94b/NDP1.1sp1-KB867460-X86.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -384,7 +377,7 @@ begin
       '/lang:enu /passive /norestart',
       '.NET Framework 2.0 Service Pack 2',
       GetString('https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x86.exe', 'https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x64.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -395,7 +388,7 @@ begin
       '/lang:enu /passive /norestart',
       '.NET Framework 3.5 Service Pack 1',
       'https://download.microsoft.com/download/0/6/1/061f001c-8752-4600-a198-53214c69b51f/dotnetfx35setup.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -406,7 +399,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.0 Client',
       'https://download.microsoft.com/download/7/B/6/7B629E05-399A-4A92-B5BC-484C74B5124B/dotNetFx40_Client_setup.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -417,7 +410,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.0',
       'https://download.microsoft.com/download/1/B/E/1BE39E79-7E39-46A3-96FF-047F95396215/dotNetFx40_Full_setup.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -428,7 +421,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.5.2',
       'https://download.microsoft.com/download/B/4/1/B4119C11-0423-477B-80EE-7A474314B347/NDP452-KB2901954-Web.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -439,7 +432,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.6.2',
       'https://download.microsoft.com/download/D/5/C/D5C98AB0-35CC-45D9-9BA5-B18256BA2AE6/NDP462-KB3151802-Web.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -450,7 +443,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.7.2',
       'https://download.microsoft.com/download/0/5/C/05C1EC0E-D5EE-463B-BFE3-9311376A6809/NDP472-KB4054531-Web.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -461,7 +454,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.8',
       'https://download.visualstudio.microsoft.com/download/pr/7afca223-55d2-470a-8edc-6a1739ae3252/c9b8749dd99fc0d4453b2a3e4c37ba16/ndp48-web.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -472,7 +465,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Core Runtime 3.1.16' + GetArchitectureTitle,
       GetString('https://go.microsoft.com/fwlink/?linkid=2166324', 'https://go.microsoft.com/fwlink/?linkid=2166228'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -483,7 +476,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 3.1.16' + GetArchitectureTitle,
       GetString('https://go.microsoft.com/fwlink/?linkid=2166322', 'https://go.microsoft.com/fwlink/?linkid=2166226'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -494,7 +487,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 3.1.16' + GetArchitectureTitle,
       GetString('https://go.microsoft.com/fwlink/?linkid=2166323', 'https://go.microsoft.com/fwlink/?linkid=2166227'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -505,7 +498,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Runtime 5.0.7' + GetArchitectureTitle,
       GetString('https://go.microsoft.com/fwlink/?linkid=2166321', 'https://go.microsoft.com/fwlink/?linkid=2166225'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -516,7 +509,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 5.0.7' + GetArchitectureTitle,
       GetString('https://go.microsoft.com/fwlink/?linkid=2166319', 'https://go.microsoft.com/fwlink/?linkid=2166223'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -527,7 +520,7 @@ begin
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 5.0.7' + GetArchitectureTitle,
       GetString('https://go.microsoft.com/fwlink/?linkid=2166320', 'https://go.microsoft.com/fwlink/?linkid=2166224'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -538,7 +531,7 @@ begin
       '/q',
       'Visual C++ 2005 Service Pack 1 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x86.EXE', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.EXE'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -549,7 +542,7 @@ begin
       '/q',
       'Visual C++ 2008 Service Pack 1 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe', 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -560,7 +553,7 @@ begin
       '/passive /norestart',
       'Visual C++ 2010 Service Pack 1 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe', 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -571,7 +564,7 @@ begin
       '/passive /norestart',
       'Visual C++ 2012 Update 4 Redistributable' + GetArchitectureTitle,
       GetString('https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe', 'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -583,7 +576,7 @@ begin
       '/passive /norestart',
       'Visual C++ 2013 Update 5 Redistributable' + GetArchitectureTitle,
       GetString('https://download.visualstudio.microsoft.com/download/pr/10912113/5da66ddebb0ad32ebd4b922fd82e8e25/vcredist_x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
   //ForceX86 := False; // disable forced 32-bit install again
 #endif
@@ -595,7 +588,7 @@ begin
       '/passive /norestart',
       'Visual C++ 2015-2019 Redistributable' + GetArchitectureTitle,
       GetString('https://aka.ms/vs/16/release/vc_redist.x86.exe', 'https://aka.ms/vs/16/release/vc_redist.x64.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -616,7 +609,7 @@ begin
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2008 R2 Service Pack 2 Express',
       GetString('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -627,7 +620,7 @@ begin
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2012 Service Pack 4 Express',
       GetString('https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -638,7 +631,7 @@ begin
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2014 Service Pack 3 Express',
       GetString('https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe'),
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -649,7 +642,7 @@ begin
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2016 Service Pack 2 Express',
       'https://download.microsoft.com/download/3/7/6/3767D272-76A1-4F31-8849-260BD37924E4/SQLServer2016-SSEI-Expr.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -660,7 +653,7 @@ begin
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2017 Express',
       'https://download.microsoft.com/download/5/E/9/5E9B18CC-8FD5-467E-B5BF-BADE39C51F73/SQLServer2017-SSEI-Expr.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
@@ -671,7 +664,7 @@ begin
       '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2019 Express',
       'https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe',
-      '', False, False, False);
+      '', False, False);
   end;
 #endif
 
