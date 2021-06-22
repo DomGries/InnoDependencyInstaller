@@ -220,7 +220,7 @@ begin
       end;
 
       if NeedsRestart then begin
-        RegWriteStringValue(HKEY_CURRENT_USER, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', 'InstallBootstrap', ExpandConstant('{srcexe}'));
+        RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', '{#SetupSetting("AppName")}', ExpandConstant('{srcexe}'));
       end;
     end;
 
