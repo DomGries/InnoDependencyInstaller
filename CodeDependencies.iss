@@ -137,7 +137,7 @@ function PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   ProductCount, I, ResultCode: Integer;
   Retry: Boolean;
-  Value: String;
+  TempValue: String;
 begin
   ProductCount := GetArrayLength(Dependencies);
 
@@ -220,7 +220,11 @@ begin
       end;
 
       if NeedsRestart then begin
-        RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', '{#SetupSetting("AppName")}', ExpandConstant('{srcexe}'));
+        TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + WizardDirValue + '" /GROUP="' + WizardGroupValue + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
+        if WizardNoIcons then begin
+          TempValue := TempValue + ' /NOICONS';
+        end;
+        RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', '{#SetupSetting("AppName")}', TempValue);
       end;
     end;
 
