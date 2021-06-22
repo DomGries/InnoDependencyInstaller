@@ -11,19 +11,19 @@
 3. Open the extracted _CodeDependencies.iss_ file.
 4. Comment out dependency defines to disable installing them and leave only dependencies that need to be installed:
     - `#define UseVC2013 <-- will be installed`
-    - `//#define UseVC2013 <-- commented out and will not be installed`
+    - `;#define UseVC2013 <-- commented out and will not be installed`
 5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary.
 6. Build setup using Inno Setup compiler.
 
 ## Details
 
-You have two ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _CodeDependencies.iss_ file. Another way is to pack the dependency into a single executable setup. To do so, you need:
+You have two ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _CodeDependencies.iss_ file. Another way is to pack the dependency into a single executable setup like so:
 
 * Include the dependency setup file by defining the source:
 
     `Source: "dxwebsetup.exe"; Flags: dontcopy noencryption`
 
-* Call the _ExtractTemporaryFile()_ function before _AddDependency()_  
+* Call _ExtractTemporaryFile()_ before the corresponding _Dependency_Add_ function
 
     `ExtractTemporaryFile('dxwebsetup.exe');`
 
