@@ -54,6 +54,8 @@ begin
   // add the dependencies you need
   Dependency_AddVC2013;
   // ...
+
+  Result := True;
 end;
 ```
 
