@@ -325,7 +325,7 @@ begin
     Dependency_Add('dotnetfx46.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.6.2',
-      'https://download.microsoft.com/download/D/5/C/D5C98AB0-35CC-45D9-9BA5-B18256BA2AE6/NDP462-KB3151802-Web.exe',
+      'https://download.visualstudio.microsoft.com/download/pr/375f6a02-34bc-4b7d-ad8b-957789cf81e8/79d36d30ead282d128a11c9654d4a50d/ndp462-kb3151802-web.exe',
       '', False, False);
   end;
 end;
