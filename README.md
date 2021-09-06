@@ -80,12 +80,8 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
 ## Dependencies
 
 * .NET
-    * .NET Framework 1.1
-    * .NET Framework 1.1 Service Pack 1 (Patch)
-    * .NET Framework 2.0 Service Pack 2
     * .NET Framework 3.5 Service Pack 1
-    * .NET Framework 4.0 Client
-    * .NET Framework 4.0 Full
+    * .NET Framework 4.0
     * .NET Framework 4.5.2
     * .NET Framework 4.6.2
     * .NET Framework 4.7.2
@@ -114,7 +110,6 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * SQL Server 2019 Express
 
 * DirectX End-User Runtime
-* Windows Installer 4.5
 
 ## Credits
 
