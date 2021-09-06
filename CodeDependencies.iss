@@ -223,53 +223,6 @@ begin
   Result := ShellExec('', ExpandConstant('{tmp}{\}') + 'netcorecheck' + Dependency_ArchSuffix + '.exe', Version, '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0);
 end;
 
-procedure Dependency_AddMsi45;
-var
-  PackedVersion: Int64;
-begin
-  // https://www.microsoft.com/en-US/download/details.aspx?id=8483
-  if not GetPackedVersion(ExpandConstant('{sys}{\}msi.dll'), PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(4, 5, 0, 0)) < 0) then begin
-    Dependency_Add('msi45' + Dependency_ArchSuffix + '.msu',
-      '/quiet /norestart',
-      'Windows Installer 4.5',
-      Dependency_String('https://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/Windows6.0-KB942288-v2-x86.msu', 'https://download.microsoft.com/download/2/6/1/261fca42-22c0-4f91-9451-0e0f2e08356d/Windows6.0-KB942288-v2-x64.msu'),
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddDotNet11;
-begin
-  // https://www.microsoft.com/en-US/download/details.aspx?id=26
-  if not IsDotNetInstalled(net11, 0) then begin
-    Dependency_Add('dotnetfx11.exe',
-      '/q',
-      '.NET Framework 1.1',
-      'https://download.microsoft.com/download/a/a/c/aac39226-8825-44ce-90e3-bf8203e74006/dotnetfx.exe',
-      '', False, False);
-  end;
-
-  // https://www.microsoft.com/en-US/download/details.aspx?id=33
-  if not IsDotNetInstalled(net11, 1) then begin
-    Dependency_Add('dotnetfx11sp1.exe',
-      '/q',
-      '.NET Framework 1.1 Service Pack 1',
-      'https://download.microsoft.com/download/8/b/4/8b4addd8-e957-4dea-bdb8-c4e00af5b94b/NDP1.1sp1-KB867460-X86.exe',
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddDotNet20;
-begin
-  // https://www.microsoft.com/en-US/download/details.aspx?id=1639
-  if not IsDotNetInstalled(net20, 2) then begin
-    Dependency_Add('dotnetfx20' + Dependency_ArchSuffix + '.exe',
-      '/lang:enu /passive /norestart',
-      '.NET Framework 2.0 Service Pack 2',
-      Dependency_String('https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x86.exe', 'https://download.microsoft.com/download/c/6/e/c6e88215-0178-4c6c-b5f3-158ff77b1f38/NetFx20SP2_x64.exe'),
-      '', False, False);
-  end;
-end;
-
 procedure Dependency_AddDotNet35;
 begin
   // https://dotnet.microsoft.com/download/dotnet-framework/net35-sp1
@@ -282,19 +235,7 @@ begin
   end;
 end;
 
-procedure Dependency_AddDotNet40Client;
-begin
-  // https://www.microsoft.com/en-US/download/details.aspx?id=24872
-  if not IsDotNetInstalled(net4client, 0) and not IsDotNetInstalled(net4full, 0) then begin
-    Dependency_Add('dotNetFx40_Client_setup.exe',
-      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Framework 4.0 Client',
-      'https://download.microsoft.com/download/7/B/6/7B629E05-399A-4A92-B5BC-484C74B5124B/dotNetFx40_Client_setup.exe',
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddDotNet40Full;
+procedure Dependency_AddDotNet40;
 begin
   // https://dotnet.microsoft.com/download/dotnet-framework/net40
   if not IsDotNetInstalled(net4full, 0) then begin
@@ -606,13 +547,8 @@ end;
 #ifndef Dependency_NoExampleSetup
 
 ; comment out dependency defines to disable installing them
-#define UseMsi45
-
-;#define UseDotNet11
-#define UseDotNet20
 #define UseDotNet35
-#define UseDotNet40Client
-#define UseDotNet40Full
+#define UseDotNet40
 #define UseDotNet45
 #define UseDotNet46
 #define UseDotNet47
@@ -730,24 +666,11 @@ end;
 
 function InitializeSetup: Boolean;
 begin
-#ifdef UseMsi45
-  Dependency_AddMsi45;
-#endif
-
-#ifdef UseDotNet11
-  Dependency_AddDotNet11;
-#endif
-#ifdef UseDotNet20
-  Dependency_AddDotNet20;
-#endif
 #ifdef UseDotNet35
   Dependency_AddDotNet35;
 #endif
-#ifdef UseDotNet40Client
-  Dependency_AddDotNet40Client;
-#endif
-#ifdef UseDotNet40Full
-  Dependency_AddDotNet40Full;
+#ifdef UseDotNet40
+  Dependency_AddDotNet40;
 #endif
 #ifdef UseDotNet45
   Dependency_AddDotNet45;
