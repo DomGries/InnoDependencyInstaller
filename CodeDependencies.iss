@@ -539,6 +539,20 @@ begin
   end;
 end;
 
+procedure Dependency_AddMSAccess2010Engine;
+var
+  Path: String;
+begin
+  // https://www.microsoft.com/de-de/download/details.aspx?id=13255
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Office\14.0\Access Connectivity Engine\InstallRoot', 'Path', Path) then begin
+    Dependency_Add('AccessDatabaseEngine' + Dependency_ArchSuffix + '.exe',
+      '',
+      'Microsoft Access Database Engine 2010 Redistributable',
+      'https://download.microsoft.com/download/0/6/A/06AD225D-42E3-4A58-A35C-71CCF694C9C6/AccessDatabaseEngine' + Dependency_ArchSuffix + '.exe',
+      '', True, False);
+  end;
+end;
+
 
 [Setup]
 ; -------------
