@@ -92,6 +92,9 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * .NET Runtime 5.0
     * ASP.NET Core Runtime 5.0
     * .NET Desktop Runtime 5.0
+    * .NET Runtime 6.0
+    * ASP.NET Core Runtime 6.0
+    * .NET Desktop Runtime 6.0
 
 * C++
     * Visual C++ 2005 Service Pack 1 Redistributable
