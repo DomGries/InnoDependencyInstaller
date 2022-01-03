@@ -23,32 +23,13 @@ You can include _CodeDependencies.iss_ file into your setup by disabling compila
 
 ```iss
 #define public Dependency_NoExampleSetup
+#define public Dependency_UseEventAttributes
 #include "CodeDependencies.iss"
 
 [Setup]
 ; ...
 
 [Code]
-procedure InitializeWizard;
-begin
-  Dependency_InitializeWizard;
-end;
-
-function PrepareToInstall(var NeedsRestart: Boolean): String;
-begin
-  Result := Dependency_PrepareToInstall(NeedsRestart);
-end;
-
-function NeedRestart: Boolean;
-begin
-  Result := Dependency_NeedRestart;
-end;
-
-function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
-begin
-  Result := Dependency_UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo);
-end;
-
 function InitializeSetup: Boolean;
 begin
   // add the dependencies you need
