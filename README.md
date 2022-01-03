@@ -19,7 +19,7 @@
 
 ## Integration
 
-You can include _CodeDependencies.iss_ file into your setup by disabling compilation of the example setup before, forwarding the required Inno Setup functions to the shared dependency code, and calling the dependency install functions as needed:
+You can include _CodeDependencies.iss_ file into your setup by disabling compilation of the example setup before and calling the dependency install functions as needed:
 
 ```iss
 #define public Dependency_NoExampleSetup
