@@ -54,11 +54,17 @@ begin
   Dependency_List[DependencyCount] := Dependency;
 end;
 
+#ifdef Dependency_UseEventAttributes
+<event('InitializeWizard')>
+#endif
 procedure Dependency_InitializeWizard;
 begin
   Dependency_DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 end;
 
+#ifdef Dependency_UseEventAttributes
+<event('PrepareToInstall')>
+#endif
 function Dependency_PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   DependencyCount, DependencyIndex, ResultCode: Integer;
@@ -158,6 +164,9 @@ begin
   end;
 end;
 
+#ifdef Dependency_UseEventAttributes
+<event('UpdateReadyMemo')>
+#endif
 function Dependency_UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
   Result := '';
@@ -187,6 +196,14 @@ begin
     Result := Result + FmtMessage(Dependency_Memo, [Space]);
   end;
 end;
+
+#ifdef Dependency_UseEventAttributes
+<event('NeedRestart')>
+function Dependency_NeedRestartF: Boolean;
+begin
+  Result := Dependency_NeedRestart;
+end;
+#endif
 
 function Dependency_IsX64: Boolean;
 begin
@@ -645,7 +662,6 @@ SourceDir=src
 OutputDir={#SourcePath}\bin
 AllowNoIcons=yes
 
-MinVersion=6.0
 PrivilegesRequired=admin
 
 // remove next line if you only deploy 32-bit binaries and dependencies
@@ -683,6 +699,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
+#ifndef Dependency_UseEventAttributes
 procedure InitializeWizard;
 begin
   Dependency_InitializeWizard;
@@ -702,6 +719,7 @@ function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, Me
 begin
   Result := Dependency_UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo);
 end;
+#endif
 
 function InitializeSetup: Boolean;
 begin
