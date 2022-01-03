@@ -653,8 +653,6 @@ UninstallDisplayIcon={app}\MyProgram.exe
 SourceDir=src
 OutputDir={#SourcePath}\bin
 AllowNoIcons=yes
-
-MinVersion=6.0
 PrivilegesRequired=admin
 
 // remove next line if you only deploy 32-bit binaries and dependencies
