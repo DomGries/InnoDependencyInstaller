@@ -307,11 +307,11 @@ end;
 procedure Dependency_AddNetCore31;
 begin
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 3.1.18') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 3.1.22') then begin
     Dependency_Add('netcore31' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Core Runtime 3.1.18' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/c6a860af-a0ec-44d9-95bb-27213e6ae584/f042477c51e9e274bc2df2b3936cc75d/dotnet-runtime-3.1.18-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/7d09d7c0-8902-4467-9268-d7f584923cde/eddcb12257e68b030bc1b4baf9a68681/dotnet-runtime-3.1.18-win-x64.exe'),
+      '.NET Core Runtime 3.1.22' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/c2437aed-8cc4-41d0-a239-d6c7cf7bddae/062c37e8b06df740301c0bca1b0b7b9a/dotnet-runtime-3.1.22-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/4e95705e-1bb6-4764-b899-1b97eb70ea1d/dd311e073bd3e25b2efe2dcf02727e81/dotnet-runtime-3.1.22-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -319,11 +319,11 @@ end;
 procedure Dependency_AddNetCore31Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.18') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.22') then begin
     Dependency_Add('netcore31asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 3.1.18' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/e9290580-1545-415c-864b-578d9469364f/4593126fe99a07fc0b52a7328597b865/aspnetcore-runtime-3.1.18-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/c37ece76-1305-4042-a9e6-58e7cb1b0bf6/75c20ff59335e370985b4f03fa637fcb/aspnetcore-runtime-3.1.18-win-x64.exe'),
+      'ASP.NET Core Runtime 3.1.22' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/0a1a2ee5-b8ed-4f0d-a4af-a7bce9a9ac2b/d452039b49d79e8897f272c3ab34b875/aspnetcore-runtime-3.1.22-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/80e52143-31e8-450e-aa94-b3f8484aaba9/4b69e5c77d50e7b367960a0079c90a99/aspnetcore-runtime-3.1.22-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -331,11 +331,11 @@ end;
 procedure Dependency_AddNetCore31Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.18') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.22') then begin
     Dependency_Add('netcore31desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 3.1.18' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/1a1efc0c-f28c-4d60-8a52-6d62da05444c/0d192b81749b9374342b64150c9442a0/windowsdesktop-runtime-3.1.18-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/aa240732-82d7-4bd1-9701-e4014d7dc735/41a460f5e9c343f7b9207f64ab0e4c90/windowsdesktop-runtime-3.1.18-win-x64.exe'),
+      '.NET Desktop Runtime 3.1.22' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/e4fcd574-4487-4b4b-8ca8-c23177c6f59f/c6d67a04956169dc21895cdcb42bf344/windowsdesktop-runtime-3.1.22-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/1c14e24b-7f31-42dc-ba3c-83295a2d6f7e/41b93591162dfe556cc160ae44fbe75e/windowsdesktop-runtime-3.1.22-win-x64.exe),
       '', False, False);
   end;
 end;
