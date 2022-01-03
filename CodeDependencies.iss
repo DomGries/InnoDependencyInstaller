@@ -54,18 +54,14 @@ begin
   Dependency_List[DependencyCount] := Dependency;
 end;
 
-#ifdef Dependency_UseEventAttributes
 <event('InitializeWizard')>
-#endif
-procedure Dependency_InitializeWizard;
+procedure Dependency_Internal1;
 begin
   Dependency_DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 end;
 
-#ifdef Dependency_UseEventAttributes
 <event('PrepareToInstall')>
-#endif
-function Dependency_PrepareToInstall(var NeedsRestart: Boolean): String;
+function Dependency_Internal2(var NeedsRestart: Boolean): String;
 var
   DependencyCount, DependencyIndex, ResultCode: Integer;
   Retry: Boolean;
@@ -164,10 +160,8 @@ begin
   end;
 end;
 
-#ifdef Dependency_UseEventAttributes
 <event('UpdateReadyMemo')>
-#endif
-function Dependency_UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
+function Dependency_Internal3(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
   Result := '';
   if MemoUserInfoInfo <> '' then begin
@@ -197,13 +191,11 @@ begin
   end;
 end;
 
-#ifdef Dependency_UseEventAttributes
 <event('NeedRestart')>
-function Dependency_NeedRestartF: Boolean;
+function Dependency_Internal4: Boolean;
 begin
   Result := Dependency_NeedRestart;
 end;
-#endif
 
 function Dependency_IsX64: Boolean;
 begin
@@ -700,28 +692,6 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
-#ifndef Dependency_UseEventAttributes
-procedure InitializeWizard;
-begin
-  Dependency_InitializeWizard;
-end;
-
-function PrepareToInstall(var NeedsRestart: Boolean): String;
-begin
-  Result := Dependency_PrepareToInstall(NeedsRestart);
-end;
-
-function NeedRestart: Boolean;
-begin
-  Result := Dependency_NeedRestart;
-end;
-
-function UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
-begin
-  Result := Dependency_UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo);
-end;
-#endif
-
 function InitializeSetup: Boolean;
 begin
 #ifdef UseDotNet35

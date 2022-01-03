@@ -23,7 +23,6 @@ You can include _CodeDependencies.iss_ file into your setup by disabling compila
 
 ```iss
 #define public Dependency_NoExampleSetup
-#define public Dependency_UseEventAttributes
 #include "CodeDependencies.iss"
 
 [Setup]
