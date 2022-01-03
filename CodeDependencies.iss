@@ -343,11 +343,11 @@ end;
 procedure Dependency_AddDotNet50;
 begin
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 5.0.9') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 5.0.13') then begin
     Dependency_Add('dotnet50' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Runtime 5.0.9' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/334f5618-b0fa-474c-b55e-1d10c9142161/61eb66bf79d0e6cf36f894a5fe847634/dotnet-runtime-5.0.9-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/f3bb58e7-45e1-46ef-9b90-877a450e345e/b18e3d2c429422e9c1238c9b66ded855/dotnet-runtime-5.0.9-win-x64.exe'),
+      '.NET Runtime 5.0.13' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/4a79fcd5-d61b-4606-8496-68071c8099c6/2bf770ca40521e8c4563072592eadd06/dotnet-runtime-5.0.13-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/fccf43d2-3e62-4ede-b5a5-592a7ccded7b/6339f1fdfe3317df5b09adf65f0261ab/dotnet-runtime-5.0.13-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -355,11 +355,11 @@ end;
 procedure Dependency_AddDotNet50Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.9') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.13') then begin
     Dependency_Add('dotnet50asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 5.0.9' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/5bec3496-6944-4edc-936e-5a1beedd4fdd/6fb2df0cbd879c27c22c9f705784b768/aspnetcore-runtime-5.0.9-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/4b0ef3e7-ba6b-4213-b866-318695afbf3b/4218a12f9588ce7d6d6d394f8f3ef22e/aspnetcore-runtime-5.0.9-win-x64.exe'),
+      'ASP.NET Core Runtime 5.0.13' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/340f9482-fc43-4ef7-b434-e2ed57f55cb3/c641b805cef3823769409a6dbac5746b/aspnetcore-runtime-5.0.13-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/aac560f3-eac8-437e-aebd-9830119deb10/6a3880161cf527e4ec71f67efe4d91ad/aspnetcore-runtime-5.0.13-win-x64.exe),
       '', False, False);
   end;
 end;
@@ -367,11 +367,11 @@ end;
 procedure Dependency_AddDotNet50Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.9') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.13') then begin
     Dependency_Add('dotnet50desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 5.0.9' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/d889a1ec-bf19-4915-8d8c-81adda8d558b/fffa6e33af1b4cfcafdca9aac3aef476/windowsdesktop-runtime-5.0.9-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/8bc41df1-cbb4-4da6-944f-6652378e9196/1014aacedc80bbcc030dabb168d2532f/windowsdesktop-runtime-5.0.9-win-x64.exe'),
+      '.NET Desktop Runtime 5.0.13' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/c8125c6b-d399-4be3-b201-8f1394fc3b25/724758f754fc7b67daba74db8d6d91d9/windowsdesktop-runtime-5.0.13-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/2bfb80f2-b8f2-44b0-90c1-d3c8c1c8eac8/409dd3d3367feeeda048f4ff34b32e82/windowsdesktop-runtime-5.0.13-win-x64.exe'),
       '', False, False);
   end;
 end;
