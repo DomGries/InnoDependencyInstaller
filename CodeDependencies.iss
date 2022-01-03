@@ -472,14 +472,14 @@ begin
   end;
 end;
 
-procedure Dependency_AddVC2015To2019;
+procedure Dependency_AddVC2015To2022;
 begin
-  // https://support.microsoft.com/en-US/help/2977003/the-latest-supported-visual-c-downloads
-  if not IsMsiProductInstalled(Dependency_String('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 29, 30037, 0)) then begin
-    Dependency_Add('vcredist2019' + Dependency_ArchSuffix + '.exe',
+  // https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
+  if not IsMsiProductInstalled(Dependency_String('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 30, 30704, 0)) then begin
+    Dependency_Add('vcredist2022' + Dependency_ArchSuffix + '.exe',
       '/passive /norestart',
-      'Visual C++ 2015-2019 Redistributable' + Dependency_ArchTitle,
-      Dependency_String('https://aka.ms/vs/16/release/vc_redist.x86.exe', 'https://aka.ms/vs/16/release/vc_redist.x64.exe'),
+      'Visual C++ 2015-2022 Redistributable' + Dependency_ArchTitle,
+      Dependency_String('https://aka.ms/vs/17/release/vc_redist.x86.exe', 'https://aka.ms/vs/17/release/vc_redist.x64.exe'),
       '', False, False);
   end;
 end;
@@ -618,7 +618,7 @@ end;
 #define UseVC2010
 #define UseVC2012
 #define UseVC2013
-#define UseVC2015To2019
+#define UseVC2015To2022
 
 ; requires dxwebsetup.exe (see download link below)
 ;#define UseDirectX
@@ -756,8 +756,8 @@ begin
   Dependency_AddVC2013;
   //Dependency_ForceX86 := False; // disable forced 32-bit install again
 #endif
-#ifdef UseVC2015To2019
-  Dependency_AddVC2015To2019;
+#ifdef UseVC2015To2022
+  Dependency_AddVC2015To2022;
 #endif
 
 #ifdef UseDirectX

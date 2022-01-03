@@ -82,7 +82,7 @@ The installation routine of the dependencies is automatic, and in quiet or semi 
     * Visual C++ 2010 Service Pack 1 Redistributable
     * Visual C++ 2012 Update 4 Redistributable
     * Visual C++ 2013 Update 5 Redistributable
-    * Visual C++ 2015-2019 Redistributable
+    * Visual C++ 2015-2022 Redistributable
 
 * SQL
     * SQL Server 2008 R2 Service Pack 2 Express
