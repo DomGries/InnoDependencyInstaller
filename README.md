@@ -19,7 +19,7 @@
 
 ## Integration
 
-You can include _CodeDependencies.iss_ file into your setup by disabling compilation of the example setup before and calling the dependency install functions as needed:
+You can include _CodeDependencies.iss_ file into your setup by disabling compilation of the example setup before and calling the desired _Dependency_Add_ functions:
 
 ```iss
 #define public Dependency_NoExampleSetup
@@ -55,7 +55,15 @@ You have two ways to distribute the dependency installers. By default, the depen
     ExtractTemporaryFile('dxwebsetup.exe');
     ```
 
-The installation routine of the dependencies is automatic, and in quiet or semi quiet mode. Therefore no user interaction is needed.
+The dependencies are installed based on the system architecture. If you want to install 32-bit dependencies on a 64-bit system you can force 32-bit mode like so:
+
+```iss
+Dependency_ForceX86 := True; // force 32-bit install of next dependencies
+Dependency_AddVC2013;
+Dependency_ForceX86 := False; // disable forced 32-bit install again
+```
+
+If you only deploy 32-bit binaries and dependencies you can also instead just not define [ArchitecturesInstallIn64BitMode](https://jrsoftware.org/ishelp/index.php?topic=setup_architecturesinstallin64bitmode) in [Setup].
 
 ## Dependencies
 
