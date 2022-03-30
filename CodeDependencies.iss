@@ -585,11 +585,11 @@ begin
 end;
 
 
+#ifndef Dependency_NoExampleSetup
 [Setup]
 ; -------------
 ; EXAMPLE SETUP
 ; -------------
-#ifndef Dependency_NoExampleSetup
 
 ; comment out dependency defines to disable installing them
 #define UseDotNet35
