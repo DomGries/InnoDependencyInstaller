@@ -770,17 +770,6 @@ Name: nl; MessagesFile: "compiler:Languages\Dutch.isl"
 Name: de; MessagesFile: "compiler:Languages\German.isl"
 
 [Files]
-#ifdef UseNetCoreCheck
-; download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
-; download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
-Source: "netcorecheck.exe"; Flags: dontcopy noencryption
-Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
-#endif
-
-#ifdef UseDirectX
-Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
-#endif
-
 Source: "MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsX64; Flags: ignoreversion
 Source: "MyProg.exe"; DestDir: "{app}"; Check: not Dependency_IsX64; Flags: ignoreversion
 
@@ -794,4 +783,16 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 
 [Run]
 Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
+#endif
+
+[Files]
+#ifdef UseNetCoreCheck
+; download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
+; download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
+Source: "netcorecheck.exe"; Flags: dontcopy noencryption
+Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
+#endif
+
+#ifdef UseDirectX
+Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif
