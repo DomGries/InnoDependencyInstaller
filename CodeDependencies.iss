@@ -584,6 +584,112 @@ begin
   end;
 end;
 
+<event('InitializeSetup')>
+function Dependency_InitializeSetup: Boolean;
+begin
+#ifdef UseDotNet35
+  Dependency_AddDotNet35;
+#endif
+#ifdef UseDotNet40
+  Dependency_AddDotNet40;
+#endif
+#ifdef UseDotNet45
+  Dependency_AddDotNet45;
+#endif
+#ifdef UseDotNet46
+  Dependency_AddDotNet46;
+#endif
+#ifdef UseDotNet47
+  Dependency_AddDotNet47;
+#endif
+#ifdef UseDotNet48
+  Dependency_AddDotNet48;
+#endif
+
+#ifdef UseNetCore31
+  #define UseNetCoreCheck
+  Dependency_AddNetCore31;
+#endif
+#ifdef UseNetCore31Asp
+  #define UseNetCoreCheck
+  Dependency_AddNetCore31Asp;
+#endif
+#ifdef UseNetCore31Desktop
+  #define UseNetCoreCheck
+  Dependency_AddNetCore31Desktop;
+#endif
+#ifdef UseDotNet50
+  #define UseNetCoreCheck
+  Dependency_AddDotNet50;
+#endif
+#ifdef UseDotNet50Asp
+  #define UseNetCoreCheck
+  Dependency_AddDotNet50Asp;
+#endif
+#ifdef UseDotNet50Desktop
+  #define UseNetCoreCheck
+  Dependency_AddDotNet50Desktop;
+#endif
+#ifdef UseDotNet60
+  #define UseNetCoreCheck
+  Dependency_AddDotNet60;
+#endif
+#ifdef UseDotNet60Asp
+  #define UseNetCoreCheck
+  Dependency_AddDotNet60Asp;
+#endif
+#ifdef UseDotNet60Desktop
+  #define UseNetCoreCheck
+  Dependency_AddDotNet60Desktop;
+#endif
+
+#ifdef UseVC2005
+  Dependency_AddVC2005;
+#endif
+#ifdef UseVC2008
+  Dependency_AddVC2008;
+#endif
+#ifdef UseVC2010
+  Dependency_AddVC2010;
+#endif
+#ifdef UseVC2012
+  Dependency_AddVC2012;
+#endif
+#ifdef UseVC2013
+  //Dependency_ForceX86 := True; // force 32-bit install of next dependencies
+  Dependency_AddVC2013;
+  //Dependency_ForceX86 := False; // disable forced 32-bit install again
+#endif
+#ifdef UseVC2015To2022
+  Dependency_AddVC2015To2022;
+#endif
+
+#ifdef UseDirectX
+  ExtractTemporaryFile('dxwebsetup.exe');
+  Dependency_AddDirectX;
+#endif
+
+#ifdef UseSql2008Express
+  Dependency_AddSql2008Express;
+#endif
+#ifdef UseSql2012Express
+  Dependency_AddSql2012Express;
+#endif
+#ifdef UseSql2014Express
+  Dependency_AddSql2014Express;
+#endif
+#ifdef UseSql2016Express
+  Dependency_AddSql2016Express;
+#endif
+#ifdef UseSql2017Express
+  Dependency_AddSql2017Express;
+#endif
+#ifdef UseSql2019Express
+  Dependency_AddSql2019Express;
+#endif
+
+  Result := True;
+end;
 
 #ifndef Dependency_NoExampleSetup
 [Setup]
@@ -688,103 +794,4 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 
 [Run]
 Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
-
-[Code]
-function InitializeSetup: Boolean;
-begin
-#ifdef UseDotNet35
-  Dependency_AddDotNet35;
-#endif
-#ifdef UseDotNet40
-  Dependency_AddDotNet40;
-#endif
-#ifdef UseDotNet45
-  Dependency_AddDotNet45;
-#endif
-#ifdef UseDotNet46
-  Dependency_AddDotNet46;
-#endif
-#ifdef UseDotNet47
-  Dependency_AddDotNet47;
-#endif
-#ifdef UseDotNet48
-  Dependency_AddDotNet48;
-#endif
-
-#ifdef UseNetCore31
-  Dependency_AddNetCore31;
-#endif
-#ifdef UseNetCore31Asp
-  Dependency_AddNetCore31Asp;
-#endif
-#ifdef UseNetCore31Desktop
-  Dependency_AddNetCore31Desktop;
-#endif
-#ifdef UseDotNet50
-  Dependency_AddDotNet50;
-#endif
-#ifdef UseDotNet50Asp
-  Dependency_AddDotNet50Asp;
-#endif
-#ifdef UseDotNet50Desktop
-  Dependency_AddDotNet50Desktop;
-#endif
-#ifdef UseDotNet60
-  Dependency_AddDotNet60;
-#endif
-#ifdef UseDotNet60Asp
-  Dependency_AddDotNet60Asp;
-#endif
-#ifdef UseDotNet60Desktop
-  Dependency_AddDotNet60Desktop;
-#endif
-
-#ifdef UseVC2005
-  Dependency_AddVC2005;
-#endif
-#ifdef UseVC2008
-  Dependency_AddVC2008;
-#endif
-#ifdef UseVC2010
-  Dependency_AddVC2010;
-#endif
-#ifdef UseVC2012
-  Dependency_AddVC2012;
-#endif
-#ifdef UseVC2013
-  //Dependency_ForceX86 := True; // force 32-bit install of next dependencies
-  Dependency_AddVC2013;
-  //Dependency_ForceX86 := False; // disable forced 32-bit install again
-#endif
-#ifdef UseVC2015To2022
-  Dependency_AddVC2015To2022;
-#endif
-
-#ifdef UseDirectX
-  ExtractTemporaryFile('dxwebsetup.exe');
-  Dependency_AddDirectX;
-#endif
-
-#ifdef UseSql2008Express
-  Dependency_AddSql2008Express;
-#endif
-#ifdef UseSql2012Express
-  Dependency_AddSql2012Express;
-#endif
-#ifdef UseSql2014Express
-  Dependency_AddSql2014Express;
-#endif
-#ifdef UseSql2016Express
-  Dependency_AddSql2016Express;
-#endif
-#ifdef UseSql2017Express
-  Dependency_AddSql2017Express;
-#endif
-#ifdef UseSql2019Express
-  Dependency_AddSql2019Express;
-#endif
-
-  Result := True;
-end;
-
 #endif
