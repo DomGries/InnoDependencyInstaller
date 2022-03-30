@@ -787,10 +787,13 @@ Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}
 
 [Files]
 #ifdef UseNetCoreCheck
+
+#define protected CurrentFilePath ExtractFilePath(__PATHFILENAME__)
+
 ; download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
 ; download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
-Source: "netcorecheck.exe"; Flags: dontcopy noencryption
-Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
+Source: "{#CurrentFilePath}\src\netcorecheck.exe"; Flags: dontcopy noencryption
+Source: "{#CurrentFilePath}\src\netcorecheck_x64.exe"; Flags: dontcopy noencryption
 #endif
 
 #ifdef UseDirectX
