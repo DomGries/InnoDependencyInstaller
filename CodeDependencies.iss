@@ -54,6 +54,18 @@ begin
   Dependency_List[DependencyCount] := Dependency;
 end;
 
+function Dependency_Execute(const Filename, Parameters: String; var ResultCode : Integer): Boolean;
+var
+  Handled: Boolean;
+begin
+  Handled := False;
+  #ifdef Dependency_CustomExecute
+  Result := {#Dependency_CustomExecute}(Filename, Parameters, ResultCode, Handled);
+  #endif
+  if not Handled then
+    Result := ShellExec('', Filename, Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode);
+end;
+
 <event('InitializeWizard')>
 procedure Dependency_Internal1;
 begin
@@ -110,7 +122,7 @@ begin
 
         while True do begin
           ResultCode := 0;
-          if ShellExec('', ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+          if Dependency_Execute(ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, ResultCode) then begin
             if Dependency_List[DependencyIndex].RestartAfter then begin
               if DependencyIndex = DependencyCount - 1 then begin
                 Dependency_NeedRestart := True;
