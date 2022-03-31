@@ -318,6 +318,41 @@ begin
   Result := Dependency_String(' (x86)', ' (x64)');
 end;
 
+function Dependency_LoadFromTempFile(const FileName: string): AnsiString;
+begin
+  LoadStringFromFile(Filename, Result);  { Cannot fail }
+  DeleteFile(Filename);
+  { Remove new-line at the end }
+  if (Length(Result) >= 2) and (Result[Length(Result) - 1] = #13) and
+     (Result[Length(Result)] = #10) then begin
+    Delete(Result, Length(Result) - 1, 2);  
+  end;
+end;
+
+{ Exec with output stored in result. }
+{ ResultString will only be altered if True is returned. }
+function Dependency_ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
+  const Wait: TExecWait; var ResultCode: Integer; var ResultString, ResultErrorString: AnsiString): Boolean;
+var
+  TempFilename: String;
+  TempErrorFilename: String;
+  Command: String;
+begin
+  TempFilename := ExpandConstant('{tmp}\~execwithresult.txt');
+  TempErrorFilename := ExpandConstant('{tmp}\~execwithresulterror.txt');
+  { Exec via cmd and redirect output to file. Must use special string-behavior to work. }
+  Command :=
+    Format('"%s" /S /C ""%s" %s > "%s" 2> "%s""', [
+      ExpandConstant('{cmd}'), Filename, Params, TempFilename, TempErrorFilename]);
+  Result := Exec(ExpandConstant('{cmd}'), Command, WorkingDir, ShowCmd, Wait, ResultCode);
+  if not Result then begin
+    Exit;
+  end;
+  
+  ResultString := Dependency_LoadFromTempFile(TempFilename);
+  ResultErrorString := Dependency_LoadFromTempFile(TempErrorFilename);
+end;
+
 function Dependency_IsNetCoreInstalled(const Version: String): Boolean;
 var
   ResultCode: Integer;
@@ -681,6 +716,53 @@ begin
   end;
 end;
 
+const
+  Dependency_JavaURL = 'https://java.com/%s/download/manual.jsp';
+  Dependency_JavaVersionMarker = 'java version "';
+
+procedure Dependency_AddJava(minVersion: string; setupExeName: string);
+var
+  MustInstall: Boolean;
+  Parameters: string;
+  ResultCode: Integer;
+  ExecOutput, ExecErrorOutput: AnsiString;
+  VersionPos: Integer;
+  EffectiveVersion: string;
+  PackedMinVersion: Int64;
+  PackedEffectiveVersion: Int64;
+begin
+  MustInstall := True;
+  Parameters := '-version' + Dependency_String('', ' -d64');
+
+  // Start java.exe and see the returned values
+  if Dependency_ExecWithResult('java.exe', Parameters, '', SW_HIDE, ewWaitUntilTerminated, ResultCode, ExecOutput, ExecErrorOutput) then
+  begin
+    if ResultCode = 0 then
+    begin
+      VersionPos := Pos(Dependency_JavaVersionMarker, ExecErrorOutput);
+      if VersionPos > 0 then
+      begin
+        EffectiveVersion := Copy(ExecErrorOutput, VersionPos + Length(Dependency_JavaVersionMarker), MaxInt);
+        EffectiveVersion := Copy(EffectiveVersion, 1, Pos('"', EffectiveVersion) - 1);
+        EffectiveVersion := Copy(EffectiveVersion, 1, Pos('_', EffectiveVersion) - 1);
+        MustInstall := not StrToVersion(minVersion, PackedMinVersion) or not StrToVersion(EffectiveVersion, PackedEffectiveVersion) or (ComparePackedVersion(PackedEffectiveVersion, PackedMinVersion) < 0);
+      end;
+    end;
+  end;
+
+  if MustInstall then
+    Dependency_AddEx(setupExeName,
+      '/s /SPONSORS=Disable /INSTALL_SILENT=Enable',
+      'Java ' + minVersion + Dependency_String('', ' (64 bits)'),
+      Format(Dependency_JavaURL, [ExpandConstant('{language}')]),
+      '', False, False, True);                     
+end;
+
+procedure Dependency_AddJava8();
+begin
+  Dependency_AddJava('1.8', 'java8.exe');
+end;
+
 [CustomMessages]
 ;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
 en.lcid=1033
@@ -731,6 +813,9 @@ en.externalinstall_description=The following dependencies are missing on this co
 #define UseSql2016Express
 #define UseSql2017Express
 #define UseSql2019Express
+
+; If missing, this prevents setup from moving on. This is because Java cannot be downloaded from Oracle without first accessing the download page
+; #define UseJava8
 
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
@@ -885,6 +970,10 @@ begin
 #ifdef UseSql2019Express
   Dependency_AddSql2019Express;
 #endif
+
+#ifdef UseJava8
+  Dependency_AddJava8;
+#endif 
 
   Result := True;
 end;
