@@ -20,6 +20,7 @@ type
     Checksum: String;
     ForceSuccess: Boolean;
     RestartAfter: Boolean;
+    ExternalInstall: Boolean;
   end;
 
 var
@@ -27,13 +28,87 @@ var
   Dependency_List: array of TDependency_Entry;
   Dependency_NeedRestart, Dependency_ForceX86: Boolean;
   Dependency_DownloadPage: TDownloadWizardPage;
+  Dependency_ExternalInstallCount: Integer;
+  Dependency_ExternalInstallPage: TWizardPage;
 
-procedure Dependency_Add(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, RestartAfter: Boolean);
+procedure Dependency_URLLabelClick(Sender: TObject);
+var
+  URL: string;
+  ErrorCode: Integer;
+begin
+  URL := TNewStaticText(Sender).Caption;
+  ShellExecAsOriginalUser('', URL, '', '', SW_SHOW, ewNoWait, ErrorCode);  
+end; 
+  
+procedure Dependency_ExternalInstallPageActivate(Sender: TWizardPage);
+var
+  NextTop: Integer;
+  DescLeft: Integer;
+  UrlLeft: Integer;
+  LabelWidth: Integer;
+  DependencyCount: Integer;
+  DependencyIndex: Integer;
+  Dependency: TDependency_Entry;
+  NewDescLabel: TNewStaticText;
+  NewURLLabel: TNewStaticText;
+begin
+  WizardForm.NextButton.Enabled := False;
+  WizardForm.BackButton.Enabled := False;
+  WizardForm.CancelButton.Caption := SetupMessage(msgButtonFinish);
+  
+  NextTop := 0;
+  DescLeft := 0;
+  UrlLeft := Dependency_ExternalInstallPage.SurfaceWidth div 2; 
+  LabelWidth := (Dependency_ExternalInstallPage.SurfaceWidth div 2) - ScaleX(10); 
+  DependencyCount := GetArrayLength(Dependency_List);
+  for DependencyIndex := 0 to DependencyCount - 1 do begin
+    Dependency := Dependency_List[DependencyIndex];
+    if Dependency.ExternalInstall then begin
+      NewDescLabel := TNewStaticText.Create(Dependency_ExternalInstallPage);
+      NewDescLabel.AutoSize := False;
+      NewDescLabel.WordWrap := False;
+      NewDescLabel.Left := DescLeft; 
+      NewDescLabel.Top := NextTop;
+      NewDescLabel.Width := LabelWidth;
+      NewDescLabel.Caption := Dependency.Title;
+      NewDescLabel.Parent := Dependency_ExternalInstallPage.Surface;
+
+      NewURLLabel := TNewStaticText.Create(Dependency_ExternalInstallPage);
+      NewURLLabel.AutoSize := False;
+      NewURLLabel.WordWrap := False;
+      NewURLLabel.Left := UrlLeft; 
+      NewURLLabel.Top := NextTop;
+      NewURLLabel.Width := LabelWidth;
+      NewURLLabel.Caption := Dependency.URL;
+      NewURLLabel.OnClick := @Dependency_URLLabelClick;
+      NewURLLabel.Cursor := crHand;
+      NewURLLabel.Parent := Dependency_ExternalInstallPage.Surface;
+      NewURLLabel.Font.Color := clBlue; // change font after setting parent to get valid default values
+      NewURLLabel.Font.Style := NewURLLabel.Font.Style + [fsUnderline];
+      
+      NextTop := NextTop + Trunc(NewDescLabel.Height * 1.5);
+    end;
+  end;
+end;
+
+procedure Dependency_CreateExternalInstallPageIfNeeded;
+begin
+  if (Dependency_ExternalInstallCount > 0) and not Assigned(Dependency_ExternalInstallPage) then begin
+    Dependency_ExternalInstallPage := CreateCustomPage(wpSelectTasks, CustomMessage('externalinstall_title'), CustomMessage('externalinstall_description'));
+    Dependency_ExternalInstallPage.OnActivate := @Dependency_ExternalInstallPageActivate;
+  end;
+end;
+
+procedure Dependency_AddEx(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, RestartAfter, ExternalInstall: Boolean);
 var
   Dependency: TDependency_Entry;
   DependencyCount: Integer;
 begin
-  Dependency_Memo := Dependency_Memo + #13#10 + '%1' + Title;
+  if ExternalInstall then begin
+    Inc(Dependency_ExternalInstallCount)
+  end else begin
+    Dependency_Memo := Dependency_Memo + #13#10 + '%1' + Title;
+  end;
 
   Dependency.Filename := Filename;
   Dependency.Parameters := Parameters;
@@ -48,10 +123,16 @@ begin
   Dependency.Checksum := Checksum;
   Dependency.ForceSuccess := ForceSuccess;
   Dependency.RestartAfter := RestartAfter;
+  Dependency.ExternalInstall := ExternalInstall;
 
   DependencyCount := GetArrayLength(Dependency_List);
   SetArrayLength(Dependency_List, DependencyCount + 1);
   Dependency_List[DependencyCount] := Dependency;
+end;
+
+procedure Dependency_Add(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, RestartAfter: Boolean);
+begin
+  Dependency_AddEx(Filename, Parameters, Title, URL, Checksum, ForceSuccess, RestartAfter, False);
 end;
 
 <event('InitializeWizard')>
@@ -70,10 +151,11 @@ begin
   DependencyCount := GetArrayLength(Dependency_List);
 
   if DependencyCount > 0 then begin
-    Dependency_DownloadPage.Show;
+    if DependencyCount - Dependency_ExternalInstallCount > 0 then
+      Dependency_DownloadPage.Show;
 
     for DependencyIndex := 0 to DependencyCount - 1 do begin
-      if Dependency_List[DependencyIndex].URL <> '' then begin
+      if not Dependency_List[DependencyIndex].ExternalInstall and (Dependency_List[DependencyIndex].URL <> '') then begin
         Dependency_DownloadPage.Clear;
         Dependency_DownloadPage.Add(Dependency_List[DependencyIndex].URL, Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Checksum);
 
@@ -105,45 +187,47 @@ begin
 
     if Result = '' then begin
       for DependencyIndex := 0 to DependencyCount - 1 do begin
-        Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
-        Dependency_DownloadPage.SetProgress(DependencyIndex + 1, DependencyCount + 1);
+        if not Dependency_List[DependencyIndex].ExternalInstall then begin
+          Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
+          Dependency_DownloadPage.SetProgress(DependencyIndex + 1, DependencyCount + 1);
 
-        while True do begin
-          ResultCode := 0;
-          if ShellExec('', ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
-            if Dependency_List[DependencyIndex].RestartAfter then begin
-              if DependencyIndex = DependencyCount - 1 then begin
-                Dependency_NeedRestart := True;
-              end else begin
+          while True do begin
+            ResultCode := 0;
+            if ShellExec('', ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+              if Dependency_List[DependencyIndex].RestartAfter then begin
+                if DependencyIndex = DependencyCount - 1 then begin
+                  Dependency_NeedRestart := True;
+                end else begin
+                  NeedsRestart := True;
+                  Result := Dependency_List[DependencyIndex].Title;
+                end;
+                break;
+              end else if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
+                break;
+              end else if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
                 NeedsRestart := True;
                 Result := Dependency_List[DependencyIndex].Title;
+                break;
+              end else if ResultCode = 3010 then begin // ERROR_SUCCESS_REBOOT_REQUIRED (3010)
+                Dependency_NeedRestart := True;
+                break;
               end;
-              break;
-            end else if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
-              break;
-            end else if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
-              NeedsRestart := True;
-              Result := Dependency_List[DependencyIndex].Title;
-              break;
-            end else if ResultCode = 3010 then begin // ERROR_SUCCESS_REBOOT_REQUIRED (3010)
-              Dependency_NeedRestart := True;
-              break;
+            end;
+
+            case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[DependencyIndex].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
+              IDABORT: begin
+                Result := Dependency_List[DependencyIndex].Title;
+                break;
+              end;
+              IDIGNORE: begin
+                break;
+              end;
             end;
           end;
 
-          case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[DependencyIndex].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
-            IDABORT: begin
-              Result := Dependency_List[DependencyIndex].Title;
-              break;
-            end;
-            IDIGNORE: begin
-              break;
-            end;
+          if Result <> '' then begin
+            break;
           end;
-        end;
-
-        if Result <> '' then begin
-          break;
         end;
       end;
 
@@ -197,6 +281,19 @@ begin
   Result := Dependency_NeedRestart;
 end;
 
+<event('NextButtonClick')>
+function Dependency_NextButtonClick(CurPageID: Integer): boolean;
+begin
+  Dependency_CreateExternalInstallPageIfNeeded;
+  Result := true;
+end;
+
+<event('CancelButtonClick')>
+procedure Dependency_CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
+begin
+  Confirm := (Dependency_ExternalInstallCount = 0) or (CurPageID <> Dependency_ExternalInstallPage.ID);
+end;  
+
 function Dependency_IsX64: Boolean;
 begin
   Result := not Dependency_ForceX86 and Is64BitInstallMode;
@@ -219,6 +316,41 @@ end;
 function Dependency_ArchTitle: String;
 begin
   Result := Dependency_String(' (x86)', ' (x64)');
+end;
+
+function Dependency_LoadFromTempFile(const FileName: string): AnsiString;
+begin
+  LoadStringFromFile(Filename, Result);  { Cannot fail }
+  DeleteFile(Filename);
+  { Remove new-line at the end }
+  if (Length(Result) >= 2) and (Result[Length(Result) - 1] = #13) and
+     (Result[Length(Result)] = #10) then begin
+    Delete(Result, Length(Result) - 1, 2);  
+  end;
+end;
+
+{ Exec with output stored in result. }
+{ ResultString will only be altered if True is returned. }
+function Dependency_ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
+  const Wait: TExecWait; var ResultCode: Integer; var ResultString, ResultErrorString: AnsiString): Boolean;
+var
+  TempFilename: String;
+  TempErrorFilename: String;
+  Command: String;
+begin
+  TempFilename := ExpandConstant('{tmp}\~execwithresult.txt');
+  TempErrorFilename := ExpandConstant('{tmp}\~execwithresulterror.txt');
+  { Exec via cmd and redirect output to file. Must use special string-behavior to work. }
+  Command :=
+    Format('"%s" /S /C ""%s" %s > "%s" 2> "%s""', [
+      ExpandConstant('{cmd}'), Filename, Params, TempFilename, TempErrorFilename]);
+  Result := Exec(ExpandConstant('{cmd}'), Command, WorkingDir, ShowCmd, Wait, ResultCode);
+  if not Result then begin
+    Exit;
+  end;
+  
+  ResultString := Dependency_LoadFromTempFile(TempFilename);
+  ResultErrorString := Dependency_LoadFromTempFile(TempErrorFilename);
 end;
 
 function Dependency_IsNetCoreInstalled(const Version: String): Boolean;
@@ -584,6 +716,58 @@ begin
   end;
 end;
 
+const
+  Dependency_JavaURL = 'https://java.com/%s/download/manual.jsp';
+  Dependency_JavaVersionMarker = 'java version "';
+
+procedure Dependency_AddJava(minVersion: string; setupExeName: string);
+var
+  MustInstall: Boolean;
+  Parameters: string;
+  ResultCode: Integer;
+  ExecOutput, ExecErrorOutput: AnsiString;
+  VersionPos: Integer;
+  EffectiveVersion: string;
+  PackedMinVersion: Int64;
+  PackedEffectiveVersion: Int64;
+begin
+  MustInstall := True;
+  Parameters := '-version' + Dependency_String('', ' -d64');
+
+  // Start java.exe and see the returned values
+  if Dependency_ExecWithResult('java.exe', Parameters, '', SW_HIDE, ewWaitUntilTerminated, ResultCode, ExecOutput, ExecErrorOutput) then
+  begin
+    if ResultCode = 0 then
+    begin
+      VersionPos := Pos(Dependency_JavaVersionMarker, ExecErrorOutput);
+      if VersionPos > 0 then
+      begin
+        EffectiveVersion := Copy(ExecErrorOutput, VersionPos + Length(Dependency_JavaVersionMarker), MaxInt);
+        EffectiveVersion := Copy(EffectiveVersion, 1, Pos('"', EffectiveVersion) - 1);
+        EffectiveVersion := Copy(EffectiveVersion, 1, Pos('_', EffectiveVersion) - 1);
+        MustInstall := not StrToVersion(minVersion, PackedMinVersion) or not StrToVersion(EffectiveVersion, PackedEffectiveVersion) or (ComparePackedVersion(PackedEffectiveVersion, PackedMinVersion) < 0);
+      end;
+    end;
+  end;
+
+  if MustInstall then
+    Dependency_AddEx(setupExeName,
+      '/s /SPONSORS=Disable /INSTALL_SILENT=Enable',
+      'Java ' + minVersion + Dependency_String('', ' (64 bits)'),
+      Format(Dependency_JavaURL, [ExpandConstant('{language}')]),
+      '', False, False, True);                     
+end;
+
+procedure Dependency_AddJava8();
+begin
+  Dependency_AddJava('1.8', 'java8.exe');
+end;
+
+[CustomMessages]
+;http://www.microsoft.com/globaldev/reference/lcid-all.mspx
+en.lcid=1033
+en.externalinstall_title=Missing dependencies
+en.externalinstall_description=The following dependencies are missing on this computer. Please use the associated links to download and install them before running setup again.
 
 [Setup]
 ; -------------
@@ -629,6 +813,9 @@ end;
 #define UseSql2016Express
 #define UseSql2017Express
 #define UseSql2019Express
+
+; If missing, this prevents setup from moving on. This is because Java cannot be downloaded from Oracle without first accessing the download page
+; #define UseJava8
 
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
@@ -783,6 +970,10 @@ begin
 #ifdef UseSql2019Express
   Dependency_AddSql2019Express;
 #endif
+
+#ifdef UseJava8
+  Dependency_AddJava8;
+#endif 
 
   Result := True;
 end;
