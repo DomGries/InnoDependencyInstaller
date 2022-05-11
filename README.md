@@ -102,6 +102,8 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
 
 * DirectX End-User Runtime
 
+* WebView2 runtime
+
 ## Credits
 
 Thanks to the community for sharing many fixes and improvements. To contribute please [create a pull request](https://github.com/DomGries/InnoDependencyInstaller/pulls).

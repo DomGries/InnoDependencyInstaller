@@ -584,6 +584,17 @@ begin
   end;
 end;
 
+procedure Dependency_AddWebView2;
+begin
+  if not RegValueExists(HKLM, Dependency_String('SOFTWARE', 'SOFTWARE\WOW6432Node') + '\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv') then begin
+    Dependency_Add('MicrosoftEdgeWebview2Setup.exe',
+      '/silent /install',
+      'WebView2 Runtime',
+      'https://go.microsoft.com/fwlink/p/?LinkId=2124703',
+      '', False, False);
+  end;
+end;
+
 
 [Setup]
 ; -------------
@@ -629,6 +640,8 @@ end;
 #define UseSql2016Express
 #define UseSql2017Express
 #define UseSql2019Express
+
+#define UseWebView2
 
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
@@ -782,6 +795,10 @@ begin
 #endif
 #ifdef UseSql2019Express
   Dependency_AddSql2019Express;
+#endif
+
+#ifdef UseWebView2
+  Dependency_AddWebView2;
 #endif
 
   Result := True;
