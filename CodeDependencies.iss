@@ -658,6 +658,9 @@ end;
   #define UseDotNet60
   #define UseDotNet60Asp
   #define UseDotNet60Desktop
+  #define UseDotNet70
+  #define UseDotNet70Asp
+  #define UseDotNet70Desktop
 #endif
 
 #define UseVC2005
