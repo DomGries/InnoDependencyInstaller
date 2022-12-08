@@ -83,6 +83,9 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * .NET Runtime 6.0
     * ASP.NET Core Runtime 6.0
     * .NET Desktop Runtime 6.0
+    * .NET Runtime 7.0
+    * ASP.NET Core Runtime 7.0
+    * .NET Desktop Runtime 7.0
 
 * C++
     * Visual C++ 2005 Service Pack 1 Redistributable
