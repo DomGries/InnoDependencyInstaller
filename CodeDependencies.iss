@@ -412,6 +412,42 @@ begin
   end;
 end;
 
+procedure Dependency_AddDotNet70;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/7.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 7.0.9') then begin
+    Dependency_Add('dotnet70' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Runtime 7.0.9' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/305a85f5-2b0d-459b-b2ea-caf71b98d25d/805edc610efa49432e5e268bbba4eacb/dotnet-runtime-7.0.9-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/73058888-02a4-4f6d-b3cd-845531c2d7d0/a785e54b7f12046c00714b2ba759e173/dotnet-runtime-7.0.9-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddDotNet70Asp;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/7.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 7.0.9') then begin
+    Dependency_Add('dotnet70asp' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      'ASP.NET Core Runtime 7.0.9' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/6ec3b357-31df-4b18-948f-4979a5b4b99f/fdeec71fc7f0f34ecfa0cb8b2b897da0/aspnetcore-runtime-7.0.9-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/edd9c9b1-0c49-4297-9197-9392b2462318/d06fedaefb256d801ce94ade76af3ad9/aspnetcore-runtime-7.0.9-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddDotNet70Desktop;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/7.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 7.0.9') then begin
+    Dependency_Add('dotnet70desktop' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Desktop Runtime 7.0.9' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/139b19d0-2d39-48ce-b59a-aec437509c20/ea6a2711eec53660c3b14d78b9fb2963/windowsdesktop-runtime-7.0.9-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/7727acb3-25ca-473b-a392-75afeb33cab7/f11f0477fd2fcfbb3111881377d0c9bb/windowsdesktop-runtime-7.0.9-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
 procedure Dependency_AddVC2005;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=26347
