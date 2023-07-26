@@ -7,37 +7,54 @@
 ## Installation and Usage
 
 1. Download and install [Inno Setup 6.2+](https://www.jrsoftware.org/isinfo.php).
-2. Download [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
-3. Open the extracted _CodeDependencies.iss_ file.
-4. Comment out dependency defines to disable installing them in the example setup and leave only dependencies that need to be installed:
-    ```iss
-    #define UseVC2013 <-- installed in example setup
-    ;#define UseVC2013 <-- commented out and not installed in example setup
-    ```
-5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary.
-6. Build setup using Inno Setup compiler.
-
-## Integration
-
-You can include _CodeDependencies.iss_ file into your setup by disabling compilation of the example setup before and calling the desired _Dependency_Add_ functions:
-
+2. Download _CodeDependencies.iss_ and _dependencies_ folder in the folder of your iss script.
+3. On top of your iss script add this snippet:
 ```iss
-#define public Dependency_NoExampleSetup
+;#define UseDotNet35
+;#define UseDotNet40
+;#define UseDotNet45
+;#define UseDotNet46
+;#define UseDotNet47
+;#define UseDotNet48
+;#define UseNetCore31
+;#define UseNetCore31Asp
+;#define UseNetCore31Desktop
+;#define UseDotNet50
+;#define UseDotNet50Asp
+;#define UseDotNet50Desktop
+;#define UseDotNet60
+;#define UseDotNet60Asp
+;#define UseDotNet60Desktop
+;#define UseDotNet70
+;#define UseDotNet70Asp
+;#define UseDotNet70Desktop
+
+;#define UseVC2005
+;#define UseVC2008
+;#define UseVC2010
+;#define UseVC2012
+;#define UseVC2013
+;#define UseVC2015To2022
+
+;#define UseDirectX
+
+;#define UseSql2008Express
+;#define UseSql2012Express
+;#define UseSql2014Express
+;#define UseSql2016Express
+;#define UseSql2017Express
+;#define UseSql2019Express
+;#define UseSql2022Express
+
+;#define UseWebView2
+
+;#define UseAccessDatabaseEngine2010
+;#define UseAccessDatabaseEngine2016
+
 #include "CodeDependencies.iss"
-
-[Setup]
-; ...
-
-[Code]
-function InitializeSetup: Boolean;
-begin
-  // add the dependencies you need
-  Dependency_AddVC2013;
-  // ...
-
-  Result := True;
-end;
 ```
+4. From that snippet remove the comment (the initial semicolon ";") to the dependencies you want to add (you can remove the unused defines if you desire)
+5. Build setup using Inno Setup compiler. Done.
 
 ## Details
 
@@ -67,45 +84,37 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
 
 ## Dependencies
 
-* .NET
+* Microsoft .NET
     * .NET Framework 3.5 Service Pack 1
     * .NET Framework 4.0
     * .NET Framework 4.5.2
     * .NET Framework 4.6.2
     * .NET Framework 4.7.2
     * .NET Framework 4.8
-    * .NET Core Runtime 3.1
-    * ASP.NET Core Runtime 3.1
-    * .NET Desktop Runtime 3.1
-    * .NET Runtime 5.0
-    * ASP.NET Core Runtime 5.0
-    * .NET Desktop Runtime 5.0
-    * .NET Runtime 6.0
-    * ASP.NET Core Runtime 6.0
-    * .NET Desktop Runtime 6.0
-    * .NET Runtime 7.0
-    * ASP.NET Core Runtime 7.0
-    * .NET Desktop Runtime 7.0
-
-* C++
+    * .NET Core 3.1 (Runtime, ASP.NET or Desktop)
+    * .NET 5.0 (Runtime, ASP.NET or Desktop)
+    * .NET 6.0 (Runtime, ASP.NET or Desktop)
+    * .NET 7.0 (Runtime, ASP.NET or Desktop)
+* Visual C++
     * Visual C++ 2005 Service Pack 1 Redistributable
     * Visual C++ 2008 Service Pack 1 Redistributable
     * Visual C++ 2010 Service Pack 1 Redistributable
     * Visual C++ 2012 Update 4 Redistributable
     * Visual C++ 2013 Update 5 Redistributable
     * Visual C++ 2015-2022 Redistributable
-
-* SQL
+* Microsoft SQL Server
     * SQL Server 2008 R2 Service Pack 2 Express
     * SQL Server 2012 Service Pack 4 Express
     * SQL Server 2014 Service Pack 3 Express
     * SQL Server 2016 Service Pack 2 Express
     * SQL Server 2017 Express
     * SQL Server 2019 Express
-
+    * SQL Server 2022 Express
 * DirectX End-User Runtime
-
 * WebView2 runtime
+* Microsoft Access Database Engine
+    * Access Database Engine 2010
+    * Access Database Engine 2016
 
 ## Credits
 
