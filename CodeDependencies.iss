@@ -230,6 +230,11 @@ begin
   Result := Dependency_String(' (x86)', ' (x64)');
 end;
 
+function ArchTitle(Param: String): String;
+begin
+  Result := Dependency_String('x86', 'x64');
+end;
+
 function Dependency_IsNetCoreInstalled(const Version: String): Boolean;
 var
   ResultCode: Integer;
@@ -739,6 +744,45 @@ begin
   end;
 end;
 
+procedure Dependency_AddCrystalReports13ForVS;
+var
+  Build: String;
+  MinBuild: LongInt;
+  Params: String;
+  MustInstall: Boolean;
+  Title_Operation: String;
+begin
+  // https://wiki.scn.sap.com/wiki/display/BOBJ/Crystal+Reports%2C+Developer+for+Visual+Studio+Downloads
+
+  MinBuild := 4634; //Ver 13.0.34 - SP34
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\SAP BusinessObjects\Crystal Reports for .NET Framework 4.0\Crystal Reports', 'BuildNum', Build) then
+  begin
+    //New install
+    MustInstall := True;
+    Params := '/qb';
+    Title_Operation := 'INSTALL';
+  end
+  else if StrToIntDef(Build, 0) < MinBuild then
+  begin
+    //Upgrade
+    MustInstall := True;
+    Params := '/qb UPGRADE=1';
+    Title_Operation := 'UPGRADE';
+  end
+  else
+  begin
+    MustInstall := False;
+  end;
+
+  if MustInstall then
+    Dependency_Add(Dependency_String('CR13SP34-32bit.MSI','CR13SP34-64bit.MSI'),
+      Params,
+      'Crystal Reports 13 for Visual Studio SP34 ' + Dependency_ArchTitle + ' ' + Title_Operation,
+      Dependency_String('https://origin-az.softwaredownloads.sap.com/public/file/0020000000674342023',
+                        'https://origin-az.softwaredownloads.sap.com/public/file/0020000000674412023'),
+      '', False, False);
+end;
+
 [Code]
 function InitializeSetup: Boolean;
 begin
@@ -876,6 +920,9 @@ begin
   Dependency_AddAccessDatabaseEngine2016;
 #endif
 
+#ifdef UseCrystalReports13ForVS
+  Dependency_AddCrystalReports13ForVS;
+#endif
   Result := True;
 end;
 
