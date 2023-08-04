@@ -7,8 +7,8 @@
 ## Installation and Usage
 
 1. Download and install [Inno Setup 6.2+](https://www.jrsoftware.org/isinfo.php).
-2. Download _CodeDependencies.iss_ and _dependencies_ folder in the folder of your iss script.
-3. On top of your iss script add this snippet:
+2. Download **_CodeDependencies.iss_** and **_dependencies_** folder in the folder of your Inno Setup script.
+3. On top of your Inno Setup script add this snippet:
 ```iss
 ;#define UseDotNet35
 ;#define UseDotNet40
@@ -16,6 +16,7 @@
 ;#define UseDotNet46
 ;#define UseDotNet47
 ;#define UseDotNet48
+;#define UseDotNet481
 ;#define UseNetCore31
 ;#define UseNetCore31Asp
 ;#define UseNetCore31Desktop
@@ -51,9 +52,11 @@
 ;#define UseAccessDatabaseEngine2010
 ;#define UseAccessDatabaseEngine2016
 
+;#define UseCrystalReports13ForVS
+
 #include "CodeDependencies.iss"
 ```
-4. From that snippet remove the comment (the initial semicolon ";") to the dependencies you want to add (you can remove the unused defines if you desire)
+4. From that snippet remove the comment (the initial semicolon ";") to the dependencies you want to add to your installer (you can even remove the lines of unused defines if you prefer)
 5. Build setup using Inno Setup compiler. Done.
 
 ## Details
@@ -82,6 +85,22 @@ Dependency_ForceX86 := False; // disable forced 32-bit install again
 
 If you only deploy 32-bit binaries and dependencies you can also instead just not define [ArchitecturesInstallIn64BitMode](https://jrsoftware.org/ishelp/index.php?topic=setup_architecturesinstallin64bitmode) in [Setup].
 
+## Example setup
+
+You can find two example installers: 
+  * ExampleInstaller 32bit.iss
+  * ExampleInstaller 64bit.iss 
+
+The second one simply includes the first one defining the following line to automatically run in 64bit mode on a 64bit PC:
+```iss
+ArchitecturesInstallIn64BitMode=x64
+```
+So you can mainly check the _ExampleInstaller 32bit.iss_ file to check how to include dependencies.
+
+Please note that both examples compiles the **_bin\MyProgram-1.0 Setup.exe_** file so it will contain the 32bit or 32/64 bit depending on what you compile last.
+
+
+
 ## Dependencies
 
 * Microsoft .NET
@@ -91,6 +110,7 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * .NET Framework 4.6.2
     * .NET Framework 4.7.2
     * .NET Framework 4.8
+    * .NET Framework 4.8.1
     * .NET Core 3.1 (Runtime, ASP.NET or Desktop)
     * .NET 5.0 (Runtime, ASP.NET or Desktop)
     * .NET 6.0 (Runtime, ASP.NET or Desktop)
@@ -115,6 +135,7 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
 * Microsoft Access Database Engine
     * Access Database Engine 2010
     * Access Database Engine 2016
+* Crystal Reports 13 for Visual Studio
 
 ## Credits
 
