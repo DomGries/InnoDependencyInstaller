@@ -4,7 +4,7 @@
 #define UseDotNet46
 #define UseDotNet47
 #define UseDotNet48
-#define UseDotNet481
+;#define UseDotNet481
 ;#define UseNetCore31
 ;#define UseNetCore31Asp
 #define UseNetCore31Desktop
@@ -25,7 +25,7 @@
 #define UseVC2013
 #define UseVC2015To2022
 
-#define UseDirectX
+;#define UseDirectX
 
 ;#define UseSql2008Express
 ;#define UseSql2012Express
@@ -39,6 +39,8 @@
 
 #define UseAccessDatabaseEngine2010
 #define UseAccessDatabaseEngine2016
+
+#define UseCrystalReports13ForVS
 
 #include "CodeDependencies.iss"
 ;+-----+----------------------------------------+
@@ -60,7 +62,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
+OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion} Setup
 DefaultGroupName={#MyAppSetupName}
 DefaultDirName={autopf}\{#MyAppSetupName}
 UninstallDisplayIcon={app}\MyProgram.exe
@@ -70,8 +72,6 @@ SolidCompression=yes
 InternalCompressLevel=normal
 AllowNoIcons=yes
 PrivilegesRequired=admin
-; remove next line if you only deploy 32-bit binaries and dependencies
-ArchitecturesInstallIn64BitMode=x64
 WizardStyle=modern
 
 [Languages]
