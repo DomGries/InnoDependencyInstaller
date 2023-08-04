@@ -4,6 +4,7 @@
 #define UseDotNet46
 #define UseDotNet47
 #define UseDotNet48
+#define UseDotNet481
 ;#define UseNetCore31
 ;#define UseNetCore31Asp
 #define UseNetCore31Desktop

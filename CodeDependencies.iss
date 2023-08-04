@@ -315,6 +315,28 @@ begin
   end;
 end;
 
+procedure Dependency_AddDotNet481;
+var
+  Net45OrLaterRelease: Cardinal;
+  IsInstalled: Boolean;
+begin
+  // https://dotnet.microsoft.com/en-us/download/dotnet-framework/net481
+  // Determine installed version ref: https://learn.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed#detect-net-framework-45-and-later-versions
+  if RegQueryDWordValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', Net45OrLaterRelease) then
+    IsInstalled := (Net45OrLaterRelease >= 533320) //On Windows 11 2022 Update: 533320, all other Windows operating systems: 533325
+  else
+    IsInstalled := False;
+  if not IsInstalled then
+  begin
+    Dependency_Add('dotnetfx481.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Framework 4.8.1',
+      'https://go.microsoft.com/fwlink/?LinkId=2203304',
+      '', False, False);
+  end;
+end;
+
+
 procedure Dependency_AddNetCore31;
 begin
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
@@ -741,6 +763,9 @@ begin
 #endif
 #ifdef UseDotNet48
   Dependency_AddDotNet48;
+#endif
+#ifdef UseDotNet481
+  Dependency_AddDotNet481;
 #endif
 
 #ifdef UseNetCore31
