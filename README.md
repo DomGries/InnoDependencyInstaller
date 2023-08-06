@@ -92,6 +92,7 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * SQL Server 2016 Service Pack 3 Express
     * SQL Server 2017 Express
     * SQL Server 2019 Express
+    * SQL Server 2022 Express
 * DirectX End-User Runtime
 * WebView2 runtime
 

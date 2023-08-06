@@ -622,6 +622,21 @@ begin
   end;
 end;
 
+procedure Dependency_AddSql2022Express;
+var
+  Version: String;
+  PackedVersion: Int64;
+begin
+  // https://www.microsoft.com/en-us/download/details.aspx?id=104781
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(16, 0, 1000, 6)) < 0) then begin
+    Dependency_Add('sql2022express' + Dependency_ArchSuffix + '.exe',
+      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
+      'SQL Server 2022 Express',
+      'https://go.microsoft.com/fwlink/p/?linkid=2216019',
+      '', False, False);
+  end;
+end;
+
 procedure Dependency_AddWebView2;
 begin
   if not RegValueExists(HKLM, Dependency_String('SOFTWARE', 'SOFTWARE\WOW6432Node') + '\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv') then begin
@@ -681,6 +696,7 @@ end;
 #define UseSql2016Express
 #define UseSql2017Express
 #define UseSql2019Express
+#define UseSql2022Express
 
 #define UseWebView2
 
@@ -845,6 +861,9 @@ begin
 #endif
 #ifdef UseSql2019Express
   Dependency_AddSql2019Express;
+#endif
+#ifdef UseSql2022Express
+  Dependency_AddSql2022Express;
 #endif
 
 #ifdef UseWebView2
