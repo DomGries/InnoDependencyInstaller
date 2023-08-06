@@ -89,7 +89,7 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * SQL Server 2008 R2 Service Pack 2 Express
     * SQL Server 2012 Service Pack 4 Express
     * SQL Server 2014 Service Pack 3 Express
-    * SQL Server 2016 Service Pack 2 Express
+    * SQL Server 2016 Service Pack 3 Express
     * SQL Server 2017 Express
     * SQL Server 2019 Express
 * DirectX End-User Runtime
