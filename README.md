@@ -74,19 +74,10 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * .NET Framework 4.6.2
     * .NET Framework 4.7.2
     * .NET Framework 4.8
-    * .NET Core Runtime 3.1
-    * ASP.NET Core Runtime 3.1
-    * .NET Desktop Runtime 3.1
-    * .NET Runtime 5.0
-    * ASP.NET Core Runtime 5.0
-    * .NET Desktop Runtime 5.0
-    * .NET Runtime 6.0
-    * ASP.NET Core Runtime 6.0
-    * .NET Desktop Runtime 6.0
-    * .NET Runtime 7.0
-    * ASP.NET Core Runtime 7.0
-    * .NET Desktop Runtime 7.0
-
+    * .NET Core 3.1 (Runtime, ASP.NET, Desktop)
+    * .NET 5.0 (Runtime, ASP.NET, Desktop)
+    * .NET 6.0 (Runtime, ASP.NET, Desktop)
+    * .NET 7.0 (Runtime, ASP.NET, Desktop)
 * C++
     * Visual C++ 2005 Service Pack 1 Redistributable
     * Visual C++ 2008 Service Pack 1 Redistributable
@@ -94,7 +85,6 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * Visual C++ 2012 Update 4 Redistributable
     * Visual C++ 2013 Update 5 Redistributable
     * Visual C++ 2015-2022 Redistributable
-
 * SQL
     * SQL Server 2008 R2 Service Pack 2 Express
     * SQL Server 2012 Service Pack 4 Express
@@ -102,9 +92,7 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * SQL Server 2016 Service Pack 2 Express
     * SQL Server 2017 Express
     * SQL Server 2019 Express
-
 * DirectX End-User Runtime
-
 * WebView2 runtime
 
 ## Credits
