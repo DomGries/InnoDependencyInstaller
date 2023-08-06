@@ -639,6 +639,7 @@ end;
 
 procedure Dependency_AddWebView2;
 begin
+  // https://developer.microsoft.com/en-us/microsoft-edge/webview2
   if not RegValueExists(HKLM, Dependency_String('SOFTWARE', 'SOFTWARE\WOW6432Node') + '\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv') then begin
     Dependency_Add('MicrosoftEdgeWebview2Setup.exe',
       '/silent /install',
@@ -648,6 +649,29 @@ begin
   end;
 end;
 
+procedure Dependency_AddAccessDatabaseEngine2010;
+begin
+  // https://www.microsoft.com/en-us/download/details.aspx?id=13255
+  if not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Office\14.0\Access Connectivity Engine\Engines\ACE') then begin
+    Dependency_Add('AccessDatabaseEngine2010' + Dependency_ArchSuffix + '.exe',
+      '/quiet',
+      'Microsoft Access Database Engine 2010 ' + Dependency_ArchTitle,
+      Dependency_String('https://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine.exe', 'https://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine_X64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddAccessDatabaseEngine2016;
+begin
+  // https://www.microsoft.com/en-us/download/details.aspx?id=54920
+  if not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Office\16.0\Access Connectivity Engine\Engines\ACE') then begin
+    Dependency_Add('AccessDatabaseEngine2016' + Dependency_ArchSuffix + '.exe',
+      '/quiet',
+      'Microsoft Access Database Engine 2016 ' + Dependency_ArchTitle,
+      Dependency_String('https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine.exe', 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'),
+      '', False, False);
+  end;
+end;
 
 [Setup]
 ; -------------
@@ -699,6 +723,9 @@ end;
 #define UseSql2022Express
 
 #define UseWebView2
+
+#define UseAccessDatabaseEngine2010
+#define UseAccessDatabaseEngine2016
 
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
@@ -868,6 +895,13 @@ begin
 
 #ifdef UseWebView2
   Dependency_AddWebView2;
+#endif
+
+#ifdef UseAccessDatabaseEngine2010
+  Dependency_AddAccessDatabaseEngine2010;
+#endif
+#ifdef UseAccessDatabaseEngine2016
+  Dependency_AddAccessDatabaseEngine2016;
 #endif
 
   Result := True;

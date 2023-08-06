@@ -95,6 +95,9 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * SQL Server 2022 Express
 * DirectX End-User Runtime
 * WebView2 runtime
+* Access Database Engine
+    * Access Database Engine 2010
+    * Access Database Engine 2016
 
 ## Credits
 
