@@ -225,7 +225,7 @@ function Dependency_IsNetCoreInstalled(const Version: String): Boolean;
 var
   ResultCode: Integer;
 begin
-  // source code: https://github.com/dotnet/deployment-tools/tree/master/src/clickonce/native/projects/NetCoreCheck
+  // source code: https://github.com/dotnet/deployment-tools/tree/main/src/clickonce/native/projects/NetCoreCheck
   if not FileExists(ExpandConstant('{tmp}{\}') + 'netcorecheck' + Dependency_ArchSuffix + '.exe') then begin
     ExtractTemporaryFile('netcorecheck' + Dependency_ArchSuffix + '.exe');
   end;
@@ -309,7 +309,7 @@ end;
 procedure Dependency_AddNetCore31;
 begin
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 3.1.32') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.NETCore.App -v 3.1.32') then begin
     Dependency_Add('netcore31' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Core Runtime 3.1.32' + Dependency_ArchTitle,
@@ -321,7 +321,7 @@ end;
 procedure Dependency_AddNetCore31Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 3.1.32') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.AspNetCore.App -v 3.1.32') then begin
     Dependency_Add('netcore31asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 3.1.32' + Dependency_ArchTitle,
@@ -333,7 +333,7 @@ end;
 procedure Dependency_AddNetCore31Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 3.1.32') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.WindowsDesktop.App -v 3.1.32') then begin
     Dependency_Add('netcore31desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 3.1.32' + Dependency_ArchTitle,
@@ -345,7 +345,7 @@ end;
 procedure Dependency_AddDotNet50;
 begin
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 5.0.17') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.NETCore.App -v 5.0.17') then begin
     Dependency_Add('dotnet50' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Runtime 5.0.17' + Dependency_ArchTitle,
@@ -357,7 +357,7 @@ end;
 procedure Dependency_AddDotNet50Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 5.0.17') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.AspNetCore.App -v 5.0.17') then begin
     Dependency_Add('dotnet50asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 5.0.17' + Dependency_ArchTitle,
@@ -369,7 +369,7 @@ end;
 procedure Dependency_AddDotNet50Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 5.0.17') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.WindowsDesktop.App -v 5.0.17') then begin
     Dependency_Add('dotnet50desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 5.0.17' + Dependency_ArchTitle,
@@ -381,7 +381,7 @@ end;
 procedure Dependency_AddDotNet60;
 begin
   // https://dotnet.microsoft.com/download/dotnet/6.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 6.0.20') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.NETCore.App -v 6.0.20') then begin
     Dependency_Add('dotnet60' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Runtime 6.0.20' + Dependency_ArchTitle,
@@ -393,7 +393,7 @@ end;
 procedure Dependency_AddDotNet60Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet/6.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 6.0.20') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.AspNetCore.App -v 6.0.20') then begin
     Dependency_Add('dotnet60asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 6.0.20' + Dependency_ArchTitle,
@@ -405,7 +405,7 @@ end;
 procedure Dependency_AddDotNet60Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/6.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 6.0.20') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.WindowsDesktop.App -v 6.0.20') then begin
     Dependency_Add('dotnet60desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 6.0.20' + Dependency_ArchTitle,
@@ -417,7 +417,7 @@ end;
 procedure Dependency_AddDotNet70;
 begin
   // https://dotnet.microsoft.com/download/dotnet/7.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 7.0.9') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.NETCore.App -v 7.0.9') then begin
     Dependency_Add('dotnet70' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Runtime 7.0.9' + Dependency_ArchTitle,
@@ -429,7 +429,7 @@ end;
 procedure Dependency_AddDotNet70Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet/7.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 7.0.9') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.AspNetCore.App -v 7.0.9') then begin
     Dependency_Add('dotnet70asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 7.0.9' + Dependency_ArchTitle,
@@ -441,7 +441,7 @@ end;
 procedure Dependency_AddDotNet70Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/7.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 7.0.9') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.WindowsDesktop.App -v 7.0.9') then begin
     Dependency_Add('dotnet70desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 7.0.9' + Dependency_ArchTitle,
@@ -762,8 +762,8 @@ Name: de; MessagesFile: "compiler:Languages\German.isl"
 
 [Files]
 #ifdef UseNetCoreCheck
-; download netcorecheck.exe: https://go.microsoft.com/fwlink/?linkid=2135256
-; download netcorecheck_x64.exe: https://go.microsoft.com/fwlink/?linkid=2135504
+; download netcorecheck.exe: https://www.nuget.org/packages/Microsoft.NET.Tools.NETCoreCheck.x86
+; download netcorecheck_x64.exe: https://www.nuget.org/packages/Microsoft.NET.Tools.NETCoreCheck.x64
 Source: "netcorecheck.exe"; Flags: dontcopy noencryption
 Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
 #endif
