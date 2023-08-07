@@ -747,7 +747,6 @@ OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
 DefaultGroupName={#MyAppSetupName}
 DefaultDirName={autopf}\{#MyAppSetupName}
 UninstallDisplayIcon={app}\MyProgram.exe
-SourceDir=src
 OutputDir={#SourcePath}\bin
 AllowNoIcons=yes
 PrivilegesRequired=admin
@@ -764,16 +763,16 @@ Name: de; MessagesFile: "compiler:Languages\German.isl"
 #ifdef UseNetCoreCheck
 ; download netcorecheck.exe: https://www.nuget.org/packages/Microsoft.NET.Tools.NETCoreCheck.x86
 ; download netcorecheck_x64.exe: https://www.nuget.org/packages/Microsoft.NET.Tools.NETCoreCheck.x64
-Source: "netcorecheck.exe"; Flags: dontcopy noencryption
-Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
+Source: "src\netcorecheck.exe"; Flags: dontcopy noencryption
+Source: "src\netcorecheck_x64.exe"; Flags: dontcopy noencryption
 #endif
 
 #ifdef UseDirectX
 Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif
 
-Source: "MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsX64; Flags: ignoreversion
-Source: "MyProg.exe"; DestDir: "{app}"; Check: not Dependency_IsX64; Flags: ignoreversion
+Source: "src\MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsX64; Flags: ignoreversion
+Source: "src\MyProg.exe"; DestDir: "{app}"; Check: not Dependency_IsX64; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProg.exe"
