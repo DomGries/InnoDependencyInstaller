@@ -8,21 +8,21 @@
 
 1. Download and install [Inno Setup 6.2+](https://www.jrsoftware.org/isinfo.php).
 2. Download [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
-3. Open the extracted _CodeDependencies.iss_ file.
-4. Comment out dependency defines to disable installing them in the example setup and leave only dependencies that need to be installed:
+3. Open the extracted _ExampleSetup.iss_ file.
+4. Comment out dependency function calls inside _InitializeSetup_ function to disable installing them:
     ```iss
-    #define UseVC2013 <-- installed in example setup
-    ;#define UseVC2013 <-- commented out and not installed in example setup
+    Dependency_AddVC2013; // installed in example setup
+    //Dependency_AddVC2013; // commented out and not installed in example setup
     ```
 5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary.
-6. Build setup using Inno Setup compiler.
+6. Build the setup using Inno Setup compiler.
 
 ## Integration
 
-You can include _CodeDependencies.iss_ file into your setup by disabling compilation of the example setup before and calling the desired _Dependency_Add_ functions:
+You can also just include _CodeDependencies.iss_ file into your setup and calling the desired _Dependency_Add_ functions:
 
 ```iss
-#define public Dependency_NoExampleSetup
+#define public Dependency_Files_NetCoreCheck
 #include "CodeDependencies.iss"
 
 [Setup]
@@ -32,7 +32,7 @@ You can include _CodeDependencies.iss_ file into your setup by disabling compila
 function InitializeSetup: Boolean;
 begin
   // add the dependencies you need
-  Dependency_AddVC2013;
+  Dependency_AddDotNet70;
   // ...
 
   Result := True;
@@ -41,7 +41,7 @@ end;
 
 ## Details
 
-You have two ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _CodeDependencies.iss_ file. Another way is to pack the dependency into a single executable setup like so:
+You have two ways to distribute the dependency installers. By default, most dependencies will be downloaded from the official website. Another way is to pack the dependency into a single executable setup like so:
 
 * Include the dependency setup file by defining the source:
 

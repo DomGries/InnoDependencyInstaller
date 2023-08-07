@@ -1,14 +1,6 @@
-﻿; -- CodeDependencies.iss --
-;
-; This script shows how to download and install any dependency such as .NET,
-; Visual C++ or SQL Server during your application's installation process.
-;
-; contribute: https://github.com/DomGries/InnoDependencyInstaller
+﻿; https://github.com/DomGries/InnoDependencyInstaller
 
 
-; -----------
-; SHARED CODE
-; -----------
 [Code]
 // types and variables
 type
@@ -524,6 +516,9 @@ end;
 
 procedure Dependency_AddDirectX;
 begin
+#ifdef Dependency_Files_DirectX
+  ExtractTemporaryFile('dxwebsetup.exe');
+#endif
   // https://www.microsoft.com/en-us/download/details.aspx?id=35
   Dependency_Add('dxwebsetup.exe',
     '/q',
@@ -655,7 +650,7 @@ begin
   if not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Office\14.0\Access Connectivity Engine\Engines\ACE') then begin
     Dependency_Add('AccessDatabaseEngine2010' + Dependency_ArchSuffix + '.exe',
       '/quiet',
-      'Microsoft Access Database Engine 2010 ' + Dependency_ArchTitle,
+      'Microsoft Access Database Engine 2010' + Dependency_ArchTitle,
       Dependency_String('https://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine.exe', 'https://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine_X64.exe'),
       '', False, False);
   end;
@@ -667,243 +662,20 @@ begin
   if not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Office\16.0\Access Connectivity Engine\Engines\ACE') then begin
     Dependency_Add('AccessDatabaseEngine2016' + Dependency_ArchSuffix + '.exe',
       '/quiet',
-      'Microsoft Access Database Engine 2016 ' + Dependency_ArchTitle,
+      'Microsoft Access Database Engine 2016' + Dependency_ArchTitle,
       Dependency_String('https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine.exe', 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'),
       '', False, False);
   end;
 end;
 
-[Setup]
-; -------------
-; EXAMPLE SETUP
-; -------------
-#ifndef Dependency_NoExampleSetup
-
-; comment out dependency defines to disable installing them
-#define UseDotNet35
-#define UseDotNet40
-#define UseDotNet45
-#define UseDotNet46
-#define UseDotNet47
-#define UseDotNet48
-
-; requires netcorecheck.exe and netcorecheck_x64.exe (see download link below)
-#define UseNetCoreCheck
-#ifdef UseNetCoreCheck
-  #define UseNetCore31
-  #define UseNetCore31Asp
-  #define UseNetCore31Desktop
-  #define UseDotNet50
-  #define UseDotNet50Asp
-  #define UseDotNet50Desktop
-  #define UseDotNet60
-  #define UseDotNet60Asp
-  #define UseDotNet60Desktop
-  #define UseDotNet70
-  #define UseDotNet70Asp
-  #define UseDotNet70Desktop
-#endif
-
-#define UseVC2005
-#define UseVC2008
-#define UseVC2010
-#define UseVC2012
-#define UseVC2013
-#define UseVC2015To2022
-
-; requires dxwebsetup.exe (see download link below)
-;#define UseDirectX
-
-#define UseSql2008Express
-#define UseSql2012Express
-#define UseSql2014Express
-#define UseSql2016Express
-#define UseSql2017Express
-#define UseSql2019Express
-#define UseSql2022Express
-
-#define UseWebView2
-
-#define UseAccessDatabaseEngine2010
-#define UseAccessDatabaseEngine2016
-
-#define MyAppSetupName 'MyProgram'
-#define MyAppVersion '1.0'
-#define MyAppPublisher 'Inno Setup'
-#define MyAppCopyright 'Copyright © Inno Setup'
-#define MyAppURL 'https://jrsoftware.org/isinfo.php'
-
-AppName={#MyAppSetupName}
-AppVersion={#MyAppVersion}
-AppVerName={#MyAppSetupName} {#MyAppVersion}
-AppCopyright={#MyAppCopyright}
-VersionInfoVersion={#MyAppVersion}
-VersionInfoCompany={#MyAppPublisher}
-AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
-AppUpdatesURL={#MyAppURL}
-OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
-DefaultGroupName={#MyAppSetupName}
-DefaultDirName={autopf}\{#MyAppSetupName}
-UninstallDisplayIcon={app}\MyProgram.exe
-OutputDir={#SourcePath}\bin
-AllowNoIcons=yes
-PrivilegesRequired=admin
-
-; remove next line if you only deploy 32-bit binaries and dependencies
-ArchitecturesInstallIn64BitMode=x64
-
-[Languages]
-Name: en; MessagesFile: "compiler:Default.isl"
-Name: nl; MessagesFile: "compiler:Languages\Dutch.isl"
-Name: de; MessagesFile: "compiler:Languages\German.isl"
-
 [Files]
-#ifdef UseNetCoreCheck
+#ifdef Dependency_Files_NetCoreCheck
 ; download netcorecheck.exe: https://www.nuget.org/packages/Microsoft.NET.Tools.NETCoreCheck.x86
 ; download netcorecheck_x64.exe: https://www.nuget.org/packages/Microsoft.NET.Tools.NETCoreCheck.x64
-Source: "src\netcorecheck.exe"; Flags: dontcopy noencryption
-Source: "src\netcorecheck_x64.exe"; Flags: dontcopy noencryption
+Source: "netcorecheck.exe"; Flags: dontcopy noencryption
+Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
 #endif
 
-#ifdef UseDirectX
+#ifdef Dependency_Files_DirectX
 Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
-#endif
-
-Source: "src\MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsX64; Flags: ignoreversion
-Source: "src\MyProg.exe"; DestDir: "{app}"; Check: not Dependency_IsX64; Flags: ignoreversion
-
-[Icons]
-Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProg.exe"
-Name: "{group}\{cm:UninstallProgram,{#MyAppSetupName}}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\{#MyAppSetupName}"; Filename: "{app}\MyProg.exe"; Tasks: desktopicon
-
-[Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
-
-[Run]
-Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
-
-[Code]
-function InitializeSetup: Boolean;
-begin
-#ifdef UseDotNet35
-  Dependency_AddDotNet35;
-#endif
-#ifdef UseDotNet40
-  Dependency_AddDotNet40;
-#endif
-#ifdef UseDotNet45
-  Dependency_AddDotNet45;
-#endif
-#ifdef UseDotNet46
-  Dependency_AddDotNet46;
-#endif
-#ifdef UseDotNet47
-  Dependency_AddDotNet47;
-#endif
-#ifdef UseDotNet48
-  Dependency_AddDotNet48;
-#endif
-
-#ifdef UseNetCore31
-  Dependency_AddNetCore31;
-#endif
-#ifdef UseNetCore31Asp
-  Dependency_AddNetCore31Asp;
-#endif
-#ifdef UseNetCore31Desktop
-  Dependency_AddNetCore31Desktop;
-#endif
-#ifdef UseDotNet50
-  Dependency_AddDotNet50;
-#endif
-#ifdef UseDotNet50Asp
-  Dependency_AddDotNet50Asp;
-#endif
-#ifdef UseDotNet50Desktop
-  Dependency_AddDotNet50Desktop;
-#endif
-#ifdef UseDotNet60
-  Dependency_AddDotNet60;
-#endif
-#ifdef UseDotNet60Asp
-  Dependency_AddDotNet60Asp;
-#endif
-#ifdef UseDotNet60Desktop
-  Dependency_AddDotNet60Desktop;
-#endif
-#ifdef UseDotNet70
-  Dependency_AddDotNet70;
-#endif
-#ifdef UseDotNet70Asp
-  Dependency_AddDotNet70Asp;
-#endif
-#ifdef UseDotNet70Desktop
-  Dependency_AddDotNet70Desktop;
-#endif
-
-#ifdef UseVC2005
-  Dependency_AddVC2005;
-#endif
-#ifdef UseVC2008
-  Dependency_AddVC2008;
-#endif
-#ifdef UseVC2010
-  Dependency_AddVC2010;
-#endif
-#ifdef UseVC2012
-  Dependency_AddVC2012;
-#endif
-#ifdef UseVC2013
-  //Dependency_ForceX86 := True; // force 32-bit install of next dependencies
-  Dependency_AddVC2013;
-  //Dependency_ForceX86 := False; // disable forced 32-bit install again
-#endif
-#ifdef UseVC2015To2022
-  Dependency_AddVC2015To2022;
-#endif
-
-#ifdef UseDirectX
-  ExtractTemporaryFile('dxwebsetup.exe');
-  Dependency_AddDirectX;
-#endif
-
-#ifdef UseSql2008Express
-  Dependency_AddSql2008Express;
-#endif
-#ifdef UseSql2012Express
-  Dependency_AddSql2012Express;
-#endif
-#ifdef UseSql2014Express
-  Dependency_AddSql2014Express;
-#endif
-#ifdef UseSql2016Express
-  Dependency_AddSql2016Express;
-#endif
-#ifdef UseSql2017Express
-  Dependency_AddSql2017Express;
-#endif
-#ifdef UseSql2019Express
-  Dependency_AddSql2019Express;
-#endif
-#ifdef UseSql2022Express
-  Dependency_AddSql2022Express;
-#endif
-
-#ifdef UseWebView2
-  Dependency_AddWebView2;
-#endif
-
-#ifdef UseAccessDatabaseEngine2010
-  Dependency_AddAccessDatabaseEngine2010;
-#endif
-#ifdef UseAccessDatabaseEngine2016
-  Dependency_AddAccessDatabaseEngine2016;
-#endif
-
-  Result := True;
-end;
-
 #endif
