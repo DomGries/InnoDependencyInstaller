@@ -669,13 +669,13 @@ begin
 end;
 
 [Files]
-#ifdef Dependency_Files_NetCoreCheck
+#ifdef Dependency_Path_NetCoreCheck
 ; download netcorecheck.exe: https://www.nuget.org/packages/Microsoft.NET.Tools.NETCoreCheck.x86
 ; download netcorecheck_x64.exe: https://www.nuget.org/packages/Microsoft.NET.Tools.NETCoreCheck.x64
-Source: "netcorecheck.exe"; Flags: dontcopy noencryption
-Source: "netcorecheck_x64.exe"; Flags: dontcopy noencryption
+Source: "{#Dependency_Path_NetCoreCheck}netcorecheck.exe"; Flags: dontcopy noencryption
+Source: "{#Dependency_Path_NetCoreCheck}netcorecheck_x64.exe"; Flags: dontcopy noencryption
 #endif
 
-#ifdef Dependency_Files_DirectX
-Source: "dxwebsetup.exe"; Flags: dontcopy noencryption
+#ifdef Dependency_Path_DirectX
+Source: "{#Dependency_Path_NetCoreCheck}dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif

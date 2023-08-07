@@ -19,10 +19,11 @@
 
 ## Integration
 
-You can also just include _CodeDependencies.iss_ file into your setup and calling the desired _Dependency_Add_ functions:
+You can also just include _CodeDependencies.iss_ file into your setup and call the desired _Dependency_Add_ functions (some may need defining their exe file path before the include):
 
 ```iss
-#define public Dependency_Files_NetCoreCheck
+#define public Dependency_Path_NetCoreCheck "dependencies\"
+
 #include "CodeDependencies.iss"
 
 [Setup]

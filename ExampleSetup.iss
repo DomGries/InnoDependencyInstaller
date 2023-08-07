@@ -2,10 +2,10 @@
 
 
 ; requires netcorecheck.exe and netcorecheck_x64.exe (see CodeDependencies.iss)
-#define public Dependency_Files_NetCoreCheck
+#define public Dependency_Path_NetCoreCheck "dependencies\"
 
 ; requires dxwebsetup.exe (see CodeDependencies.iss)
-;#define public Dependency_Files_DirectX
+;#define public Dependency_Path_DirectX "dependencies\"
 
 #include "CodeDependencies.iss"
 
@@ -30,7 +30,6 @@ OutputBaseFilename={#MyAppSetupName}-{#MyAppVersion}
 DefaultGroupName={#MyAppSetupName}
 DefaultDirName={autopf}\{#MyAppSetupName}
 UninstallDisplayIcon={app}\MyProgram.exe
-SourceDir=src
 OutputDir={#SourcePath}\bin
 AllowNoIcons=yes
 PrivilegesRequired=admin
@@ -46,8 +45,8 @@ Name: de; MessagesFile: "compiler:Languages\German.isl"
 Name: es; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Files]
-Source: "MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsX64; Flags: ignoreversion
-Source: "MyProg.exe"; DestDir: "{app}"; Check: not Dependency_IsX64; Flags: ignoreversion
+Source: "example\MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsX64; Flags: ignoreversion
+Source: "example\MyProg.exe"; DestDir: "{app}"; Check: not Dependency_IsX64; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppSetupName}"; Filename: "{app}\MyProg.exe"
@@ -71,7 +70,7 @@ begin
   Dependency_AddDotNet47;
   Dependency_AddDotNet48;
 
-#ifdef Dependency_Files_NetCoreCheck
+#ifdef Dependency_Path_NetCoreCheck
   Dependency_AddNetCore31;
   Dependency_AddNetCore31Asp;
   Dependency_AddNetCore31Desktop;
