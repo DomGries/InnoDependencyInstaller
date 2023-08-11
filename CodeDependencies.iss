@@ -677,5 +677,5 @@ Source: "{#Dependency_Path_NetCoreCheck}netcorecheck_x64.exe"; Flags: dontcopy n
 #endif
 
 #ifdef Dependency_Path_DirectX
-Source: "{#Dependency_Path_NetCoreCheck}dxwebsetup.exe"; Flags: dontcopy noencryption
+Source: "{#Dependency_Path_DirectX}dxwebsetup.exe"; Flags: dontcopy noencryption
 #endif
