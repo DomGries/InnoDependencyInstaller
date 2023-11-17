@@ -83,6 +83,9 @@ begin
   Dependency_AddDotNet70;
   Dependency_AddDotNet70Asp;
   Dependency_AddDotNet70Desktop;
+  Dependency_AddDotNet80;
+  Dependency_AddDotNet80Asp;
+  Dependency_AddDotNet80Desktop;
 #endif
 
   Dependency_AddVC2005;
