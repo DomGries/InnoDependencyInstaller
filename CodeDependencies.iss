@@ -452,11 +452,11 @@ end;
 procedure Dependency_AddDotNet80;
 begin
   // https://dotnet.microsoft.com/download/dotnet/8.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 8.0.0') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 8.0.1') then begin
     Dependency_Add('dotnet80' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Runtime 8.0.0' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/593685c9-7e98-455a-8e34-4b8ad1be9489/6ccf85c6fc244428d61f74ca3aee0645/dotnet-runtime-8.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/7f4d5cbc-4449-4ea5-9578-c467821f251f/b9b19f89d0642bf78f4b612c6a741637/dotnet-runtime-8.0.0-win-x64.exe'),
+      '.NET Runtime 8.0.1' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/8c884ea1-2ae5-4359-82a4-8ce8fb309b0e/53a67e660c7b331577c95b02f87935fe/dotnet-runtime-8.0.1-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/cede7e69-dbd4-4908-9bfb-12fa4660e2b9/d9ed17179d0275abee5afd29d5460b48/dotnet-runtime-8.0.1-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -464,11 +464,11 @@ end;
 procedure Dependency_AddDotNet80Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet/8.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 8.0.0') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 8.0.1') then begin
     Dependency_Add('dotnet80asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 8.0.0' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/66ae7d00-596a-4e36-be73-2ebc0c332329/e2f6e37933e204fef5687e338a95b749/aspnetcore-runtime-8.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/89d3660b-d344-47c5-a1cd-d8343a3f3779/9f55af82923dab7e3dce912f5c5b9d60/aspnetcore-runtime-8.0.0-win-x64.exe'),
+      'ASP.NET Core Runtime 8.0.1' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/054695b5-a7fd-43e9-8e7f-c8422e9766c4/78ff5d8a3ea0f03af996456dd260351e/aspnetcore-runtime-8.0.1-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/4b805b84-302c-42e3-b57e-665d0bb7b1f0/3a0965017f98303c7fe1ab1291728e07/aspnetcore-runtime-8.0.1-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -476,11 +476,11 @@ end;
 procedure Dependency_AddDotNet80Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/8.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 8.0.0') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 8.0.1') then begin
     Dependency_Add('dotnet80desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 8.0.0' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/f9e3b581-059d-429f-9f0d-1d1167ff7e32/bd7661030cd5d66cd3eee0fd20b24540/windowsdesktop-runtime-8.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/7f4d5cbc-4449-4ea5-9578-c467821f251f/b9b19f89d0642bf78f4b612c6a741637/dotnet-runtime-8.0.0-win-x64.exe'),
+      '.NET Desktop Runtime 8.0.1' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/ca725693-6de7-4a4d-b8a4-4390b0387c66/ce13f2f016152d9b5f2d3c6537cc415b/windowsdesktop-runtime-8.0.1-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/f18288f6-1732-415b-b577-7fb46510479a/a98239f751a7aed31bc4aa12f348a9bf/windowsdesktop-runtime-8.0.1-win-x64.exe'),
       '', False, False);
   end;
 end;
