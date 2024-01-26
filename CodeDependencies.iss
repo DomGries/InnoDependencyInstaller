@@ -415,11 +415,11 @@ end;
 procedure Dependency_AddDotNet70;
 begin
   // https://dotnet.microsoft.com/download/dotnet/7.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 7.0.13') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 7.0.15') then begin
     Dependency_Add('dotnet70' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Runtime 7.0.13' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/91a03ec1-d418-4d81-b664-545e2057b67f/b8b8066ac5d54b8c6c31960d678b5b30/dotnet-runtime-7.0.13-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/7f25ba8c-e2f3-4432-83c2-8ab41e361a3e/5201929d4c9b5752a47a9cf4d2b494e0/dotnet-runtime-7.0.13-win-x64.exe'),
+      '.NET Runtime 7.0.15' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/a0b41d8a-5de8-4dbc-b72b-6c52edf5727e/0b9b3b50a325c1b82ec17a5b63e92ea2/dotnet-runtime-7.0.15-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/83b58670-c0ea-4442-ad35-beb5009f5396/bcf1e10f57dbeea2f46490430abf6882/dotnet-runtime-7.0.15-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -427,11 +427,11 @@ end;
 procedure Dependency_AddDotNet70Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet/7.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 7.0.13') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 7.0.15') then begin
     Dependency_Add('dotnet70asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 7.0.13' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/6db4150d-11f3-4c21-b2c6-c81d5e6243db/3707dcce96dae59516a7679953df1ace/aspnetcore-runtime-7.0.13-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/2047544d-b948-480e-a4ce-2d5276d906dc/010c6e5c6b822dc2121c1d23f0820cf6/aspnetcore-runtime-7.0.13-win-x64.exe'),
+      'ASP.NET Core Runtime 7.0.15' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/23a3ba62-0a1a-4602-8ff9-003b33c52728/c221ac946c2a13484f5df1b655e96e26/aspnetcore-runtime-7.0.15-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/af20f5ce-cdf2-469c-ae29-20731dbdb49c/d9c568ae0fb44b91778aa74f6431f041/aspnetcore-runtime-7.0.15-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -439,15 +439,14 @@ end;
 procedure Dependency_AddDotNet70Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/7.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 7.0.13') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 7.0.15') then begin
     Dependency_Add('dotnet70desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 7.0.13' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/84986c79-dd13-4bbc-abef-294638d5864a/75d29754580986fef26b5d64ec880075/windowsdesktop-runtime-7.0.13-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/515cc796-e9f2-4b5c-be7f-b42f115a65a7/b0b146fcbf1d1c135807ff24b3d88093/windowsdesktop-runtime-7.0.13-win-x64.exe'),
+      '.NET Desktop Runtime 7.0.15' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/fd3675e7-91e6-4fce-9c77-9336a4973e42/e970987509babd919e8ea29309054c8c/windowsdesktop-runtime-7.0.15-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/00f765dd-f009-41b4-921f-bee1273f3638/3cb6ac95b2aa7eeb272c6179d56fd036/windowsdesktop-runtime-7.0.15-win-x64.exe'),
       '', False, False);
   end;
 end;
-
 
 procedure Dependency_AddDotNet80;
 begin
