@@ -656,6 +656,26 @@ begin
   end;
 end;
 
+procedure Dependency_AddAnyDesk;
+var
+  InstallLocation: String;
+begin
+  // Vérifie si AnyDesk est déjà installé en consultant la base de registre
+  if RegQueryStringValue(HKEY_LOCAL_MACHINE, 'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\AnyDesk', 'InstallLocation', InstallLocation) then
+  begin
+    // Si la clé de registre existe, AnyDesk est installé
+    Log('AnyDesk is already installed at: ' + InstallLocation);
+  end
+  else
+  begin
+      // https://anydesk.com
+      Dependency_Add('AnyDesk.exe',
+        '--install "C:\Program Files (x86)\AnyDesk" --start-with-win --silent --create-shortcuts --create-desktop-icon ',
+        'AnyDesk',
+        'https://download.anydesk.com/AnyDesk.exe',
+        '', False, False);
+  end;
+end;
 
 [Setup]
 ; -------------
