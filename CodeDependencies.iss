@@ -17,7 +17,7 @@ type
 var
   Dependency_Memo: String;
   Dependency_List: array of TDependency_Entry;
-  Dependency_NeedRestart, Dependency_ForceX86: Boolean;
+  Dependency_NeedRestart, Dependency_ForceX86, Dependency_IgnoreUpdateReadyMemoEvent: Boolean;
   Dependency_DownloadPage: TDownloadWizardPage;
 
 procedure Dependency_Add(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, RestartAfter: Boolean);
@@ -156,31 +156,34 @@ end;
 function Dependency_Internal3(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
   Result := '';
-  if MemoUserInfoInfo <> '' then begin
-    Result := Result + MemoUserInfoInfo + Newline + NewLine;
-  end;
-  if MemoDirInfo <> '' then begin
-    Result := Result + MemoDirInfo + Newline + NewLine;
-  end;
-  if MemoTypeInfo <> '' then begin
-    Result := Result + MemoTypeInfo + Newline + NewLine;
-  end;
-  if MemoComponentsInfo <> '' then begin
-    Result := Result + MemoComponentsInfo + Newline + NewLine;
-  end;
-  if MemoGroupInfo <> '' then begin
-    Result := Result + MemoGroupInfo + Newline + NewLine;
-  end;
-  if MemoTasksInfo <> '' then begin
-    Result := Result + MemoTasksInfo;
-  end;
 
-  if Dependency_Memo <> '' then begin
-    if MemoTasksInfo = '' then begin
-      Result := Result + SetupMessage(msgReadyMemoTasks);
+  if not Dependency_IgnoreUpdateReadyMemoEvent then begin
+      if MemoUserInfoInfo <> '' then begin
+        Result := Result + MemoUserInfoInfo + Newline + NewLine;
+      end;
+      if MemoDirInfo <> '' then begin
+        Result := Result + MemoDirInfo + Newline + NewLine;
+      end;
+      if MemoTypeInfo <> '' then begin
+        Result := Result + MemoTypeInfo + Newline + NewLine;
+      end;
+      if MemoComponentsInfo <> '' then begin
+        Result := Result + MemoComponentsInfo + Newline + NewLine;
+      end;
+      if MemoGroupInfo <> '' then begin
+        Result := Result + MemoGroupInfo + Newline + NewLine;
+      end;
+      if MemoTasksInfo <> '' then begin
+        Result := Result + MemoTasksInfo;
+      end;
+
+      if Dependency_Memo <> '' then begin
+        if MemoTasksInfo = '' then begin
+          Result := Result + SetupMessage(msgReadyMemoTasks);
+        end;
+        Result := Result + FmtMessage(Dependency_Memo, [Space]);
+      end;
     end;
-    Result := Result + FmtMessage(Dependency_Memo, [Space]);
-  end;
 end;
 
 <event('NeedRestart')>
