@@ -37,9 +37,6 @@ PrivilegesRequired=admin
 ; remove next line if you only deploy 32-bit binaries and dependencies
 ArchitecturesInstallIn64BitMode=x64
 
-; keep the next line if you want to prevent Setup from running on 32-bit Windows
-ArchitecturesAllowed=x64
-
 [Languages]
 Name: en; MessagesFile: "compiler:Default.isl"
 Name: fr; MessagesFile: "compiler:Languages\French.isl"
