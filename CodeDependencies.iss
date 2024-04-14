@@ -284,12 +284,24 @@ begin
 end;
 
 procedure Dependency_AddDotNet48;
+begin
+    // https://dotnet.microsoft.com/download/dotnet-framework/net48
+    if not IsDotNetInstalled(net48, 0) then begin
+      Dependency_Add('dotnetfx48.exe',
+        '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+        '.NET Framework 4.8',
+        'https://go.microsoft.com/fwlink/?LinkId=2085155',
+        '', False, False);
+    end;
+end;
+
+procedure Dependency_AddDotNet481;
 var
   Version: Cardinal;
 begin
   // https://dotnet.microsoft.com/download/dotnet-framework/net481
   if not RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', Version) or (Version < 533320) then begin
-    Dependency_Add('dotnetfx48.exe',
+    Dependency_Add('dotnetfx481.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.8.1',
       'https://go.microsoft.com/fwlink/?LinkId=2203304',

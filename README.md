@@ -74,6 +74,7 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * .NET Framework 4.5.2
     * .NET Framework 4.6.2
     * .NET Framework 4.7.2
+    * .NET Framework 4.8
     * .NET Framework 4.8.1
     * .NET Core 3.1 (Runtime, ASP.NET, Desktop)
     * .NET 5.0 (Runtime, ASP.NET, Desktop)
