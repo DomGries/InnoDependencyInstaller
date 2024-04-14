@@ -16,7 +16,7 @@ type
 var
   Dependency_Memo: String;
   Dependency_List: array of TDependency_Entry;
-  Dependency_NeedRestart, Dependency_ForceX86: Boolean;
+  Dependency_NeedToRestart, Dependency_ForceX86: Boolean;
   Dependency_DownloadPage: TDownloadWizardPage;
 
 procedure Dependency_Add(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, RestartAfter: Boolean);
@@ -46,13 +46,13 @@ begin
 end;
 
 <event('InitializeWizard')>
-procedure Dependency_Internal1;
+procedure Dependency_InitializeWizard;
 begin
   Dependency_DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
 end;
 
 <event('PrepareToInstall')>
-function Dependency_Internal2(var NeedsRestart: Boolean): String;
+function Dependency_PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   DependencyCount, DependencyIndex, ResultCode: Integer;
   Retry: Boolean;
@@ -104,7 +104,7 @@ begin
           if ShellExec('', ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
             if Dependency_List[DependencyIndex].RestartAfter then begin
               if DependencyIndex = DependencyCount - 1 then begin
-                Dependency_NeedRestart := True;
+                Dependency_NeedToRestart := True;
               end else begin
                 NeedsRestart := True;
                 Result := Dependency_List[DependencyIndex].Title;
@@ -117,7 +117,7 @@ begin
               Result := Dependency_List[DependencyIndex].Title;
               break;
             end else if ResultCode = 3010 then begin // ERROR_SUCCESS_REBOOT_REQUIRED (3010)
-              Dependency_NeedRestart := True;
+              Dependency_NeedToRestart := True;
               break;
             end;
           end;
@@ -151,8 +151,10 @@ begin
   end;
 end;
 
+#ifndef Dependency_NoUpdateReadyMemo
 <event('UpdateReadyMemo')>
-function Dependency_Internal3(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
+#endif
+function Dependency_UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
 begin
   Result := '';
   if MemoUserInfoInfo <> '' then begin
@@ -183,9 +185,9 @@ begin
 end;
 
 <event('NeedRestart')>
-function Dependency_Internal4: Boolean;
+function Dependency_NeedRestart: Boolean;
 begin
-  Result := Dependency_NeedRestart;
+  Result := Dependency_NeedToRestart;
 end;
 
 function Dependency_IsX64: Boolean;
