@@ -1,7 +1,6 @@
-﻿; https://github.com/DomGries/InnoDependencyInstaller
+﻿[Code]
+// https://github.com/DomGries/InnoDependencyInstaller
 
-
-[Code]
 // types and variables
 type
   TDependency_Entry = record
