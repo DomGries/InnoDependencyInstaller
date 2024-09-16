@@ -496,6 +496,42 @@ begin
   end;
 end;
 
+procedure Dependency_AddDotNet90;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/9.0
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.NETCore.App -v 9.0.0-rc.1') then begin
+    Dependency_Add('dotnet90' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Runtime 9.0.0 RC 1' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/e19676b9-e0d7-4ecb-b2ad-5e1ceeaf1d8d/93016ee5df25f623b959f49e546bf935/dotnet-runtime-9.0.0-rc.1.24431.7-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/98d8bcc9-a242-4b85-9764-e1fd3088cae9/71109ed672b325c05b895eba2afe3918/dotnet-runtime-9.0.0-rc.1.24431.7-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddDotNet90Asp;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/9.0
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.AspNetCore.App -v 9.0.0-rc.1') then begin
+    Dependency_Add('dotnet90asp' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      'ASP.NET Core Runtime 9.0.0 RC 1' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/9cd27e9e-80d6-46d1-b987-0ce1fa685d40/b7ed2424f5b1412da37da8b87dc5a11c/aspnetcore-runtime-9.0.0-rc.1.24452.1-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/3e0086bb-e60d-4357-a583-574e143fe998/926a13080470152c1d84eb618d92612b/aspnetcore-runtime-9.0.0-rc.1.24452.1-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddDotNet90Desktop;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/9.0
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.WindowsDesktop.App -v 9.0.0-rc.1') then begin
+    Dependency_Add('dotnet90desktop' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Desktop Runtime 9.0.0 RC 1' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/ad33dd90-1911-497e-87d9-f3506c17f87d/2c8aec980e150fa37a65b4bb115bfaf0/windowsdesktop-runtime-9.0.0-rc.1.24452.1-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/42d0d927-a9fd-4466-85b9-a92881127771/ada1c6949c9e4a173284391d91add261/windowsdesktop-runtime-9.0.0-rc.1.24452.1-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
 procedure Dependency_AddVC2005;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=26347
