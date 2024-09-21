@@ -479,7 +479,7 @@ begin
     Dependency_Add('dotnet80asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 8.0.3' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/e1efd12b-9598-4b70-ad83-496563ae3f7c/da67696e4232886f52d50bb8ecda5ab1/aspnetcore-runtime-8.0.3-win-x86.zip', 'https://download.visualstudio.microsoft.com/download/pr/e91876a9-1760-42cb-a6f4-97c57e9cca52/b433fcf4768929539f17e1908cb315bf/aspnetcore-runtime-8.0.3-win-x64.exe'),
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/bc6a4cfd-be25-4dc0-90e9-2000f740a66b/6c5e6422aec7a09a8cebc1dbe8e37971/aspnetcore-runtime-8.0.8-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/e91876a9-1760-42cb-a6f4-97c57e9cca52/b433fcf4768929539f17e1908cb315bf/aspnetcore-runtime-8.0.3-win-x64.exe'),
       '', False, False);
   end;
 end;
