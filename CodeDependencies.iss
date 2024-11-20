@@ -499,11 +499,11 @@ end;
 procedure Dependency_AddDotNet90;
 begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
-  if not Dependency_IsNetCoreInstalled('-n Microsoft.NETCore.App -v 9.0.0-rc.2') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.NETCore.App -v 9.0.0') then begin
     Dependency_Add('dotnet90' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Runtime 9.0.0 RC 2' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/508704e7-25d0-4df6-864a-f070091a7a6b/45ec71800b5b829815ba861e1f510e2c/dotnet-runtime-9.0.0-rc.2.24473.5-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/19f3f64f-4734-44d8-aa2b-aba6f2940bfe/405c15d5bd31713faaddf9cd9e8d4fc0/dotnet-runtime-9.0.0-rc.2.24473.5-win-x64.exe'),
+      '.NET Runtime 9.0.0' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/0e89cce9-dc02-423c-a657-0c2b421edf21/af2e916785775fe7e023b953af404db5/dotnet-runtime-9.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/99bd07c2-c95c-44dc-9d47-36d3b18df240/bdf26c62f69c1b783687c1dce83ccf7a/dotnet-runtime-9.0.0-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -511,11 +511,11 @@ end;
 procedure Dependency_AddDotNet90Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
-  if not Dependency_IsNetCoreInstalled('-n Microsoft.AspNetCore.App -v 9.0.0-rc.2') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.AspNetCore.App -v 9.0.0') then begin
     Dependency_Add('dotnet90asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 9.0.0 RC 2' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/a5f93dba-813b-45e5-8c8b-62ed494214b7/a28cec13a364ca326827bcb97211bd66/aspnetcore-runtime-9.0.0-rc.2.24474.3-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/a6506b9a-1839-476a-91c1-61ea79144b45/4158c6a3ba3eeccbaed806abcfad7d07/aspnetcore-runtime-9.0.0-rc.2.24474.3-win-x64.exe'),
+      'ASP.NET Core Runtime 9.0.0' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/70c1a68c-e5e4-45ef-9f2c-df1d3f195a2e/6b8e20fe1e45f886e464908cf18efd96/aspnetcore-runtime-9.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/815e6104-b92c-4cd5-8971-cba2f685002a/37befaa217f3269a152016da80a922c1/aspnetcore-runtime-9.0.0-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -523,11 +523,11 @@ end;
 procedure Dependency_AddDotNet90Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
-  if not Dependency_IsNetCoreInstalled('-n Microsoft.WindowsDesktop.App -v 9.0.0-rc.2') then begin
+  if not Dependency_IsNetCoreInstalled('-n Microsoft.WindowsDesktop.App -v 9.0.0') then begin
     Dependency_Add('dotnet90desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 9.0.0 RC 2' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/f6a4c462-a2a6-4488-9448-574b659c31e5/7eb8840cb5e42e0fd41a57964fe3472c/windowsdesktop-runtime-9.0.0-rc.2.24474.4-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/30d1fcdb-8bf1-4b6e-ad06-f66ed68017bf/20abf38df849587b0a2de99a31f5c1c8/windowsdesktop-runtime-9.0.0-rc.2.24474.4-win-x64.exe'),
+      '.NET Desktop Runtime 9.0.0' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/8dfbde7b-c316-418d-934a-d3246253f342/69c6a35b77a4f01b95588e1df2bddf9a/windowsdesktop-runtime-9.0.0-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/685792b6-4827-4dca-a971-bce5d7905170/1bf61b02151bc56e763dc711e45f0e1e/windowsdesktop-runtime-9.0.0-win-x64.exe'),
       '', False, False);
   end;
 end;
