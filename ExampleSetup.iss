@@ -1,9 +1,6 @@
 ﻿; https://github.com/DomGries/InnoDependencyInstaller
 
 
-; requires netcorecheck.exe and netcorecheck_x64.exe (see CodeDependencies.iss)
-#define public Dependency_Path_NetCoreCheck "dependencies\"
-
 ; requires dxwebsetup.exe (see CodeDependencies.iss)
 ;#define public Dependency_Path_DirectX "dependencies\"
 
@@ -70,7 +67,6 @@ begin
   Dependency_AddDotNet47;
   Dependency_AddDotNet48;
 
-#ifdef Dependency_Path_NetCoreCheck
   Dependency_AddNetCore31;
   Dependency_AddNetCore31Asp;
   Dependency_AddNetCore31Desktop;
@@ -89,7 +85,6 @@ begin
   Dependency_AddDotNet90;
   Dependency_AddDotNet90Asp;
   Dependency_AddDotNet90Desktop;
-#endif
 
   Dependency_AddVC2005;
   Dependency_AddVC2008;

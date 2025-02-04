@@ -6,7 +6,7 @@
 
 ## Installation and Usage
 
-1. Download and install [Inno Setup 6.2+](https://www.jrsoftware.org/isinfo.php).
+1. Download and install [Inno Setup 6.4+](https://www.jrsoftware.org/isinfo.php).
 2. Download [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
 3. Open the extracted _ExampleSetup.iss_ file.
 4. Comment out dependency function calls inside _InitializeSetup_ function to disable installing them:
