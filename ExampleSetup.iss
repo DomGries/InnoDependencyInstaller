@@ -66,6 +66,7 @@ begin
   Dependency_AddDotNet46;
   Dependency_AddDotNet47;
   Dependency_AddDotNet48;
+  //Dependency_AddDotNet481;
 
   Dependency_AddNetCore31;
   Dependency_AddNetCore31Asp;

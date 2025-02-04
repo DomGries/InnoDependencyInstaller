@@ -317,11 +317,9 @@ begin
 end;
 
 procedure Dependency_AddDotNet481;
-var
-  Version: Cardinal;
 begin
   // https://dotnet.microsoft.com/download/dotnet-framework/net481
-  if not RegQueryDWordValue(HKLM, 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full', 'Release', Version) or (Version < 533320) then begin
+  if not IsDotNetInstalled(net481, 0) then begin
     Dependency_Add('dotnetfx481.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Framework 4.8.1',
