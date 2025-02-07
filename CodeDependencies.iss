@@ -227,8 +227,7 @@ var
   PackedVersion: Int64;
   LineMajor, LineMinor, LineRevision, LineBuild: Word;
 begin
-  Result := False;
-  if ExecAndCaptureOutput(ExpandConstant('{cmd}'),'/C dotnet --list-runtimes', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
+  if ExecAndCaptureOutput(ExpandConstant(Dependency_String('{commonpf32}', '{commonpf64}')) + '\dotnet\dotnet.exe', '--list-runtimes', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
     for LineIndex := 0 to Length(Output.StdOut) - 1 do begin
       LineParts := StringSplit(Trim(Output.StdOut[LineIndex]), [' '], stExcludeEmpty);
 
@@ -237,11 +236,12 @@ begin
 
         if (LineMajor = Major) and (LineMinor = Minor) and (LineRevision >= Revision) then begin
           Result := True;
-          break;
+          exit;
         end;
       end;
     end;
   end;
+  Result := False;
 end;
 
 procedure Dependency_AddDotNet35;
