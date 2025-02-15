@@ -220,6 +220,7 @@ end;
 
 function Dependency_IsNetCoreInstalled(Runtime: String; Major, Minor, Revision: Word): Boolean;
 var
+  Path: String;
   ResultCode: Integer;
   Output: TExecOutput;
   LineIndex: Integer;
@@ -227,7 +228,10 @@ var
   PackedVersion: Int64;
   LineMajor, LineMinor, LineRevision, LineBuild: Word;
 begin
-  if ExecAndCaptureOutput(ExpandConstant(Dependency_String('{commonpf32}', '{commonpf64}')) + '\dotnet\dotnet.exe', '--list-runtimes', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
+  if not RegQueryStringValue(HKLM32, 'SOFTWARE\dotnet\Setup\InstalledVersions\x' + Dependency_String('86', '64'), 'InstallLocation', Path) or not FileExists(Path + 'dotnet.exe') then begin
+    Path := ExpandConstant(Dependency_String('{commonpf32}', '{commonpf64}')) + '\dotnet\';
+  end;
+  if ExecAndCaptureOutput(Path + 'dotnet.exe', '--list-runtimes', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
     for LineIndex := 0 to Length(Output.StdOut) - 1 do begin
       LineParts := StringSplit(Trim(Output.StdOut[LineIndex]), [' '], stExcludeEmpty);
 
