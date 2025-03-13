@@ -484,6 +484,43 @@ begin
   end;
 end;
 
+
+procedure Dependency_AddDotNet90;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/9.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App 9.0.3') then begin
+    Dependency_Add('dotnet80' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Runtime 9.0.3' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/3500ef5d-0841-4b4e-87f3-a64ddf39fba1/1bad0a48cdcd6e69677321e1c354c194/dotnet-runtime-9.0.3-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/0234f264-bfe0-4f2f-b37f-a1564c746642/47fe774e87dfb99537cd475cdf32f62f/dotnet-runtime-9.0.3-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddDotNet90Asp;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/9.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App 9.0.3') then begin
+    Dependency_Add('dotnet80asp' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      'ASP.NET Core Runtime 9.0.3' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/38c1b207-6261-4fa0-a133-27f25586d97a/8c3ab4eccb3e7c777520e362979db086/aspnetcore-runtime-9.0.3-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/9af55977-0e45-4500-8d1d-dc7f9195558a/c69aa6b827d50faecc2b4b0da5214aa6/aspnetcore-runtime-9.0.3-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddDotNet90Desktop;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/9.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App 9.0.3') then begin
+    Dependency_Add('dotnet80desktop' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Desktop Runtime 9.0.3' + Dependency_ArchTitle,
+      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/48649e20-00b9-43d4-95df-112b80ff7d4e/5652d3ca690f5dc13bbb93ec816c763c/windowsdesktop-runtime-9.0.3-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/63f0335a-6012-4017-845f-5d655d56a44f/f8d5150469889387a1de578d45415201/windowsdesktop-runtime-9.0.3-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
 procedure Dependency_AddVC2005;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=26347
