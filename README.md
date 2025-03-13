@@ -6,7 +6,7 @@
 
 ## Installation and Usage
 
-1. Download and install [Inno Setup 6.2+](https://www.jrsoftware.org/isinfo.php).
+1. Download and install [Inno Setup 6.4+](https://www.jrsoftware.org/isinfo.php).
 2. Download [this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) or clone it.
 3. Open the extracted _CodeDependencies.iss_ file.
 4. Comment out dependency defines to disable installing them in the example setup and leave only dependencies that need to be installed:
@@ -15,14 +15,13 @@
    ;#define UseVC2013 <-- commented out and not installed in example setup
    ```
 5. Modify other sections like _[Setup] [Files] [Icons]_ as necessary.
-6. Build setup using Inno Setup compiler.
+6. Build the setup using Inno Setup compiler.
 
 ## Integration
 
-You can include _CodeDependencies.iss_ file into your setup by disabling compilation of the example setup before and calling the dependency install functions as needed:
+You can also just include _CodeDependencies.iss_ file into your setup and call the desired _Dependency_Add_ functions (some may need defining their exe file path before the include):
 
 ```iss
-#define public Dependency_NoExampleSetup
 #include "CodeDependencies.iss"
 
 [Setup]
@@ -32,7 +31,7 @@ You can include _CodeDependencies.iss_ file into your setup by disabling compila
 function InitializeSetup: Boolean;
 begin
   // add the dependencies you need
-  Dependency_AddVC2013;
+  Dependency_AddDotNet90;
   // ...
 
   Result := True;
@@ -41,7 +40,7 @@ end;
 
 ## Details
 
-You have two ways to distribute the dependency installers. By default, the dependency will be downloaded from the official website once it is defined as required in the _CodeDependencies.iss_ file. Another way is to pack the dependency into a single executable setup like so:
+You have two ways to distribute the dependency installers. By default, most dependencies will be downloaded from the official website. Another way is to pack the dependency into a single executable setup like so:
 
 - Include the dependency setup file by defining the source:
 
@@ -55,7 +54,15 @@ You have two ways to distribute the dependency installers. By default, the depen
   ExtractTemporaryFile('dxwebsetup.exe');
   ```
 
-The installation routine of the dependencies is automatic, and in quiet or semi quiet mode. Therefore no user interaction is needed.
+The dependencies are installed based on the system architecture. If you want to install 32-bit dependencies on a 64-bit system you can force 32-bit mode like so:
+
+```iss
+Dependency_ForceX86 := True; // force 32-bit install of next dependencies
+Dependency_AddVC2013;
+Dependency_ForceX86 := False; // disable forced 32-bit install again
+```
+
+If you only deploy 32-bit binaries and dependencies you can also instead just not define [ArchitecturesInstallIn64BitMode](https://jrsoftware.org/ishelp/index.php?topic=setup_architecturesinstallin64bitmode) in [Setup].
 
 ## Dependencies
 
