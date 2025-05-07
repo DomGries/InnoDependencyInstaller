@@ -518,7 +518,7 @@ begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
   if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 9, 0, 4) then begin
     Dependency_Add('dotnet90' + Dependency_ArchSuffix + '.exe',
-      '/lcid ' + IntToStr(GetUILanguage) + ' /quiet /norestart',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Runtime 9.0.4' + Dependency_ArchTitle,
       Dependency_String('https://builds.dotnet.microsoft.com/dotnet/Runtime/9.0.4/dotnet-runtime-9.0.4-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/9.0.4/dotnet-runtime-9.0.4-win-x64.exe'),
       '', False, False);
@@ -530,7 +530,7 @@ begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
   if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 9, 0, 4) then begin
     Dependency_Add('dotnet90asp' + Dependency_ArchSuffix + '.exe',
-      '/lcid ' + IntToStr(GetUILanguage) + ' /quiet /norestart',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       'ASP.NET Core Runtime 9.0.4' + Dependency_ArchTitle,
       Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/9.0.4/aspnetcore-runtime-9.0.4-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/9.0.4/aspnetcore-runtime-9.0.4-win-x64.exe'),
       '', False, False);
@@ -542,7 +542,7 @@ begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
   if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 9, 0, 4) then begin
     Dependency_Add('dotnet90desktop' + Dependency_ArchSuffix + '.exe',
-      '/lcid ' + IntToStr(GetUILanguage) + ' /quiet /norestart',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 9.0.4' + Dependency_ArchTitle,
       Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/9.0.4/windowsdesktop-runtime-9.0.4-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/9.0.4/windowsdesktop-runtime-9.0.4-win-x64.exe'),
       '', False, False);
