@@ -208,14 +208,25 @@ begin
   end;
 end;
 
+function Dependency_StringNew(const x86, x64, arm64: String): String;
+begin
+  if Dependency_IsX64 then begin
+    Result := x64;
+  end else if IsArm64 then begin
+    Result :=arm64;
+  end else begin
+    Result := x86;
+  end;
+end;
+
 function Dependency_ArchSuffix: String;
 begin
-  Result := Dependency_String('', '_x64');
+  Result := Dependency_StringNew('', '_x64', '_arm64');
 end;
 
 function Dependency_ArchTitle: String;
 begin
-  Result := Dependency_String(' (x86)', ' (x64)');
+  Result := Dependency_StringNew(' (x86)', ' (x64)', ' (arm64)');
 end;
 
 function Dependency_IsNetCoreInstalled(Runtime: String; Major, Minor, Revision: Word): Boolean;
@@ -435,8 +446,10 @@ begin
     Dependency_Add('dotnet60desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
       '.NET Desktop Runtime 6.0.36' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/cdc314df-4a4c-4709-868d-b974f336f77f/acd5ab7637e456c8a3aa667661324f6d/windowsdesktop-runtime-6.0.36-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/f6b6c5dc-e02d-4738-9559-296e938dabcb/b66d365729359df8e8ea131197715076/windowsdesktop-runtime-6.0.36-win-x64.exe'),
-      '', False, False);
+        Dependency_StringNew('https://download.visualstudio.microsoft.com/download/pr/cdc314df-4a4c-4709-868d-b974f336f77f/acd5ab7637e456c8a3aa667661324f6d/windowsdesktop-runtime-6.0.36-win-x86.exe',
+        'https://download.visualstudio.microsoft.com/download/pr/f6b6c5dc-e02d-4738-9559-296e938dabcb/b66d365729359df8e8ea131197715076/windowsdesktop-runtime-6.0.36-win-x64.exe',
+        'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-arm64.exe'),
+        '', False, False);
   end;
 end;
 
@@ -612,11 +625,15 @@ end;
 procedure Dependency_AddVC2015To2022;
 begin
   // https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
-  if not IsMsiProductInstalled(Dependency_String('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 42, 34433, 0)) then begin
+  if not IsMsiProductInstalled(Dependency_StringNew('{65E5BD06-6392-3027-8C26-853107D3CF1A}',
+  '{36F68A90-239C-34DF-B58C-64B30153CE35}',
+  '{DC9BAE42-810B-423A-9E25-E4073F1C7B00}' ), PackVersionComponents(14, 42, 34433, 0)) then begin
     Dependency_Add('vcredist2022' + Dependency_ArchSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2015-2022 Redistributable' + Dependency_ArchTitle,
-      Dependency_String('https://aka.ms/vs/17/release/vc_redist.x86.exe', 'https://aka.ms/vs/17/release/vc_redist.x64.exe'),
+      Dependency_StringNew('https://aka.ms/vs/17/release/vc_redist.x86.exe', 
+      'https://aka.ms/vs/17/release/vc_redist.x64.exe',
+      'https://aka.ms/vs/17/release/vc_redist.arm64.exe'),
       '', False, False);
   end;
 end;
