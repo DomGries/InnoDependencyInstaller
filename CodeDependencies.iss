@@ -516,11 +516,11 @@ end;
 procedure Dependency_AddDotNet90;
 begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 9, 0, 6) then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 9, 0, 10) then begin
     Dependency_Add('dotnet90' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Runtime 9.0.6' + Dependency_ArchTitle,
-      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/Runtime/9.0.6/dotnet-runtime-9.0.6-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/9.0.6/dotnet-runtime-9.0.6-win-x64.exe'),
+      '.NET Runtime 9.0.10' + Dependency_ArchTitle,
+      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/Runtime/9.0.10/dotnet-runtime-9.0.10-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/9.0.10/dotnet-runtime-9.0.10-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -528,11 +528,11 @@ end;
 procedure Dependency_AddDotNet90Asp;
 begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 9, 0, 6) then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 9, 0, 10) then begin
     Dependency_Add('dotnet90asp' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      'ASP.NET Core Runtime 9.0.6' + Dependency_ArchTitle,
-      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/9.0.6/aspnetcore-runtime-9.0.6-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/9.0.6/aspnetcore-runtime-9.0.6-win-x64.exe'),
+      'ASP.NET Core Runtime 9.0.10' + Dependency_ArchTitle,
+      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/9.0.10/aspnetcore-runtime-9.0.10-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/9.0.10/aspnetcore-runtime-9.0.10-win-x64.exe'),
       '', False, False);
   end;
 end;
@@ -540,11 +540,11 @@ end;
 procedure Dependency_AddDotNet90Desktop;
 begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 9, 0, 6) then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 9, 0, 10) then begin
     Dependency_Add('dotnet90desktop' + Dependency_ArchSuffix + '.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
-      '.NET Desktop Runtime 9.0.6' + Dependency_ArchTitle,
-      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/9.0.6/windowsdesktop-runtime-9.0.6-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/9.0.6/windowsdesktop-runtime-9.0.6-win-x64.exe'),
+      '.NET Desktop Runtime 9.0.10' + Dependency_ArchTitle,
+      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/9.0.10/windowsdesktop-runtime-9.0.10-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/9.0.10/windowsdesktop-runtime-9.0.10-win-x64.exe'),
       '', False, False);
   end;
 end;
