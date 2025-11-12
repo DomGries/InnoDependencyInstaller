@@ -549,6 +549,42 @@ begin
   end;
 end;
 
+procedure Dependency_AddDotNet100;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/10.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 10, 0, 0) then begin
+    Dependency_Add('dotnet100' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Runtime 10.0.0' + Dependency_ArchTitle,
+      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/Runtime/10.0.0/dotnet-runtime-10.0.0-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/10.0.0/dotnet-runtime-10.0.0-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddDotNet100Asp;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/10.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 10, 0, 0) then begin
+    Dependency_Add('dotnet100asp' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      'ASP.NET Core Runtime 10.0.0' + Dependency_ArchTitle,
+      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/10.0.0/aspnetcore-runtime-10.0.0-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/10.0.0/aspnetcore-runtime-10.0.0-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
+procedure Dependency_AddDotNet100Desktop;
+begin
+  // https://dotnet.microsoft.com/download/dotnet/10.0
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 10, 0, 0) then begin
+    Dependency_Add('dotnet100desktop' + Dependency_ArchSuffix + '.exe',
+      '/lcid ' + IntToStr(GetUILanguage) + ' /passive /norestart',
+      '.NET Desktop Runtime 10.0.0' + Dependency_ArchTitle,
+      Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.0/windowsdesktop-runtime-10.0.0-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/10.0.0/windowsdesktop-runtime-10.0.0-win-x64.exe'),
+      '', False, False);
+  end;
+end;
+
 procedure Dependency_AddVC2005;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=26347

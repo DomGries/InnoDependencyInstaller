@@ -86,6 +86,9 @@ begin
   Dependency_AddDotNet90;
   Dependency_AddDotNet90Asp;
   Dependency_AddDotNet90Desktop;
+  Dependency_AddDotNet100;
+  Dependency_AddDotNet100Asp;
+  Dependency_AddDotNet100Desktop;
 
   Dependency_AddVC2005;
   Dependency_AddVC2008;
