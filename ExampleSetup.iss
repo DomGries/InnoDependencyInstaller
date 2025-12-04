@@ -1,4 +1,4 @@
-﻿; https://github.com/DomGries/InnoDependencyInstaller
+; https://github.com/DomGries/InnoDependencyInstaller
 
 
 ; requires dxwebsetup.exe (see CodeDependencies.iss)
@@ -67,25 +67,15 @@ begin
   Dependency_AddDotNet47;
   Dependency_AddDotNet48;
   //Dependency_AddDotNet481;
-
-  Dependency_AddNetCore31;
-  Dependency_AddNetCore31Asp;
-  Dependency_AddNetCore31Desktop;
-  Dependency_AddDotNet50;
-  Dependency_AddDotNet50Asp;
-  Dependency_AddDotNet50Desktop;
-  Dependency_AddDotNet60;
-  Dependency_AddDotNet60Asp;
-  Dependency_AddDotNet60Desktop;
-  Dependency_AddDotNet70;
-  Dependency_AddDotNet70Asp;
-  Dependency_AddDotNet70Desktop;
   Dependency_AddDotNet80;
   Dependency_AddDotNet80Asp;
   Dependency_AddDotNet80Desktop;
   Dependency_AddDotNet90;
   Dependency_AddDotNet90Asp;
   Dependency_AddDotNet90Desktop;
+  Dependency_AddDotNet100;
+  Dependency_AddDotNet100Asp;
+  Dependency_AddDotNet100Desktop;
 
   Dependency_AddVC2005;
   Dependency_AddVC2008;
