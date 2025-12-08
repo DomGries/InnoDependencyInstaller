@@ -82,9 +82,12 @@ jobs:
             if ($issContent -match [regex]::Escape($runtimeProcPattern)) {
               Write-Host "Found $versionLabel procedures in CodeDependencies.iss - keeping but marking as EOL in README..."
               
+              # Escape channel for use in regex patterns
+              $escapedChannel = [regex]::Escape($channel)
+              
               # Check if already marked as EOL in README
-              $eolPattern = "\* \.NET (Core )?${channel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\) - \*\*EOL\*\*"
-              $notEolPattern = "(\* \.NET (Core )?${channel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\))(?! - \*\*EOL\*\*)"
+              $eolPattern = "\* \.NET (Core )?${escapedChannel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\) - \*\*EOL\*\*"
+              $notEolPattern = "(\* \.NET (Core )?${escapedChannel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\))(?! - \*\*EOL\*\*)"
               
               if ($readmeContent -match $eolPattern) {
                 Write-Host "$versionLabel already marked as EOL in README.md"
