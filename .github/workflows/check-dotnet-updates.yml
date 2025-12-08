@@ -57,51 +57,49 @@ jobs:
 
           # Read ExampleSetup.iss file for EOL version removal
           $exampleSetupContent = Get-Content -Path "ExampleSetup.iss" -Raw
-          $removedVersions = @()
+          $deprecatedVersions = @()
 
-          # Process EOL versions - remove from code and documentation
+          # Process EOL versions - mark as deprecated in README, keep in code, remove from examples
           foreach ($versionInfo in $eolVersions) {
             $channel = $versionInfo.'channel-version'
             $major = [int]($channel -split '\.')[0]
             $minor = [int]($channel -split '\.')[1]
 
-            Write-Host "`nProcessing EOL .NET $channel for removal..."
+            Write-Host "`nProcessing EOL .NET $channel to mark as deprecated..."
 
             # Determine the procedure name patterns based on version
             # .NET Core 3.1 uses "NetCore31", .NET 5+ uses "DotNet{major}0"
             if ($major -eq 3 -and $minor -eq 1) {
               $procNameBase = "NetCore31"
-              $readmePattern = "\* \.NET Core 3\.1 \(Runtime, ASP\.NET, Desktop\)\r?\n?"
               $versionLabel = ".NET Core 3.1"
             } else {
               $procNameBase = "DotNet${major}0"
-              $readmePattern = "\* \.NET ${major}\.0(\.\d+)? \(Runtime, ASP\.NET, Desktop\)\r?\n?"
               $versionLabel = ".NET ${major}.0"
             }
 
             # Check if procedures exist in CodeDependencies.iss
             $runtimeProcPattern = "procedure Dependency_Add${procNameBase};"
             if ($issContent -match [regex]::Escape($runtimeProcPattern)) {
-              Write-Host "Found $versionLabel procedures in CodeDependencies.iss - removing..."
-              $updatesFound = $true
-              $removedVersions += $versionLabel
-
-              # Remove Runtime procedure - matches from "procedure Dependency_Add{Name};" to the next "procedure" or "end;"
-              $issContent = $issContent -replace `
-                "(?s)procedure Dependency_Add${procNameBase};.*?end;\r?\n\r?\n", ""
-
-              # Remove ASP.NET procedure
-              $issContent = $issContent -replace `
-                "(?s)procedure Dependency_Add${procNameBase}Asp;.*?end;\r?\n\r?\n", ""
-
-              # Remove Desktop procedure
-              $issContent = $issContent -replace `
-                "(?s)procedure Dependency_Add${procNameBase}Desktop;.*?end;\r?\n\r?\n", ""
-
-              # Remove from README.md
-              $readmeContent = $readmeContent -replace $readmePattern, ""
+              Write-Host "Found $versionLabel procedures in CodeDependencies.iss - keeping but marking as deprecated in README..."
+              
+              # Check if already marked as deprecated in README
+              $deprecatedPattern = "\* \.NET (Core )?${channel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\) - \*\*DEPRECATED\*\*"
+              $notDeprecatedPattern = "(\* \.NET (Core )?${channel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\))(?! - \*\*DEPRECATED\*\*)"
+              
+              if ($readmeContent -match $deprecatedPattern) {
+                Write-Host "$versionLabel already marked as deprecated in README.md"
+              } elseif ($readmeContent -match $notDeprecatedPattern) {
+                # Add DEPRECATED marker to existing entry
+                $readmeContent = $readmeContent -replace $notDeprecatedPattern, "`$1 - **DEPRECATED**"
+                Write-Host "Marked $versionLabel as deprecated in README.md"
+                $updatesFound = $true
+                $deprecatedVersions += $versionLabel
+              } else {
+                Write-Host "$versionLabel not found in README.md - may need to be added as deprecated"
+              }
 
               # Remove EOL version calls from ExampleSetup.iss entirely (including commented ones)
+              # Examples should only show currently supported versions
               $exampleSetupContent = $exampleSetupContent -replace `
                 "(?m)^\s*(?://)?Dependency_Add${procNameBase};.*\r?\n", ""
               $exampleSetupContent = $exampleSetupContent -replace `
@@ -109,7 +107,7 @@ jobs:
               $exampleSetupContent = $exampleSetupContent -replace `
                 "(?m)^\s*(?://)?Dependency_Add${procNameBase}Desktop;.*\r?\n", ""
 
-              Write-Host "Removed $versionLabel from CodeDependencies.iss, README.md, and ExampleSetup.iss"
+              Write-Host "Kept $versionLabel in CodeDependencies.iss, marked as deprecated in README.md, removed from ExampleSetup.iss"
             } else {
               Write-Host "$versionLabel not found in CodeDependencies.iss - already removed or not present"
             }
@@ -304,13 +302,13 @@ jobs:
 
             # Set outputs for the next step
             $summaryText = $updateSummary -join ", "
-            $removedText = $removedVersions -join ", "
+            $deprecatedText = $deprecatedVersions -join ", "
             "updates_found=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
             "summary=$summaryText" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-            "removed=$removedText" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "deprecated=$deprecatedText" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
             Write-Host "Updates found: $summaryText"
-            if ($removedVersions.Count -gt 0) {
-              Write-Host "EOL versions removed: $removedText"
+            if ($deprecatedVersions.Count -gt 0) {
+              Write-Host "EOL versions marked as deprecated: $deprecatedText"
             }
           } else {
             "updates_found=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
@@ -322,25 +320,25 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update .NET dependencies: ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.removed && format(' | Removed EOL: {0}', steps.check-updates.outputs.removed) || '' }}"
-          title: "Update .NET dependencies: ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.removed && format(' | Removed EOL: {0}', steps.check-updates.outputs.removed) || '' }}"
+          commit-message: "Update .NET dependencies: ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.deprecated && format(' | Deprecated EOL: {0}', steps.check-updates.outputs.deprecated) || '' }}"
+          title: "Update .NET dependencies: ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.deprecated && format(' | Deprecated EOL: {0}', steps.check-updates.outputs.deprecated) || '' }}"
           body: |
             This PR updates the .NET runtime dependencies.
 
             ## Updates
             ${{ steps.check-updates.outputs.summary || 'No version updates' }}
 
-            ## EOL Versions Removed
-            ${{ steps.check-updates.outputs.removed || 'None' }}
+            ## EOL Versions Marked as Deprecated
+            ${{ steps.check-updates.outputs.deprecated || 'None' }}
 
             The following files have been updated:
-            - `CodeDependencies.iss` - Updated versions and removed EOL procedures
-            - `README.md` - Updated version documentation and removed EOL entries
-            - `ExampleSetup.iss` - Removed EOL version function calls
+            - `CodeDependencies.iss` - Updated versions (EOL versions kept for compatibility)
+            - `README.md` - Updated version documentation and marked EOL entries as deprecated
+            - `ExampleSetup.iss` - Removed EOL version function calls (examples show only supported versions)
 
-            > **Note:** Only actively supported .NET versions are maintained.
+            > **Note:** Only actively supported .NET versions are shown in examples.
             > Version support status is determined dynamically from Microsoft's releases-index.json.
-            > EOL (end-of-life) versions are automatically removed from the codebase.
+            > EOL (end-of-life) versions are marked as **DEPRECATED** in the README but kept in CodeDependencies.iss for backward compatibility.
 
             ---
             *This PR was automatically created by the Check .NET Updates workflow.*
