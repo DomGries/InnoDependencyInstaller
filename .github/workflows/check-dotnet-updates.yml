@@ -96,7 +96,7 @@ jobs:
                 Write-Host "$versionLabel already marked as EOL in README.md"
               } elseif ($readmeContent -match $notEolPattern) {
                 # Add EOL marker to existing entry
-                # Note: `$1 uses backtick (`) to escape the dollar sign in PowerShell replacement strings
+                # Note: In PowerShell, `$1 uses backtick (`) to escape $ and reference the first capture group
                 $readmeContent = $readmeContent -replace $notEolPattern, "`$1 - **EOL**"
                 Write-Host "Marked $versionLabel as EOL in README.md"
                 $updatesFound = $true
