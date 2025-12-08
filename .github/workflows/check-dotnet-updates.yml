@@ -85,14 +85,18 @@ jobs:
               # Escape channel for use in regex patterns
               $escapedChannel = [regex]::Escape($channel)
               
+              # Define base pattern for matching .NET version entries in README
+              $basePattern = "\.NET (Core )?${escapedChannel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\)"
+              
               # Check if already marked as EOL in README
-              $eolPattern = "\* \.NET (Core )?${escapedChannel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\) - \*\*EOL\*\*"
-              $notEolPattern = "(\* \.NET (Core )?${escapedChannel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\))(?! - \*\*EOL\*\*)"
+              $eolPattern = "\* ${basePattern} - \*\*EOL\*\*"
+              $notEolPattern = "(\* ${basePattern})(?! - \*\*EOL\*\*)"
               
               if ($readmeContent -match $eolPattern) {
                 Write-Host "$versionLabel already marked as EOL in README.md"
               } elseif ($readmeContent -match $notEolPattern) {
                 # Add EOL marker to existing entry
+                # Note: `$1 uses backtick (`) to escape the dollar sign in PowerShell replacement strings
                 $readmeContent = $readmeContent -replace $notEolPattern, "`$1 - **EOL**"
                 Write-Host "Marked $versionLabel as EOL in README.md"
                 $updatesFound = $true
