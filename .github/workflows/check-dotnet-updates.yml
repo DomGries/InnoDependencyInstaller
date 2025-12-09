@@ -105,16 +105,19 @@ jobs:
                 Write-Host "$versionLabel not found in README.md - may need to be added as EOL"
               }
 
-              # Remove EOL version calls from ExampleSetup.iss entirely (including commented ones)
-              # Examples should only show currently supported versions
-              $exampleSetupContent = $exampleSetupContent -replace `
-                "(?m)^\s*(?://)?Dependency_Add${procNameBase};.*\r?\n", ""
-              $exampleSetupContent = $exampleSetupContent -replace `
-                "(?m)^\s*(?://)?Dependency_Add${procNameBase}Asp;.*\r?\n", ""
-              $exampleSetupContent = $exampleSetupContent -replace `
-                "(?m)^\s*(?://)?Dependency_Add${procNameBase}Desktop;.*\r?\n", ""
+              # Comment out EOL version calls in ExampleSetup.iss with EOL marker for discoverability
+              # Keep them in the example so users can discover they exist for legacy applications
+              # This handles both uncommented and already-commented EOL lines, ensuring consistent format
+              # Use a loop to avoid code duplication
+              $suffixes = @("", "Asp", "Desktop")
+              foreach ($suffix in $suffixes) {
+                # Pattern only matches lines with no comment or existing EOL comments, preserving other inline comments
+                $pattern = "(?m)^(\s*)(?://)?Dependency_Add${procNameBase}${suffix};(?:\s*//\s*EOL.*)?$"
+                $replacement = "`${1}//Dependency_Add${procNameBase}${suffix}; // EOL - $versionLabel"
+                $exampleSetupContent = $exampleSetupContent -replace $pattern, $replacement
+              }
 
-              Write-Host "Kept $versionLabel in CodeDependencies.iss, marked as EOL in README.md, removed from ExampleSetup.iss"
+              Write-Host "Kept $versionLabel in CodeDependencies.iss, marked as EOL in README.md, commented out in ExampleSetup.iss"
             } else {
               Write-Host "$versionLabel not found in CodeDependencies.iss - already removed or not present"
             }
@@ -341,9 +344,9 @@ jobs:
             The following files have been updated:
             - `CodeDependencies.iss` - Updated versions (EOL versions kept for compatibility)
             - `README.md` - Updated version documentation and marked EOL entries
-            - `ExampleSetup.iss` - Removed EOL version function calls (examples show only supported versions)
+            - `ExampleSetup.iss` - EOL version function calls commented out with EOL markers for discoverability
 
-            > **Note:** Only actively supported .NET versions are shown in examples.
+            > **Note:** EOL (end-of-life) versions are commented out in examples but kept for discoverability.
             > Version support status is determined dynamically from Microsoft's releases-index.json.
             > EOL (end-of-life) versions are marked as **EOL** in the README but kept in CodeDependencies.iss for backward compatibility.
 
