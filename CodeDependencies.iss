@@ -1,4 +1,4 @@
-﻿[Code]
+[Code]
 // https://github.com/DomGries/InnoDependencyInstaller
 
 // types and variables

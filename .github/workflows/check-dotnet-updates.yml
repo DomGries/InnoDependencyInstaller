@@ -1,0 +1,357 @@
+name: Check .NET Updates
+
+on:
+  schedule:
+    # Run weekly on Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    # Allow manual triggering
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for .NET updates
+        id: check-updates
+        shell: pwsh
+        run: |
+          # Base URL for Microsoft's .NET release metadata API
+          $apiBaseUrl = "https://dotnetcli.azureedge.net/dotnet/release-metadata"
+
+          $updatesFound = $false
+          $updateSummary = @()
+
+          # Read the current CodeDependencies.iss file
+          $issContent = Get-Content -Path "CodeDependencies.iss" -Raw
+          $readmeContent = Get-Content -Path "README.md" -Raw
+
+          # Fetch the releases index to get currently supported versions
+          Write-Host "Fetching .NET releases index..."
+          try {
+            $releasesIndex = Invoke-RestMethod -Uri "$apiBaseUrl/releases-index.json" -ErrorAction Stop
+          } catch {
+            Write-Error "Failed to fetch releases index: $_"
+            exit 1
+          }
+
+          # Get all .NET versions from the releases index
+          # - Include .NET Core 3.1 and all .NET 5+ versions
+          # - Exclude legacy .NET Core 1.x and 2.x versions (not supported by this project)
+          $allVersions = $releasesIndex.'releases-index' | Where-Object { 
+            $_.'channel-version' -match '^\d+\.\d+$' -and 
+            [int]($_.'channel-version' -split '\.')[0] -ge 3
+          }
+
+          $supportedVersions = $allVersions | Where-Object { $_.'support-phase' -eq 'active' } | Sort-Object { [int]($_.'channel-version' -split '\.')[0] }
+          $eolVersions = $allVersions | Where-Object { $_.'support-phase' -eq 'eol' }
+
+          Write-Host "Supported .NET versions: $($supportedVersions.'channel-version' -join ', ')"
+          Write-Host "End-of-life .NET versions: $($eolVersions.'channel-version' -join ', ')"
+
+          # Read ExampleSetup.iss file for EOL version removal
+          $exampleSetupContent = Get-Content -Path "ExampleSetup.iss" -Raw
+          $eolMarkedVersions = @()
+
+          # Process EOL versions - mark as EOL in README, keep in code, remove from examples
+          foreach ($versionInfo in $eolVersions) {
+            $channel = $versionInfo.'channel-version'
+            $major = [int]($channel -split '\.')[0]
+            $minor = [int]($channel -split '\.')[1]
+
+            Write-Host "`nProcessing EOL .NET $channel to mark as EOL..."
+
+            # Determine the procedure name patterns based on version
+            # .NET Core 3.1 uses "NetCore31", .NET 5+ uses "DotNet{major}0"
+            if ($major -eq 3 -and $minor -eq 1) {
+              $procNameBase = "NetCore31"
+              $versionLabel = ".NET Core 3.1"
+            } else {
+              $procNameBase = "DotNet${major}0"
+              $versionLabel = ".NET ${major}.0"
+            }
+
+            # Check if procedures exist in CodeDependencies.iss
+            $runtimeProcPattern = "procedure Dependency_Add${procNameBase};"
+            if ($issContent -match [regex]::Escape($runtimeProcPattern)) {
+              Write-Host "Found $versionLabel procedures in CodeDependencies.iss - keeping but marking as EOL in README..."
+              
+              # Escape channel for use in regex patterns
+              $escapedChannel = [regex]::Escape($channel)
+              
+              # Define base pattern for matching .NET version entries in README
+              $basePattern = "\.NET (Core )?${escapedChannel}(\.\d+)? \(Runtime, ASP\.NET, Desktop\)"
+              
+              # Check if already marked as EOL in README
+              $eolPattern = "\* ${basePattern} - \*\*EOL\*\*"
+              $notEolPattern = "(\* ${basePattern})(?! - \*\*EOL\*\*)"
+              
+              if ($readmeContent -match $eolPattern) {
+                Write-Host "$versionLabel already marked as EOL in README.md"
+              } elseif ($readmeContent -match $notEolPattern) {
+                # Add EOL marker to existing entry
+                # Note: In PowerShell, `$1 uses backtick (`) to escape $ and reference the first capture group
+                $readmeContent = $readmeContent -replace $notEolPattern, "`$1 - **EOL**"
+                Write-Host "Marked $versionLabel as EOL in README.md"
+                $updatesFound = $true
+                $eolMarkedVersions += $versionLabel
+              } else {
+                Write-Host "$versionLabel not found in README.md - may need to be added as EOL"
+              }
+
+              # Comment out EOL version calls in ExampleSetup.iss with EOL marker for discoverability
+              # Keep them in the example so users can discover they exist for legacy applications
+              # This handles both uncommented and already-commented EOL lines, ensuring consistent format
+              # Use a loop to avoid code duplication
+              $suffixes = @("", "Asp", "Desktop")
+              foreach ($suffix in $suffixes) {
+                # Pattern only matches lines with no comment or existing EOL comments, preserving other inline comments
+                $pattern = "(?m)^(\s*)(?://)?Dependency_Add${procNameBase}${suffix};(?:\s*//\s*EOL.*)?$"
+                $replacement = "`${1}//Dependency_Add${procNameBase}${suffix}; // EOL - $versionLabel"
+                $exampleSetupContent = $exampleSetupContent -replace $pattern, $replacement
+              }
+
+              Write-Host "Kept $versionLabel in CodeDependencies.iss, marked as EOL in README.md, commented out in ExampleSetup.iss"
+            } else {
+              Write-Host "$versionLabel not found in CodeDependencies.iss - already removed or not present"
+            }
+          }
+
+          # Process each supported version
+          foreach ($versionInfo in $supportedVersions) {
+            $channel = $versionInfo.'channel-version'
+            $major = [int]($channel -split '\.')[0]
+
+            Write-Host "`nChecking .NET $channel..."
+
+            # Fetch detailed release info
+            $releasesUrl = $versionInfo.'releases.json'
+            try {
+              $releases = Invoke-RestMethod -Uri $releasesUrl -ErrorAction Stop
+            } catch {
+              Write-Warning "Failed to fetch releases for .NET $channel : $_"
+              continue
+            }
+
+            # Get the latest stable release (exclude preview/rc versions)
+            # Sort by release-date descending to ensure we get the most recent release
+            $latestRelease = $releases.releases | 
+              Where-Object { $_.'release-version' -notmatch '-' } | 
+              Sort-Object { [DateTime]$_.'release-date' } -Descending | 
+              Select-Object -First 1
+
+            if (-not $latestRelease) {
+              Write-Warning "No stable release found for .NET $channel"
+              continue
+            }
+
+            $latestVersion = $latestRelease.'release-version'
+            $versionParts = $latestVersion -split '\.'
+            $latestPatch = [int]$versionParts[2]
+
+            Write-Host "Latest .NET $channel version: $latestVersion (patch: $latestPatch)"
+
+            # Find current version in CodeDependencies.iss
+            # Pattern example: Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 8, 0, 11)
+            $currentPatchPattern = "Dependency_IsNetCoreInstalled\('Microsoft\.NETCore\.App',\s*$major,\s*0,\s*(\d+)\)"
+            $currentMatch = [regex]::Match($issContent, $currentPatchPattern)
+
+            if ($currentMatch.Success) {
+              $currentPatch = [int]$currentMatch.Groups[1].Value
+              Write-Host "Current .NET $major.0 patch in file: $currentPatch"
+
+              if ($latestPatch -gt $currentPatch) {
+                Write-Host "Update available: $major.0.$currentPatch -> $major.0.$latestPatch"
+                $updatesFound = $true
+                $updateSummary += ".NET $major.0: $major.0.$currentPatch -> $major.0.$latestPatch"
+
+                # Get download URLs for windows runtimes with null checks
+                $runtimeFiles = @()
+                $aspNetFiles = @()
+                $desktopFiles = @()
+                
+                if ($latestRelease.runtime -and $latestRelease.runtime.files) {
+                  $runtimeFiles = $latestRelease.runtime.files | Where-Object { $_.name -match "win-(x86|x64)\.exe$" }
+                } else {
+                  Write-Warning ".NET $channel runtime files not found in API response"
+                }
+                
+                if ($latestRelease.'aspnetcore-runtime' -and $latestRelease.'aspnetcore-runtime'.files) {
+                  $aspNetFiles = $latestRelease.'aspnetcore-runtime'.files | Where-Object { $_.name -match "win-(x86|x64)\.exe$" }
+                } else {
+                  Write-Warning ".NET $channel ASP.NET Core runtime files not found in API response"
+                }
+                
+                if ($latestRelease.'windowsdesktop' -and $latestRelease.'windowsdesktop'.files) {
+                  $desktopFiles = $latestRelease.'windowsdesktop'.files | Where-Object { $_.name -match "win-(x86|x64)\.exe$" }
+                } else {
+                  Write-Warning ".NET $channel Windows Desktop runtime files not found in API response"
+                }
+
+                $runtimeX86 = ($runtimeFiles | Where-Object { $_.name -match "win-x86\.exe$" }).url
+                $runtimeX64 = ($runtimeFiles | Where-Object { $_.name -match "win-x64\.exe$" }).url
+                $aspNetX86 = ($aspNetFiles | Where-Object { $_.name -match "win-x86\.exe$" }).url
+                $aspNetX64 = ($aspNetFiles | Where-Object { $_.name -match "win-x64\.exe$" }).url
+                $desktopX86 = ($desktopFiles | Where-Object { $_.name -match "win-x86\.exe$" }).url
+                $desktopX64 = ($desktopFiles | Where-Object { $_.name -match "win-x64\.exe$" }).url
+
+                Write-Host "Runtime x86: $runtimeX86"
+                Write-Host "Runtime x64: $runtimeX64"
+                Write-Host "ASP.NET x86: $aspNetX86"
+                Write-Host "ASP.NET x64: $aspNetX64"
+                Write-Host "Desktop x86: $desktopX86"
+                Write-Host "Desktop x64: $desktopX64"
+
+                # Update version checks - Runtime
+                $issContent = $issContent -replace `
+                  "(Dependency_IsNetCoreInstalled\('Microsoft\.NETCore\.App',\s*$major,\s*0,\s*)$currentPatch(\))", `
+                  "`${1}$latestPatch`${2}"
+
+                # Update version checks - ASP.NET
+                $issContent = $issContent -replace `
+                  "(Dependency_IsNetCoreInstalled\('Microsoft\.AspNetCore\.App',\s*$major,\s*0,\s*)$currentPatch(\))", `
+                  "`${1}$latestPatch`${2}"
+
+                # Update version checks - Desktop
+                $issContent = $issContent -replace `
+                  "(Dependency_IsNetCoreInstalled\('Microsoft\.WindowsDesktop\.App',\s*$major,\s*0,\s*)$currentPatch(\))", `
+                  "`${1}$latestPatch`${2}"
+
+                # Update title strings
+                $issContent = $issContent -replace `
+                  "('\.NET Runtime $major\.0\.)$currentPatch(')", `
+                  "`${1}$latestPatch`${2}"
+                $issContent = $issContent -replace `
+                  "('ASP\.NET Core Runtime $major\.0\.)$currentPatch(')", `
+                  "`${1}$latestPatch`${2}"
+                $issContent = $issContent -replace `
+                  "('\.NET Desktop Runtime $major\.0\.)$currentPatch(')", `
+                  "`${1}$latestPatch`${2}"
+
+                # Update URLs if we have them
+                if ($runtimeX86 -and $runtimeX64) {
+                  $issContent = $issContent -replace `
+                    "https://[^']+dotnet-runtime-$major\.0\.$currentPatch-win-x86\.exe", `
+                    $runtimeX86
+                  $issContent = $issContent -replace `
+                    "https://[^']+dotnet-runtime-$major\.0\.$currentPatch-win-x64\.exe", `
+                    $runtimeX64
+                }
+
+                if ($aspNetX86 -and $aspNetX64) {
+                  $issContent = $issContent -replace `
+                    "https://[^']+aspnetcore-runtime-$major\.0\.$currentPatch-win-x86\.exe", `
+                    $aspNetX86
+                  $issContent = $issContent -replace `
+                    "https://[^']+aspnetcore-runtime-$major\.0\.$currentPatch-win-x64\.exe", `
+                    $aspNetX64
+                }
+
+                if ($desktopX86 -and $desktopX64) {
+                  $issContent = $issContent -replace `
+                    "https://[^']+windowsdesktop-runtime-$major\.0\.$currentPatch-win-x86\.exe", `
+                    $desktopX86
+                  $issContent = $issContent -replace `
+                    "https://[^']+windowsdesktop-runtime-$major\.0\.$currentPatch-win-x64\.exe", `
+                    $desktopX64
+                }
+
+              } else {
+                Write-Host ".NET $major.0 is up to date"
+              }
+
+              # Always ensure README has the correct entry for this supported version
+              # Use the current patch version (either updated or existing)
+              $currentVersionForReadme = if ($latestPatch -gt $currentPatch) { $latestPatch } else { $currentPatch }
+              $readmeVersionEntry = "`n    * .NET $major.0.$currentVersionForReadme (Runtime, ASP.NET, Desktop)"
+              # Pattern matches the entire line including any leading whitespace after a newline
+              $readmeVersionPattern = "(\r?\n)\s*\* \.NET $major\.0(\.\d+)? \(Runtime, ASP\.NET, Desktop\)"
+              
+              if ($readmeContent -match $readmeVersionPattern) {
+                # Entry exists - update it to ensure correct formatting and version
+                $readmeContent = $readmeContent -replace $readmeVersionPattern, $readmeVersionEntry
+                Write-Host "Updated README.md entry for .NET $major.0.$currentVersionForReadme"
+              } else {
+                # Entry doesn't exist - add it after the last .NET X.0 entry, or after .NET Framework 4.8.1
+                # First try to find the last .NET X.0 entry (e.g., "    * .NET 8.0.22 (Runtime, ASP.NET, Desktop)")
+                $lastDotNetPattern = "(\* \.NET \d+\.0\.\d+ \(Runtime, ASP\.NET, Desktop\))(\r?\n)"
+                $matches = [regex]::Matches($readmeContent, $lastDotNetPattern)
+                if ($matches.Count -gt 0) {
+                  # Insert after the last .NET entry
+                  $lastMatch = $matches[$matches.Count - 1]
+                  $insertPattern = [regex]::Escape($lastMatch.Groups[1].Value) + "(\r?\n)"
+                  $readmeContent = $readmeContent -replace $insertPattern, "`$0    * .NET $major.0.$currentVersionForReadme (Runtime, ASP.NET, Desktop)`$1"
+                  Write-Host "Added README.md entry for .NET $major.0.$currentVersionForReadme (after existing .NET entry)"
+                  $updatesFound = $true
+                } else {
+                  # No .NET X.0 entries exist, insert after .NET Framework 4.8.1
+                  $insertPattern = "(\* \.NET Framework 4\.8\.1)(\r?\n)"
+                  if ($readmeContent -match $insertPattern) {
+                    $readmeContent = $readmeContent -replace $insertPattern, "`$1`$2    * .NET $major.0.$currentVersionForReadme (Runtime, ASP.NET, Desktop)`$2"
+                    Write-Host "Added README.md entry for .NET $major.0.$currentVersionForReadme (after .NET Framework 4.8.1)"
+                    $updatesFound = $true
+                  }
+                }
+              }
+            } else {
+              Write-Host ".NET $major.0 not found in CodeDependencies.iss - may need to be added"
+            }
+          }
+
+          if ($updatesFound) {
+            # Write the updated content back to the files
+            [System.IO.File]::WriteAllText("CodeDependencies.iss", $issContent)
+            [System.IO.File]::WriteAllText("README.md", $readmeContent)
+            [System.IO.File]::WriteAllText("ExampleSetup.iss", $exampleSetupContent)
+
+            # Set outputs for the next step
+            $summaryText = $updateSummary -join ", "
+            $eolText = $eolMarkedVersions -join ", "
+            "updates_found=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "summary=$summaryText" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "eol=$eolText" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "Updates found: $summaryText"
+            if ($eolMarkedVersions.Count -gt 0) {
+              Write-Host "EOL versions marked: $eolText"
+            }
+          } else {
+            "updates_found=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "No updates found"
+          }
+
+      - name: Create Pull Request
+        if: steps.check-updates.outputs.updates_found == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update .NET dependencies: ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.eol && format(' | Marked EOL: {0}', steps.check-updates.outputs.eol) || '' }}"
+          title: "Update .NET dependencies: ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.eol && format(' | Marked EOL: {0}', steps.check-updates.outputs.eol) || '' }}"
+          body: |
+            This PR updates the .NET runtime dependencies.
+
+            ## Updates
+            ${{ steps.check-updates.outputs.summary || 'No version updates' }}
+
+            ## EOL Versions Marked
+            ${{ steps.check-updates.outputs.eol || 'None' }}
+
+            The following files have been updated:
+            - `CodeDependencies.iss` - Updated versions (EOL versions kept for compatibility)
+            - `README.md` - Updated version documentation and marked EOL entries
+            - `ExampleSetup.iss` - EOL version function calls commented out with EOL markers for discoverability
+
+            > **Note:** EOL (end-of-life) versions are commented out in examples but kept for discoverability.
+            > Version support status is determined dynamically from Microsoft's releases-index.json.
+            > EOL (end-of-life) versions are marked as **EOL** in the README but kept in CodeDependencies.iss for backward compatibility.
+
+            ---
+            *This PR was automatically created by the Check .NET Updates workflow.*
+          branch: update-dotnet-dependencies
+          delete-branch: true
+          labels: dependencies, automated
