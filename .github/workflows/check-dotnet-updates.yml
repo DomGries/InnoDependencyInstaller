@@ -107,13 +107,15 @@ jobs:
 
               # Comment out EOL version calls in ExampleSetup.iss with EOL marker for discoverability
               # Keep them in the example so users can discover they exist for legacy applications
-              # This handles both uncommented and already-commented lines, ensuring consistent format
-              $exampleSetupContent = $exampleSetupContent -replace `
-                "(?m)^(\s*)(?://)?Dependency_Add${procNameBase};(?:\s*//.*)?$", "`${1}//Dependency_Add${procNameBase}; // EOL - $versionLabel"
-              $exampleSetupContent = $exampleSetupContent -replace `
-                "(?m)^(\s*)(?://)?Dependency_Add${procNameBase}Asp;(?:\s*//.*)?$", "`${1}//Dependency_Add${procNameBase}Asp; // EOL - $versionLabel"
-              $exampleSetupContent = $exampleSetupContent -replace `
-                "(?m)^(\s*)(?://)?Dependency_Add${procNameBase}Desktop;(?:\s*//.*)?$", "`${1}//Dependency_Add${procNameBase}Desktop; // EOL - $versionLabel"
+              # This handles both uncommented and already-commented EOL lines, ensuring consistent format
+              # Use a loop to avoid code duplication
+              $suffixes = @("", "Asp", "Desktop")
+              foreach ($suffix in $suffixes) {
+                # Pattern only matches lines with no comment or existing EOL comments, preserving other inline comments
+                $pattern = "(?m)^(\s*)(?://)?Dependency_Add${procNameBase}${suffix};(?:\s*//\s*EOL.*)?$"
+                $replacement = "`${1}//Dependency_Add${procNameBase}${suffix}; // EOL - $versionLabel"
+                $exampleSetupContent = $exampleSetupContent -replace $pattern, $replacement
+              }
 
               Write-Host "Kept $versionLabel in CodeDependencies.iss, marked as EOL in README.md, commented out in ExampleSetup.iss"
             } else {
