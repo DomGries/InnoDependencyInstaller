@@ -644,16 +644,86 @@ begin
   end;
 end;
 
-procedure Dependency_AddVC2015To2022;
+// https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files?view=msvc-170#install-the-redistributable-packages
+// Read registry to detect VC++ runtime
+function GetInstalledVersion(const Arch: String; var Version: String): Boolean;
+var
+    Key: String;
+    Installed: Cardinal;
 begin
-  // https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
-  if not IsMsiProductInstalled(Dependency_String('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 42, 34433, 0)) then begin
-    Dependency_Add('vcredist2022' + Dependency_ArchSuffix + '.exe',
-      '/passive /norestart',
-      'Visual C++ 2015-2022 Redistributable' + Dependency_ArchTitle,
-      Dependency_String('https://aka.ms/vs/17/release/vc_redist.x86.exe', 'https://aka.ms/vs/17/release/vc_redist.x64.exe'),
-      '', False, False);
+    Result := False;
+    Key := 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\' + Arch;
+    if RegQueryDWordValue(HKLM, Key, 'Installed', Installed) and (Installed = 1) then
+    begin
+        Result := RegQueryStringValue(HKLM, Key, 'Version', Version);
+    end;
+end;
+
+function CompareVersions(V1, V2: String): Integer;
+var
+  P1, P2: TArrayOfString;
+  i, N1, N2, Count: Integer;
+begin
+  if (Length(V1) > 0) and ((V1[1] = 'v') or (V1[1] = 'V')) then
+    Delete(V1, 1, 1);
+
+  if (Length(V2) > 0) and ((V2[1] = 'v') or (V2[1] = 'V')) then
+    Delete(V2, 1, 1);
+
+  P1 := StringSplit(V1, ['.'], stExcludeEmpty);
+  P2 := StringSplit(V2, ['.'], stExcludeEmpty);
+
+  if Length(P1) < Length(P2) then
+  begin
+    Count := Length(P2);
+  end else begin
+    Count := Length(P1);
   end;
+  for i := 0 to Count - 1 do
+  begin
+    N1 := 0;
+    N2 := 0;
+    if i < Length(P1) then N1 := StrToIntDef(P1[i], 0);
+    if i < Length(P2) then N2 := StrToIntDef(P2[i], 0);
+    if N1 < N2 then
+    begin
+        result := -1;
+        Exit;
+    end;
+    if N1 > N2 then
+    begin
+        result := 1;
+        Exit;
+    end;
+  end;
+  Result := 0; // equal
+end;
+
+procedure Dependency_AddVC2015To2022(MinVersion: String);
+var
+  InstalledVersion: String;
+  Arch: String;
+  LogMsg: String;
+  ResultCode: Integer;
+begin
+    Arch := Dependency_String('x86', 'x64');
+    if GetInstalledVersion(Arch, InstalledVersion) then
+    begin
+      ResultCode := CompareVersions(InstalledVersion, MinVersion);
+      if ResultCode >= 0 then
+      begin
+        LogMsg := 'VC++ ' + Arch + ' installed, version=' + InstalledVersion;
+        Log(LogMsg);
+      end else
+      begin
+        LogMsg := 'VC++ ' + Arch + ' version too old: ' + InstalledVersion;
+        Dependency_Add('vcredist2022' + Dependency_ArchSuffix + '.exe',
+          '/passive /norestart',
+          'Visual C++ 2015-2022 Redistributable' + Dependency_ArchTitle,
+          Dependency_String('https://aka.ms/vs/17/release/vc_redist.x86.exe', 'https://aka.ms/vs/17/release/vc_redist.x64.exe'),
+          '', False, False);
+      end
+    end
 end;
 
 procedure Dependency_AddDirectX;
