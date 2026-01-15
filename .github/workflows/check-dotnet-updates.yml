@@ -97,7 +97,7 @@ jobs:
               } elseif ($readmeContent -match $notEolPattern) {
                 # Add EOL marker to existing entry
                 # Note: In PowerShell, `$1 uses backtick (`) to escape $ and reference the first capture group
-                $readmeContent = $readmeContent -replace $notEolPattern, "`$1 (EOL)*"
+                $readmeContent = $readmeContent -replace $notEolPattern, "`$1 - EOL"
                 Write-Host "Marked $versionLabel as EOL in README.md"
                 $updatesFound = $true
                 $eolMarkedVersions += $versionLabel
@@ -333,10 +333,8 @@ jobs:
           commit-message: "Update to .NET ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.eol && format(' | Marked EOL: {0}', steps.check-updates.outputs.eol) || '' }}"
           title: "Update to .NET ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.eol && format(' | Marked EOL: {0}', steps.check-updates.outputs.eol) || '' }}"
           body: |
-            This PR updates the following .NET runtime dependencies: .NET ${{ steps.check-updates.outputs.summary || 'No version updates' }}
-
-            ---
-            *This PR was automatically created by the Check .NET Updates workflow.*
+            This PR updates the following .NET runtime dependencies:
+            .NET ${{ steps.check-updates.outputs.summary || 'No version updates' }}
           branch: update-dotnet-dependencies
           delete-branch: true
           labels: dependencies, automated
