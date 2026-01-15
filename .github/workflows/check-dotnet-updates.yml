@@ -2,8 +2,8 @@ name: Check .NET Updates
 
 on:
   schedule:
-    # Run weekly on Monday at 9:00 AM UTC
-    - cron: '0 9 * * 1'
+    # Run weekly on Wednesday at 9:00 AM UTC
+    - cron: '0 9 * * 3'
   workflow_dispatch:
     # Allow manual triggering
 
@@ -97,7 +97,7 @@ jobs:
               } elseif ($readmeContent -match $notEolPattern) {
                 # Add EOL marker to existing entry
                 # Note: In PowerShell, `$1 uses backtick (`) to escape $ and reference the first capture group
-                $readmeContent = $readmeContent -replace $notEolPattern, "`$1 - **EOL**"
+                $readmeContent = $readmeContent -replace $notEolPattern, "`$1 (EOL)*"
                 Write-Host "Marked $versionLabel as EOL in README.md"
                 $updatesFound = $true
                 $eolMarkedVersions += $versionLabel
@@ -113,7 +113,7 @@ jobs:
               foreach ($suffix in $suffixes) {
                 # Pattern only matches lines with no comment or existing EOL comments, preserving other inline comments
                 $pattern = "(?m)^(\s*)(?://)?Dependency_Add${procNameBase}${suffix};(?:\s*//\s*EOL.*)?$"
-                $replacement = "`${1}//Dependency_Add${procNameBase}${suffix}; // EOL - $versionLabel"
+                $replacement = "`${1}//Dependency_Add${procNameBase}${suffix}; // EOL"
                 $exampleSetupContent = $exampleSetupContent -replace $pattern, $replacement
               }
 
@@ -169,7 +169,7 @@ jobs:
               if ($latestPatch -gt $currentPatch) {
                 Write-Host "Update available: $major.0.$currentPatch -> $major.0.$latestPatch"
                 $updatesFound = $true
-                $updateSummary += ".NET $major.0: $major.0.$currentPatch -> $major.0.$latestPatch"
+                $updateSummary += "$major.0.$latestPatch"
 
                 # Get download URLs for windows runtimes with null checks
                 $runtimeFiles = @()
@@ -330,25 +330,10 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update .NET dependencies: ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.eol && format(' | Marked EOL: {0}', steps.check-updates.outputs.eol) || '' }}"
-          title: "Update .NET dependencies: ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.eol && format(' | Marked EOL: {0}', steps.check-updates.outputs.eol) || '' }}"
+          commit-message: "Update to .NET ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.eol && format(' | Marked EOL: {0}', steps.check-updates.outputs.eol) || '' }}"
+          title: "Update to .NET ${{ steps.check-updates.outputs.summary }}${{ steps.check-updates.outputs.eol && format(' | Marked EOL: {0}', steps.check-updates.outputs.eol) || '' }}"
           body: |
-            This PR updates the .NET runtime dependencies.
-
-            ## Updates
-            ${{ steps.check-updates.outputs.summary || 'No version updates' }}
-
-            ## EOL Versions Marked
-            ${{ steps.check-updates.outputs.eol || 'None' }}
-
-            The following files have been updated:
-            - `CodeDependencies.iss` - Updated versions (EOL versions kept for compatibility)
-            - `README.md` - Updated version documentation and marked EOL entries
-            - `ExampleSetup.iss` - EOL version function calls commented out with EOL markers for discoverability
-
-            > **Note:** EOL (end-of-life) versions are commented out in examples but kept for discoverability.
-            > Version support status is determined dynamically from Microsoft's releases-index.json.
-            > EOL (end-of-life) versions are marked as **EOL** in the README but kept in CodeDependencies.iss for backward compatibility.
+            This PR updates the following .NET runtime dependencies: .NET ${{ steps.check-updates.outputs.summary || 'No version updates' }}
 
             ---
             *This PR was automatically created by the Check .NET Updates workflow.*
