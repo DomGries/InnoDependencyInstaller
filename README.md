@@ -78,9 +78,9 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * .NET 5.0 (Runtime, ASP.NET, Desktop) - **EOL**
     * .NET 6.0 (Runtime, ASP.NET, Desktop) - **EOL**
     * .NET 7.0 (Runtime, ASP.NET, Desktop) - **EOL**
-    * .NET 8.0.23 (Runtime, ASP.NET, Desktop)
-    * .NET 9.0.12 (Runtime, ASP.NET, Desktop)
-    * .NET 10.0.2 (Runtime, ASP.NET, Desktop)
+    * .NET 8.0.24 (Runtime, ASP.NET, Desktop)
+    * .NET 9.0.13 (Runtime, ASP.NET, Desktop)
+    * .NET 10.0.3 (Runtime, ASP.NET, Desktop)
 * C++
     * Visual C++ 2005 Service Pack 1 Redistributable
     * Visual C++ 2008 Service Pack 1 Redistributable
