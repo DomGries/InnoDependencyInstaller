@@ -110,7 +110,6 @@ Dependency_Components := ''; // disable component gating again
     * SQL Server 2022 Express
     * SQL Server 2025 Express
 * Access
-    * Access Database Engine 2010
     * Access Database Engine 2016
 * DirectX End-User Runtime
 * WebView2 Runtime

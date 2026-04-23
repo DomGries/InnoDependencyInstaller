@@ -117,7 +117,6 @@ begin
 
   Dependency_AddWebView2;
 
-  Dependency_AddAccessDatabaseEngine2010;
   Dependency_AddAccessDatabaseEngine2016;
 
   Result := True;

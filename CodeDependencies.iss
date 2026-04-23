@@ -835,18 +835,6 @@ begin
   end;
 end;
 
-procedure Dependency_AddAccessDatabaseEngine2010;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=13255
-  if not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Office\14.0\Access Connectivity Engine\Engines\ACE') then begin
-    Dependency_Add('AccessDatabaseEngine2010' + Dependency_ArchSuffix + '.exe',
-      '/quiet',
-      'Microsoft Access Database Engine 2010' + Dependency_ArchTitle,
-      Dependency_String('https://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine.exe', 'https://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine_X64.exe', 'https://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine_X64.exe'),
-      '', False, False);
-  end;
-end;
-
 procedure Dependency_AddAccessDatabaseEngine2016;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=54920
