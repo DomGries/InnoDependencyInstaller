@@ -53,6 +53,10 @@ Name: "{commondesktop}\{#MyAppSetupName}"; Filename: "{app}\MyProg.exe"; Tasks: 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 
+; Example component definition for optional-dependency gating:
+;[Components]
+;Name: "advanced"; Description: "Advanced tools (requires .NET 10)"; Types: full
+
 [Run]
 Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
 
@@ -85,9 +89,11 @@ begin
   Dependency_AddDotNet90;
   Dependency_AddDotNet90Asp;
   Dependency_AddDotNet90Desktop;
+  //Dependency_Components := 'advanced'; // only install next dependencies if the 'advanced' component is selected
   Dependency_AddDotNet100;
   Dependency_AddDotNet100Asp;
   Dependency_AddDotNet100Desktop;
+  //Dependency_Components := ''; // disable component gating again
 
   Dependency_AddVC2005;
   Dependency_AddVC2008;

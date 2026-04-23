@@ -66,6 +66,16 @@ A similar version exists for forcing 64-bit on arm.
 
 If you only deploy 32-bit binaries and dependencies you can also instead just not define [ArchitecturesInstallIn64BitMode](https://jrsoftware.org/ishelp/index.php?topic=setup_architecturesinstallin64bitmode) in [Setup].
 
+By default all added dependencies are installed for every user. You can tie them to one or more [components](https://jrsoftware.org/ishelp/index.php?topic=componentssection) so they are only downloaded and installed when the matching components are selected:
+
+```iss
+Dependency_Components := 'advanced'; // only install next dependencies if the 'advanced' component is selected
+Dependency_AddDotNet100;
+Dependency_Components := ''; // disable component gating again
+```
+
+`Dependency_Components` accepts the same expression syntax as Inno's [Components](https://jrsoftware.org/ishelp/index.php?topic=scriptfunctions) parameter (e.g. `'feature1 or feature2'`).
+
 ## Dependencies
 
 * .NET

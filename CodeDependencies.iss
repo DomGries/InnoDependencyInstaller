@@ -11,21 +11,25 @@ type
     Checksum: String;
     ForceSuccess: Boolean;
     RestartAfter: Boolean;
+    Components: String;
   end;
 
 var
-  Dependency_Memo: String;
   Dependency_List: array of TDependency_Entry;
   Dependency_NeedToRestart, Dependency_ForceX86, Dependency_ForceX64: Boolean;
+  Dependency_Components: String;
   Dependency_DownloadPage: TDownloadWizardPage;
+
+function Dependency_IsEntryActive(const Entry: TDependency_Entry): Boolean;
+begin
+  Result := (Entry.Components = '') or WizardIsComponentSelected(Entry.Components);
+end;
 
 procedure Dependency_Add(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, RestartAfter: Boolean);
 var
   Dependency: TDependency_Entry;
   DependencyCount: Integer;
 begin
-  Dependency_Memo := Dependency_Memo + #13#10 + '%1' + Title;
-
   Dependency.Filename := Filename;
   Dependency.Parameters := Parameters;
   Dependency.Title := Title;
@@ -39,6 +43,7 @@ begin
   Dependency.Checksum := Checksum;
   Dependency.ForceSuccess := ForceSuccess;
   Dependency.RestartAfter := RestartAfter;
+  Dependency.Components := Dependency_Components;
 
   DependencyCount := GetArrayLength(Dependency_List);
   SetArrayLength(Dependency_List, DependencyCount + 1);
@@ -64,6 +69,9 @@ begin
     Dependency_DownloadPage.Show;
 
     for DependencyIndex := 0 to DependencyCount - 1 do begin
+      if not Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
+        continue;
+      end;
       if Dependency_List[DependencyIndex].URL <> '' then begin
         Dependency_DownloadPage.Clear;
         Dependency_DownloadPage.Add(Dependency_List[DependencyIndex].URL, Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Checksum);
@@ -96,6 +104,9 @@ begin
 
     if Result = '' then begin
       for DependencyIndex := 0 to DependencyCount - 1 do begin
+        if not Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
+          continue;
+        end;
         Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
         Dependency_DownloadPage.SetProgress(DependencyIndex + 1, DependencyCount + 1);
 
@@ -159,6 +170,9 @@ end;
 <event('UpdateReadyMemo')>
 #endif
 function Dependency_UpdateReadyMemo(const Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
+var
+  DependencyIndex: Integer;
+  DependencyMemo: String;
 begin
   Result := '';
   if MemoUserInfoInfo <> '' then begin
@@ -180,11 +194,18 @@ begin
     Result := Result + MemoTasksInfo;
   end;
 
-  if Dependency_Memo <> '' then begin
+  DependencyMemo := '';
+  for DependencyIndex := 0 to GetArrayLength(Dependency_List) - 1 do begin
+    if Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
+      DependencyMemo := DependencyMemo + #13#10 + '%1' + Dependency_List[DependencyIndex].Title;
+    end;
+  end;
+
+  if DependencyMemo <> '' then begin
     if MemoTasksInfo = '' then begin
       Result := Result + SetupMessage(msgReadyMemoTasks);
     end;
-    Result := Result + FmtMessage(Dependency_Memo, [Space]);
+    Result := Result + FmtMessage(DependencyMemo, [Space]);
   end;
 end;
 
