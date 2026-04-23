@@ -54,13 +54,15 @@ You have two ways to distribute the dependency installers. By default, most depe
     ExtractTemporaryFile('dxwebsetup.exe');
     ```
 
-The dependencies are installed based on the system architecture. If you want to install 32-bit dependencies on a 64-bit system you can force 32-bit mode like so:
+The dependencies are installed based on the system architecture (x86, x64, or ARM64). If you want to install 32-bit dependencies on a 64-bit system you can force 32-bit mode like so:
 
 ```iss
 Dependency_ForceX86 := True; // force 32-bit install of next dependencies
 Dependency_AddVC2013;
 Dependency_ForceX86 := False; // disable forced 32-bit install again
 ```
+
+A similar version exists for forcing 64-bit on arm.
 
 If you only deploy 32-bit binaries and dependencies you can also instead just not define [ArchitecturesInstallIn64BitMode](https://jrsoftware.org/ishelp/index.php?topic=setup_architecturesinstallin64bitmode) in [Setup].
 
@@ -74,10 +76,10 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * .NET Framework 4.7.2
     * .NET Framework 4.8
     * .NET Framework 4.8.1
-    * .NET Core 3.1 (Runtime, ASP.NET, Desktop) - **EOL**
-    * .NET 5.0 (Runtime, ASP.NET, Desktop) - **EOL**
-    * .NET 6.0 (Runtime, ASP.NET, Desktop) - **EOL**
-    * .NET 7.0 (Runtime, ASP.NET, Desktop) - **EOL**
+    * .NET Core 3.1 (Runtime, ASP.NET, Desktop)
+    * .NET 5.0 (Runtime, ASP.NET, Desktop)
+    * .NET 6.0 (Runtime, ASP.NET, Desktop)
+    * .NET 7.0 (Runtime, ASP.NET, Desktop)
     * .NET 8.0.26 (Runtime, ASP.NET, Desktop)
     * .NET 9.0.15 (Runtime, ASP.NET, Desktop)
     * .NET 10.0.7 (Runtime, ASP.NET, Desktop)

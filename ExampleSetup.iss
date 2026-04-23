@@ -32,7 +32,7 @@ AllowNoIcons=yes
 PrivilegesRequired=admin
 
 ; remove next line if you only deploy 32-bit binaries and dependencies
-ArchitecturesInstallIn64BitMode=x64
+ArchitecturesInstallIn64BitMode=x64compatible or arm64
 
 [Languages]
 Name: en; MessagesFile: "compiler:Default.isl"
@@ -67,18 +67,18 @@ begin
   Dependency_AddDotNet47;
   Dependency_AddDotNet48;
   //Dependency_AddDotNet481;
-  //Dependency_AddNetCore31; // EOL
-  //Dependency_AddNetCore31Asp; // EOL
-  //Dependency_AddNetCore31Desktop; // EOL
-  //Dependency_AddDotNet50; // EOL
-  //Dependency_AddDotNet50Asp; // EOL
-  //Dependency_AddDotNet50Desktop; // EOL
-  //Dependency_AddDotNet60; // EOL
-  //Dependency_AddDotNet60Asp; // EOL
-  //Dependency_AddDotNet60Desktop; // EOL
-  //Dependency_AddDotNet70; // EOL
-  //Dependency_AddDotNet70Asp; // EOL
-  //Dependency_AddDotNet70Desktop; // EOL
+  //Dependency_AddNetCore31;
+  //Dependency_AddNetCore31Asp;
+  //Dependency_AddNetCore31Desktop;
+  //Dependency_AddDotNet50;
+  //Dependency_AddDotNet50Asp;
+  //Dependency_AddDotNet50Desktop;
+  //Dependency_AddDotNet60;
+  //Dependency_AddDotNet60Asp;
+  //Dependency_AddDotNet60Desktop;
+  //Dependency_AddDotNet70;
+  //Dependency_AddDotNet70Asp;
+  //Dependency_AddDotNet70Desktop;
   Dependency_AddDotNet80;
   Dependency_AddDotNet80Asp;
   Dependency_AddDotNet80Desktop;
