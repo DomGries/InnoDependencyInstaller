@@ -645,9 +645,15 @@ begin
 end;
 
 procedure Dependency_AddVC2015To2022;
+var
+  Version: String;
+  PackedVersion: Int64;
 begin
   // https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
-  if not IsMsiProductInstalled(Dependency_String('{65E5BD06-6392-3027-8C26-853107D3CF1A}', '{36F68A90-239C-34DF-B58C-64B30153CE35}'), PackVersionComponents(14, 42, 34433, 0)) then begin
+  if RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\' + Dependency_String('x86', 'x64'), 'Version', Version) and (Copy(Version, 1, 1) = 'v') then begin
+    Delete(Version, 1, 1);
+  end;
+  if not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(14, 51, 36231, 0)) < 0) then begin
     Dependency_Add('vcredist2022' + Dependency_ArchSuffix + '.exe',
       '/passive /norestart',
       'Visual C++ 2015-2022 Redistributable' + Dependency_ArchTitle,
