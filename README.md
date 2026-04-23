@@ -96,6 +96,7 @@ If you only deploy 32-bit binaries and dependencies you can also instead just no
     * SQL Server 2017 Express
     * SQL Server 2019 Express
     * SQL Server 2022 Express
+    * SQL Server 2025 Express
 * Access
     * Access Database Engine 2010
     * Access Database Engine 2016

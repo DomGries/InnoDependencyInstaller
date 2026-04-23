@@ -780,6 +780,21 @@ begin
   end;
 end;
 
+procedure Dependency_AddSql2025Express;
+var
+  Version: String;
+  PackedVersion: Int64;
+begin
+  // https://www.microsoft.com/en-us/sql-server/sql-server-downloads
+  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL17.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(17, 0, 1000, 7)) < 0) then begin
+    Dependency_Add('sql2025express' + Dependency_ArchSuffix + '.exe',
+      '/QS /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
+      'SQL Server 2025 Express',
+      'https://download.microsoft.com/download/7ab8f535-7eb8-4b16-82eb-eca0fa2d38f3/SQL2025-SSEI-Expr.exe',
+      '', False, False);
+  end;
+end;
+
 procedure Dependency_AddWebView2;
 begin
   // https://developer.microsoft.com/en-us/microsoft-edge/webview2

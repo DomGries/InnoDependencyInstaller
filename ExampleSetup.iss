@@ -107,6 +107,7 @@ begin
   Dependency_AddSql2017Express;
   Dependency_AddSql2019Express;
   Dependency_AddSql2022Express;
+  Dependency_AddSql2025Express;
 
   Dependency_AddWebView2;
 
