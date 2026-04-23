@@ -1,0 +1,79 @@
+name: Check Dependency URLs
+
+on:
+  schedule:
+    # First day of each month, 9:00 UTC
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-urls:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: HEAD every download URL
+        shell: pwsh
+        run: |
+          $content = Get-Content -Path "CodeDependencies.iss" -Raw
+          $urls = [regex]::Matches($content, "'(https?://[^']+)'") |
+                    ForEach-Object { $_.Groups[1].Value } |
+                    Sort-Object -Unique
+          Write-Host "Checking $($urls.Count) unique URLs...`n"
+
+          $failures = @()
+          foreach ($url in $urls) {
+            $status = $null
+            $err = $null
+            $method = 'HEAD'
+            try {
+              $resp = Invoke-WebRequest -Uri $url -Method Head -MaximumRedirection 10 `
+                -TimeoutSec 30 -UseBasicParsing -ErrorAction Stop
+              $status = [int]$resp.StatusCode
+            } catch {
+              $code = $_.Exception.Response.StatusCode.value__
+              # Some hosts reject HEAD (405) — fall back to a Range-limited GET
+              if ($code -eq 405) {
+                $method = 'GET (range)'
+                try {
+                  $resp = Invoke-WebRequest -Uri $url -Method Get -Headers @{ Range = 'bytes=0-0' } `
+                    -MaximumRedirection 10 -TimeoutSec 30 -UseBasicParsing -ErrorAction Stop
+                  $status = [int]$resp.StatusCode
+                } catch {
+                  $err = $_.Exception.Message
+                  if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode.value__ }
+                }
+              } else {
+                $err = $_.Exception.Message
+                if ($_.Exception.Response) { $status = $code }
+              }
+            }
+
+            $ok = $status -and $status -ge 200 -and $status -lt 400
+            $tag = if ($ok) { "OK  " } else { "FAIL" }
+            $statusDisplay = if ($status) { $status } else { '---' }
+            $line = "{0} [{1,3}] {2,-11} {3}" -f $tag, $statusDisplay, $method, $url
+            Write-Host $line
+            if (-not $ok) {
+              $detail = if ($err) { "$status $url — $err" } else { "$status $url" }
+              $failures += $detail
+            }
+          }
+
+          if ($failures.Count -gt 0) {
+            Write-Host "`n=== $($failures.Count) broken URL(s) ==="
+            $failures | ForEach-Object { Write-Host "  $_" }
+            # Surface in the workflow summary for quick scanning from the run page
+            "## Broken dependency URLs ($($failures.Count))" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            foreach ($f in $failures) {
+              "- $f" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            }
+            exit 1
+          }
+
+          Write-Host "`nAll $($urls.Count) URLs reachable."
