@@ -42,7 +42,8 @@ Name: de; MessagesFile: "compiler:Languages\German.isl"
 Name: es; MessagesFile: "compiler:Languages\Spanish.isl"
 
 [Files]
-Source: "example\MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsX64; Flags: ignoreversion
+Source: "example\MyProg-arm64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsArm64; Flags: ignoreversion
+Source: "example\MyProg-x64.exe"; DestDir: "{app}"; DestName: "MyProg.exe"; Check: Dependency_IsX64 and not Dependency_IsArm64; Flags: ignoreversion
 Source: "example\MyProg.exe"; DestDir: "{app}"; Check: not Dependency_IsX64; Flags: ignoreversion
 
 [Icons]
