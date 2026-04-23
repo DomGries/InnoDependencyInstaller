@@ -1,0 +1,139 @@
+name: Check Winget Manifest Updates
+
+on:
+  schedule:
+    # Thursday 9:00 UTC — offset from the .NET check (Wednesday)
+    - cron: '0 9 * * 4'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for updates
+        id: check-updates
+        shell: pwsh
+        run: |
+          $apiBase = "https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/m"
+          $issPath = "CodeDependencies.iss"
+          $content = Get-Content -Path $issPath -Raw
+          $updates = @()
+
+          # Each target maps a winget-pkgs manifest path to the PackVersionComponents(...)
+          # call in the .iss. The pattern is scoped by a unique registry-path anchor so
+          # unrelated checks sharing the same major (e.g. SQL 2017 also uses major 14)
+          # are not clobbered.
+          $targets = @(
+            @{
+              Name    = 'VC++ 2015-2022'
+              Path    = 'Microsoft/VCRedist/2015+/x64'
+              Major   = 14
+              Pattern = '(VisualStudio\\14\.0\\VC\\Runtimes[\s\S]*?PackVersionComponents\(14,\s*)(\d+),\s*(\d+),\s*(\d+)(\))'
+            },
+            @{
+              Name    = 'SQL Server 2022 Express'
+              Path    = 'Microsoft/SQLServer/2022/Express'
+              Major   = 16
+              Pattern = '(MSSQL16\.MSSQLSERVER[\s\S]*?PackVersionComponents\(16,\s*)(\d+),\s*(\d+),\s*(\d+)(\))'
+            },
+            @{
+              Name    = 'SQL Server 2025 Express'
+              Path    = 'Microsoft/SQLServer/2025/Express'
+              Major   = 17
+              Pattern = '(MSSQL17\.MSSQLSERVER[\s\S]*?PackVersionComponents\(17,\s*)(\d+),\s*(\d+),\s*(\d+)(\))'
+            }
+          )
+
+          $headers = @{ 'Accept' = 'application/vnd.github.v3+json' }
+          if ($env:GITHUB_TOKEN) { $headers['Authorization'] = "Bearer $env:GITHUB_TOKEN" }
+
+          foreach ($target in $targets) {
+            Write-Host "`nChecking $($target.Name)..."
+
+            try {
+              $data = Invoke-RestMethod "$apiBase/$($target.Path)" -Headers $headers -ErrorAction Stop
+            } catch {
+              Write-Warning "  Failed to fetch manifest listing: $_"
+              continue
+            }
+
+            $versions = @()
+            foreach ($entry in $data) {
+              if ($entry.type -ne 'dir') { continue }
+              try { $versions += [Version]$entry.name } catch { }
+            }
+
+            if ($versions.Count -eq 0) {
+              Write-Warning "  No version folders found under $($target.Path)"
+              continue
+            }
+
+            $latest = ($versions | Sort-Object | Select-Object -Last 1)
+            if ($latest.Major -ne $target.Major) {
+              Write-Warning "  Latest version $latest has major $($latest.Major), expected $($target.Major) — skipping"
+              continue
+            }
+            Write-Host "  Latest in winget-pkgs: $latest"
+
+            $match = [regex]::Match($content, $target.Pattern)
+            if (-not $match.Success) {
+              Write-Warning "  PackVersionComponents pattern not found in .iss"
+              continue
+            }
+
+            $currentMinor    = [int]$match.Groups[2].Value
+            $currentBuild    = [int]$match.Groups[3].Value
+            $currentRevision = [int]$match.Groups[4].Value
+            $current = [Version]"$($target.Major).$currentMinor.$currentBuild.$currentRevision"
+            Write-Host "  Current in .iss: $current"
+
+            if ($latest -gt $current) {
+              Write-Host "  Update: $current -> $latest"
+              $replacement = "`${1}$($latest.Minor), $($latest.Build), $($latest.Revision)`${5}"
+              $content = [regex]::Replace($content, $target.Pattern, $replacement)
+              $updates += "$($target.Name) $latest"
+            } else {
+              Write-Host "  Up to date"
+            }
+          }
+
+          if ($updates.Count -gt 0) {
+            [System.IO.File]::WriteAllText($issPath, $content)
+            $summary = $updates -join ", "
+            "updates_found=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "summary=$summary"   | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "`nUpdates found: $summary"
+          } else {
+            "updates_found=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "`nNo updates found"
+          }
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request
+        id: create-pr
+        if: steps.check-updates.outputs.updates_found == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update ${{ steps.check-updates.outputs.summary }}"
+          title: "Update ${{ steps.check-updates.outputs.summary }}"
+          body: |
+            Automated update based on the latest [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) manifests:
+            ${{ steps.check-updates.outputs.summary }}
+          branch: update-winget-dependencies
+          delete-branch: true
+          labels: dependencies, automated
+
+      - name: Enable auto-merge
+        if: steps.create-pr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }} --repo ${{ github.repository }}
