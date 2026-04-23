@@ -13,9 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Inno Setup
-        run: choco install innosetup --no-progress --yes
-
       - name: Compile ExampleSetup.iss
         shell: pwsh
         run: |
