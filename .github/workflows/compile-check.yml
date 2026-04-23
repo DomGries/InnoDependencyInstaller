@@ -1,0 +1,27 @@
+name: Compile Check
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compile:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress --yes
+
+      - name: Compile ExampleSetup.iss
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          & $iscc /Qp ExampleSetup.iss
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "ISCC failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
