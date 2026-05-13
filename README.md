@@ -92,7 +92,7 @@ Dependency_Components := ''; // disable component gating again
     * .NET 7.0 (Runtime, ASP.NET, Desktop)
     * .NET 8.0.26 (Runtime, ASP.NET, Desktop)
     * .NET 9.0.15 (Runtime, ASP.NET, Desktop)
-    * .NET 10.0.7 (Runtime, ASP.NET, Desktop)
+    * .NET 10.0.8 (Runtime, ASP.NET, Desktop)
 * C++
     * Visual C++ 2005 Service Pack 1 Redistributable
     * Visual C++ 2008 Service Pack 1 Redistributable
