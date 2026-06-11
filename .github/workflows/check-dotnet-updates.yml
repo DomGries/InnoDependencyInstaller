@@ -22,56 +22,56 @@ jobs:
         id: check-updates
         shell: pwsh
         run: |
-          # Base URL for Microsoft's .NET release metadata API
-          $apiBaseUrl = "https://dotnetcli.azureedge.net/dotnet/release-metadata"
+          $apiBaseUrl = "https://builds.dotnet.microsoft.com/dotnet/release-metadata"
 
           $updatesFound = $false
           $updateSummary = @()
 
-          # Read the current CodeDependencies.iss file
           $issContent = Get-Content -Path "CodeDependencies.iss" -Raw
 
-          # Fetch the releases index to get currently supported versions
           Write-Host "Fetching .NET releases index..."
           try {
-            $releasesIndex = Invoke-RestMethod -Uri "$apiBaseUrl/releases-index.json" -ErrorAction Stop
+            $releasesIndex = Invoke-RestMethod -Uri "$apiBaseUrl/releases-index.json" -MaximumRetryCount 3 -RetryIntervalSec 5 -ErrorAction Stop
           } catch {
             Write-Error "Failed to fetch releases index: $_"
             exit 1
           }
 
-          # Get supported .NET versions from the releases index
-          # - Only active and maintenance support-phase channels (3.0+)
-          # - Exclude legacy .NET Core 1.x and 2.x versions (not supported by this project)
-          $supportedVersions = $releasesIndex.'releases-index' | Where-Object {
+          # All channels 5.0+ including EOL: aka.ms links serve a channel's latest patch
+          # even after EOL. 3.1 stays excluded - its URLs are pinned to one build.
+          $channels = $releasesIndex.'releases-index' | Where-Object {
             $_.'channel-version' -match '^\d+\.\d+$' -and
-            [int]($_.'channel-version' -split '\.')[0] -ge 3 -and
-            $_.'support-phase' -in @('active', 'maintenance')
+            [int]($_.'channel-version' -split '\.')[0] -ge 5
           } | Sort-Object { [int]($_.'channel-version' -split '\.')[0] }
 
-          Write-Host "Supported .NET versions: $($supportedVersions.'channel-version' -join ', ')"
+          Write-Host "Channels to check: $($channels.'channel-version' -join ', ')"
 
-          # Process each supported version
-          foreach ($versionInfo in $supportedVersions) {
+          # Runtime versions within a release can differ, so resolve each product individually
+          $products = @(
+            @{ Runtime = 'Microsoft\.NETCore\.App';        JsonProperty = 'runtime';            TitlePattern = '\.NET Runtime' }
+            @{ Runtime = 'Microsoft\.AspNetCore\.App';     JsonProperty = 'aspnetcore-runtime'; TitlePattern = 'ASP\.NET Core Runtime' }
+            @{ Runtime = 'Microsoft\.WindowsDesktop\.App'; JsonProperty = 'windowsdesktop';     TitlePattern = '\.NET Desktop Runtime' }
+          )
+
+          foreach ($versionInfo in $channels) {
             $channel = $versionInfo.'channel-version'
             $major = [int]($channel -split '\.')[0]
+            $minor = [int]($channel -split '\.')[1]
 
             Write-Host "`nChecking .NET $channel..."
 
-            # Fetch detailed release info
             $releasesUrl = $versionInfo.'releases.json'
             try {
-              $releases = Invoke-RestMethod -Uri $releasesUrl -ErrorAction Stop
+              $releases = Invoke-RestMethod -Uri $releasesUrl -MaximumRetryCount 3 -RetryIntervalSec 5 -ErrorAction Stop
             } catch {
               Write-Warning "Failed to fetch releases for .NET $channel : $_"
               continue
             }
 
-            # Get the latest stable release (exclude preview/rc versions)
-            # Sort by release-date descending to ensure we get the most recent release
-            $latestRelease = $releases.releases | 
-              Where-Object { $_.'release-version' -notmatch '-' } | 
-              Sort-Object { [DateTime]$_.'release-date' } -Descending | 
+            # latest stable release (preview/rc versions contain '-')
+            $latestRelease = $releases.releases |
+              Where-Object { $_.'release-version' -notmatch '-' } |
+              Sort-Object { [DateTime]$_.'release-date' } -Descending |
               Select-Object -First 1
 
             if (-not $latestRelease) {
@@ -79,57 +79,63 @@ jobs:
               continue
             }
 
-            $latestVersion = $latestRelease.'release-version'
-            $versionParts = $latestVersion -split '\.'
-            $latestPatch = [int]$versionParts[2]
+            Write-Host "Latest .NET $channel release: $($latestRelease.'release-version')"
+            $channelUpdates = @()
 
-            Write-Host "Latest .NET $channel version: $latestVersion (patch: $latestPatch)"
-
-            # Find current version in CodeDependencies.iss
-            # Pattern example: Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 8, 0, 11)
-            $currentPatchPattern = "Dependency_IsNetCoreInstalled\('Microsoft\.NETCore\.App',\s*$major,\s*0,\s*(\d+)\)"
-            $currentMatch = [regex]::Match($issContent, $currentPatchPattern)
-
-            if ($currentMatch.Success) {
-              $currentPatch = [int]$currentMatch.Groups[1].Value
-              Write-Host "Current .NET $major.0 patch in file: $currentPatch"
-
-              if ($latestPatch -gt $currentPatch) {
-                Write-Host "Update available: $major.0.$currentPatch -> $major.0.$latestPatch"
-                $updatesFound = $true
-                $updateSummary += "$major.0.$latestPatch"
-
-                # Update version checks - Runtime
-                $issContent = $issContent -replace `
-                  "(Dependency_IsNetCoreInstalled\('Microsoft\.NETCore\.App',\s*$major,\s*0,\s*)$currentPatch(\))", `
-                  "`${1}$latestPatch`${2}"
-
-                # Update version checks - ASP.NET
-                $issContent = $issContent -replace `
-                  "(Dependency_IsNetCoreInstalled\('Microsoft\.AspNetCore\.App',\s*$major,\s*0,\s*)$currentPatch(\))", `
-                  "`${1}$latestPatch`${2}"
-
-                # Update version checks - Desktop
-                $issContent = $issContent -replace `
-                  "(Dependency_IsNetCoreInstalled\('Microsoft\.WindowsDesktop\.App',\s*$major,\s*0,\s*)$currentPatch(\))", `
-                  "`${1}$latestPatch`${2}"
-
-                # Update title strings
-                $issContent = $issContent -replace `
-                  "('\.NET Runtime $major\.0\.)$currentPatch(')", `
-                  "`${1}$latestPatch`${2}"
-                $issContent = $issContent -replace `
-                  "('ASP\.NET Core Runtime $major\.0\.)$currentPatch(')", `
-                  "`${1}$latestPatch`${2}"
-                $issContent = $issContent -replace `
-                  "('\.NET Desktop Runtime $major\.0\.)$currentPatch(')", `
-                  "`${1}$latestPatch`${2}"
-
-              } else {
-                Write-Host ".NET $major.0 is up to date"
+            foreach ($product in $products) {
+              $latestVersion = $latestRelease.($product.JsonProperty).version
+              if (-not $latestVersion -or $latestVersion -match '-') {
+                continue
               }
-            } else {
-              Write-Host ".NET $major.0 not found in CodeDependencies.iss - may need to be added"
+              $latestPatch = [int]($latestVersion -split '\.')[2]
+
+              $currentPatchPattern = "Dependency_IsNetCoreInstalled\('$($product.Runtime)',\s*$major,\s*$minor,\s*(\d+)\)"
+              $currentMatch = [regex]::Match($issContent, $currentPatchPattern)
+
+              if (-not $currentMatch.Success) {
+                Write-Host "$($product.JsonProperty) $channel not found in CodeDependencies.iss - may need to be added"
+                continue
+              }
+
+              $currentPatch = [int]$currentMatch.Groups[1].Value
+              if ($latestPatch -gt $currentPatch) {
+                Write-Host "$($product.JsonProperty) update available: $major.$minor.$currentPatch -> $latestVersion"
+                $updatesFound = $true
+                $channelUpdates += $latestVersion
+
+                $issContent = $issContent -replace `
+                  "(Dependency_IsNetCoreInstalled\('$($product.Runtime)',\s*$major,\s*$minor,\s*)$currentPatch(\))", `
+                  "`${1}$latestPatch`${2}"
+
+                $issContent = $issContent -replace `
+                  "('$($product.TitlePattern) $major\.$minor\.)$currentPatch(')", `
+                  "`${1}$latestPatch`${2}"
+              } else {
+                Write-Host "$($product.JsonProperty) $channel is up to date"
+              }
+            }
+
+            # hosting bundle entries track the ASP.NET Core runtime version
+            $aspVersion = $latestRelease.'aspnetcore-runtime'.version
+            if ($aspVersion -and $aspVersion -notmatch '-' -and $minor -eq 0) {
+              $latestPatch = [int]($aspVersion -split '\.')[2]
+              $hostingPattern = "Dependency_AddDotNetHosting\($major,\s*(\d+),"
+              $hostingMatch = [regex]::Match($issContent, $hostingPattern)
+              if ($hostingMatch.Success) {
+                $currentPatch = [int]$hostingMatch.Groups[1].Value
+                if ($latestPatch -gt $currentPatch) {
+                  Write-Host "hosting bundle update available: $major.0.$currentPatch -> $aspVersion"
+                  $updatesFound = $true
+                  $channelUpdates += $aspVersion
+                  $issContent = $issContent -replace `
+                    "(Dependency_AddDotNetHosting\($major,\s*)$currentPatch(,)", `
+                    "`${1}$latestPatch`${2}"
+                }
+              }
+            }
+
+            if ($channelUpdates.Count -gt 0) {
+              $updateSummary += ($channelUpdates | Select-Object -Unique)
             }
           }
 
@@ -168,4 +174,5 @@ jobs:
         if: steps.create-pr.outputs.pull-request-number
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash ${{ steps.create-pr.outputs.pull-request-number }} --repo ${{ github.repository }}
+        # --body "" stops GitHub appending a Co-authored-by trailer to the squash commit
+        run: gh pr merge --auto --squash --body "" ${{ steps.create-pr.outputs.pull-request-number }} --repo ${{ github.repository }}
