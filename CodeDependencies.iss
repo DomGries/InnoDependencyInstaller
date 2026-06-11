@@ -239,7 +239,7 @@ end;
 
 function Dependency_IsX64: Boolean;
 begin
-  Result := not Dependency_ForceX86 and Is64BitInstallMode;
+  Result := not Dependency_ForceX86 and (Is64BitInstallMode or (Dependency_ForceX64 and IsX64Compatible));
 end;
 
 function Dependency_String(const x86, x64, arm64: String): String;
