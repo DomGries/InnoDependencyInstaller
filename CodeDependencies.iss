@@ -580,9 +580,9 @@ begin
   end;
 end;
 
-procedure Dependency_AddDotNet80Hosting; begin Dependency_AddDotNetHosting(8, 27, 'https://aka.ms/dotnet/8.0/dotnet-hosting-win.exe'); end;
-procedure Dependency_AddDotNet90Hosting; begin Dependency_AddDotNetHosting(9, 16, 'https://aka.ms/dotnet/9.0/dotnet-hosting-win.exe'); end;
-procedure Dependency_AddDotNet100Hosting; begin Dependency_AddDotNetHosting(10, 8, 'https://aka.ms/dotnet/10.0/dotnet-hosting-win.exe'); end;
+procedure Dependency_AddDotNet80Hosting; begin Dependency_AddDotNetHosting(8, 28, 'https://aka.ms/dotnet/8.0/dotnet-hosting-win.exe'); end;
+procedure Dependency_AddDotNet90Hosting; begin Dependency_AddDotNetHosting(9, 17, 'https://aka.ms/dotnet/9.0/dotnet-hosting-win.exe'); end;
+procedure Dependency_AddDotNet100Hosting; begin Dependency_AddDotNetHosting(10, 9, 'https://aka.ms/dotnet/10.0/dotnet-hosting-win.exe'); end;
 
 procedure Dependency_AddVC2005;
 begin
