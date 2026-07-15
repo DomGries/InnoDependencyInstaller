@@ -505,66 +505,66 @@ end;
 procedure Dependency_AddDotNet80;
 begin
   // https://dotnet.microsoft.com/download/dotnet/8.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 8, 0, 28) then begin
-    Dependency_AddNetCore('dotnet80', '.NET Runtime 8.0.28', Dependency_String('https://aka.ms/dotnet/8.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 8, 0, 29) then begin
+    Dependency_AddNetCore('dotnet80', '.NET Runtime 8.0.29', Dependency_String('https://aka.ms/dotnet/8.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-arm64.exe'));
   end;
 end;
 
 procedure Dependency_AddDotNet80Asp;
 begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 8, 0, 28) then begin
-    Dependency_AddNetCore('dotnet80asp', 'ASP.NET Core Runtime 8.0.28', Dependency_String('https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 8, 0, 29) then begin
+    Dependency_AddNetCore('dotnet80asp', 'ASP.NET Core Runtime 8.0.29', Dependency_String('https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-arm64.exe'));
   end;
 end;
 
 procedure Dependency_AddDotNet80Desktop;
 begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 8, 0, 28) then begin
-    Dependency_AddNetCore('dotnet80desktop', '.NET Desktop Runtime 8.0.28', Dependency_String('https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 8, 0, 29) then begin
+    Dependency_AddNetCore('dotnet80desktop', '.NET Desktop Runtime 8.0.29', Dependency_String('https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-arm64.exe'));
   end;
 end;
 
 procedure Dependency_AddDotNet90;
 begin
   // https://dotnet.microsoft.com/download/dotnet/9.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 9, 0, 17) then begin
-    Dependency_AddNetCore('dotnet90', '.NET Runtime 9.0.17', Dependency_String('https://aka.ms/dotnet/9.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/dotnet-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 9, 0, 18) then begin
+    Dependency_AddNetCore('dotnet90', '.NET Runtime 9.0.18', Dependency_String('https://aka.ms/dotnet/9.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/dotnet-runtime-win-arm64.exe'));
   end;
 end;
 
 procedure Dependency_AddDotNet90Asp;
 begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 9, 0, 17) then begin
-    Dependency_AddNetCore('dotnet90asp', 'ASP.NET Core Runtime 9.0.17', Dependency_String('https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 9, 0, 18) then begin
+    Dependency_AddNetCore('dotnet90asp', 'ASP.NET Core Runtime 9.0.18', Dependency_String('https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-arm64.exe'));
   end;
 end;
 
 procedure Dependency_AddDotNet90Desktop;
 begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 9, 0, 17) then begin
-    Dependency_AddNetCore('dotnet90desktop', '.NET Desktop Runtime 9.0.17', Dependency_String('https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 9, 0, 18) then begin
+    Dependency_AddNetCore('dotnet90desktop', '.NET Desktop Runtime 9.0.18', Dependency_String('https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-arm64.exe'));
   end;
 end;
 
 procedure Dependency_AddDotNet100;
 begin
   // https://dotnet.microsoft.com/download/dotnet/10.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 10, 0, 9) then begin
-    Dependency_AddNetCore('dotnet100', '.NET Runtime 10.0.9', Dependency_String('https://aka.ms/dotnet/10.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/dotnet-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 10, 0, 10) then begin
+    Dependency_AddNetCore('dotnet100', '.NET Runtime 10.0.10', Dependency_String('https://aka.ms/dotnet/10.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/dotnet-runtime-win-arm64.exe'));
   end;
 end;
 
 procedure Dependency_AddDotNet100Asp;
 begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 10, 0, 9) then begin
-    Dependency_AddNetCore('dotnet100asp', 'ASP.NET Core Runtime 10.0.9', Dependency_String('https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 10, 0, 10) then begin
+    Dependency_AddNetCore('dotnet100asp', 'ASP.NET Core Runtime 10.0.10', Dependency_String('https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-arm64.exe'));
   end;
 end;
 
 procedure Dependency_AddDotNet100Desktop;
 begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 10, 0, 9) then begin
-    Dependency_AddNetCore('dotnet100desktop', '.NET Desktop Runtime 10.0.9', Dependency_String('https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-arm64.exe'));
+  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 10, 0, 10) then begin
+    Dependency_AddNetCore('dotnet100desktop', '.NET Desktop Runtime 10.0.10', Dependency_String('https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-arm64.exe'));
   end;
 end;
 
@@ -580,9 +580,9 @@ begin
   end;
 end;
 
-procedure Dependency_AddDotNet80Hosting; begin Dependency_AddDotNetHosting(8, 28, 'https://aka.ms/dotnet/8.0/dotnet-hosting-win.exe'); end;
-procedure Dependency_AddDotNet90Hosting; begin Dependency_AddDotNetHosting(9, 17, 'https://aka.ms/dotnet/9.0/dotnet-hosting-win.exe'); end;
-procedure Dependency_AddDotNet100Hosting; begin Dependency_AddDotNetHosting(10, 9, 'https://aka.ms/dotnet/10.0/dotnet-hosting-win.exe'); end;
+procedure Dependency_AddDotNet80Hosting; begin Dependency_AddDotNetHosting(8, 29, 'https://aka.ms/dotnet/8.0/dotnet-hosting-win.exe'); end;
+procedure Dependency_AddDotNet90Hosting; begin Dependency_AddDotNetHosting(9, 18, 'https://aka.ms/dotnet/9.0/dotnet-hosting-win.exe'); end;
+procedure Dependency_AddDotNet100Hosting; begin Dependency_AddDotNetHosting(10, 10, 'https://aka.ms/dotnet/10.0/dotnet-hosting-win.exe'); end;
 
 procedure Dependency_AddVC2005;
 begin
