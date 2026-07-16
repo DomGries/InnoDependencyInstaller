@@ -648,9 +648,20 @@ procedure Dependency_AddVC14;
 var
   Version: String;
   PackedVersion: Int64;
+  RootKey: Integer;
 begin
   // https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
-  if RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\' + Dependency_String('x86', 'x64', 'arm64'), 'Version', Version) and (Copy(Version, 1, 1) = 'v') then begin
+  // The x86 VC++ runtime registers its version only in the 32-bit registry view
+  // (WOW6432Node), the x64 runtime in the 64-bit view. A plain HKLM read uses the 64-bit view in
+  // 64-bit install mode and therefore never finds the x86 runtime, so the x86 redist was detected as
+  // missing and (re)installed on every run. Select the registry view that matches the queried
+  // architecture so an already-present runtime is detected correctly.
+  if Dependency_IsArm64 or Dependency_IsX64 then begin
+    RootKey := HKLM64;
+  end else begin
+    RootKey := HKLM32;
+  end;
+  if RegQueryStringValue(RootKey, 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\' + Dependency_String('x86', 'x64', 'arm64'), 'Version', Version) and (Copy(Version, 1, 1) = 'v') then begin
     Delete(Version, 1, 1);
   end;
   if not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(14, 51, 36247, 0)) < 0) then begin
