@@ -263,6 +263,15 @@ begin
   Result := Dependency_String(' (x86)', ' (x64)', ' (arm64)');
 end;
 
+function Dependency_ArchHKLM: Integer;
+begin
+  if Dependency_IsArm64 or Dependency_IsX64 then begin
+    Result := HKLM64;
+  end else begin
+    Result := HKLM32;
+  end;
+end;
+
 function Dependency_PassiveOrQuiet(const Passive, Quiet: String): String;
 begin
   if WizardSilent then begin
@@ -650,7 +659,7 @@ var
   PackedVersion: Int64;
 begin
   // https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
-  if RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\' + Dependency_String('x86', 'x64', 'arm64'), 'Version', Version) and (Copy(Version, 1, 1) = 'v') then begin
+  if RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\' + Dependency_String('x86', 'x64', 'arm64'), 'Version', Version) and (Copy(Version, 1, 1) = 'v') then begin
     Delete(Version, 1, 1);
   end;
   if not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(14, 51, 36247, 0)) < 0) then begin
@@ -681,7 +690,7 @@ var
   PackedVersion: Int64;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=30438
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(10, 50, 4000, 0)) < 0) then begin
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(10, 50, 4000, 0)) < 0) then begin
     Dependency_Add('sql2008express' + Dependency_ArchSuffix + '.exe',
       Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2008 R2 Service Pack 2 Express',
@@ -696,7 +705,7 @@ var
   PackedVersion: Int64;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=56042
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(11, 0, 7001, 0)) < 0) then begin
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(11, 0, 7001, 0)) < 0) then begin
     Dependency_Add('sql2012express' + Dependency_ArchSuffix + '.exe',
       Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2012 Service Pack 4 Express',
@@ -711,7 +720,7 @@ var
   PackedVersion: Int64;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=57473
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(12, 0, 6024, 0)) < 0) then begin
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(12, 0, 6024, 0)) < 0) then begin
     Dependency_Add('sql2014express' + Dependency_ArchSuffix + '.exe',
       Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2014 Service Pack 3 Express',
@@ -726,7 +735,7 @@ var
   PackedVersion: Int64;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=103447
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(13, 0, 6404, 1)) < 0) then begin
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(13, 0, 6404, 1)) < 0) then begin
     Dependency_Add('sql2016express' + Dependency_ArchSuffix + '.exe',
       Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2016 Service Pack 3 Express',
@@ -741,7 +750,7 @@ var
   PackedVersion: Int64;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=55994
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(14, 0, 0, 0)) < 0) then begin
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(14, 0, 0, 0)) < 0) then begin
     Dependency_Add('sql2017express' + Dependency_ArchSuffix + '.exe',
       Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2017 Express',
@@ -756,7 +765,7 @@ var
   PackedVersion: Int64;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=101064
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(15, 0, 0, 0)) < 0) then begin
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(15, 0, 0, 0)) < 0) then begin
     Dependency_Add('sql2019express' + Dependency_ArchSuffix + '.exe',
       Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2019 Express',
@@ -771,7 +780,7 @@ var
   PackedVersion: Int64;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=104781
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(16, 0, 1000, 6)) < 0) then begin
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(16, 0, 1000, 6)) < 0) then begin
     Dependency_Add('sql2022express' + Dependency_ArchSuffix + '.exe',
       Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2022 Express',
@@ -786,7 +795,7 @@ var
   PackedVersion: Int64;
 begin
   // https://www.microsoft.com/en-us/sql-server/sql-server-downloads
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL17.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(17, 0, 1000, 7)) < 0) then begin
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL17.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(17, 0, 1000, 7)) < 0) then begin
     Dependency_Add('sql2025express' + Dependency_ArchSuffix + '.exe',
       Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
       'SQL Server 2025 Express',
@@ -798,7 +807,7 @@ end;
 procedure Dependency_AddSqlOleDb19;
 begin
   // https://learn.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server
-  if not RegValueExists(HKLM, 'SOFTWARE\Microsoft\MSOLEDBSQL19', 'InstalledVersion') then begin
+  if not RegValueExists(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\MSOLEDBSQL19', 'InstalledVersion') then begin
     Dependency_Add('msoledbsql' + Dependency_ArchSuffix + '.msi',
       '/qn /norestart IACCEPTMSOLEDBSQLLICENSETERMS=YES',
       'Microsoft OLE DB Driver 19 for SQL Server' + Dependency_ArchTitle,
@@ -810,7 +819,7 @@ end;
 procedure Dependency_AddSqlOdbc18;
 begin
   // https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server
-  if not RegKeyExists(HKLM, 'SOFTWARE\ODBC\ODBCINST.INI\ODBC Driver 18 for SQL Server') then begin
+  if not RegKeyExists(Dependency_ArchHKLM, 'SOFTWARE\ODBC\ODBCINST.INI\ODBC Driver 18 for SQL Server') then begin
     Dependency_Add('msodbcsql' + Dependency_ArchSuffix + '.msi',
       '/qn /norestart IACCEPTMSODBCSQLLICENSETERMS=YES',
       'Microsoft ODBC Driver 18 for SQL Server' + Dependency_ArchTitle,
@@ -822,7 +831,7 @@ end;
 procedure Dependency_AddWebView2;
 begin
   // https://developer.microsoft.com/en-us/microsoft-edge/webview2
-  if not (RegValueExists(HKLM, Dependency_String('SOFTWARE', 'SOFTWARE\WOW6432Node', 'SOFTWARE\WOW6432Node') + '\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')
+  if not (RegValueExists(HKLM32, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')
     or RegValueExists(HKCU, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')) then begin
     Dependency_Add('MicrosoftEdgeWebview2Setup.exe',
       '/silent /install',
@@ -835,7 +844,7 @@ end;
 procedure Dependency_AddAccessDatabaseEngine2016;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=54920
-  if not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Office\16.0\Access Connectivity Engine\Engines\ACE') then begin
+  if not RegKeyExists(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Office\16.0\Access Connectivity Engine\Engines\ACE') then begin
     Dependency_Add('AccessDatabaseEngine2016' + Dependency_ArchSuffix + '.exe',
       '/quiet',
       'Microsoft Access Database Engine 2016' + Dependency_ArchTitle,
@@ -847,7 +856,7 @@ end;
 procedure Dependency_AddVSTORuntime;
 begin
   // https://learn.microsoft.com/en-us/visualstudio/vsto/how-to-install-the-visual-studio-tools-for-office-runtime-redistributable
-  if not RegKeyExists(HKLM, Dependency_String('SOFTWARE', 'SOFTWARE\WOW6432Node', 'SOFTWARE\WOW6432Node') + '\Microsoft\VSTO Runtime Setup\v4R') then begin
+  if not RegKeyExists(HKLM32, 'SOFTWARE\Microsoft\VSTO Runtime Setup\v4R') then begin
     Dependency_Add('vstor_redist.exe',
       '/q /norestart',
       'Visual Studio 2010 Tools for Office Runtime',
