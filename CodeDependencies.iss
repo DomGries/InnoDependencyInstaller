@@ -281,6 +281,16 @@ begin
   end;
 end;
 
+function Dependency_IsMsiProductInstalled(const UpgradeCode: String; const PackedMinVersion: Int64): Boolean;
+begin
+  try
+    Result := IsMsiProductInstalled(UpgradeCode, PackedMinVersion);
+  except
+    Log('Failed to query MSI product ' + UpgradeCode + ': ' + GetExceptionMessage);
+    Result := False;
+  end;
+end;
+
 var
   Dependency_NetCoreRuntimesArch: String;
   Dependency_NetCoreRuntimes: TArrayOfString;
@@ -592,20 +602,6 @@ end;
 procedure Dependency_AddDotNet80Hosting; begin Dependency_AddDotNetHosting(8, 29, 'https://aka.ms/dotnet/8.0/dotnet-hosting-win.exe'); end;
 procedure Dependency_AddDotNet90Hosting; begin Dependency_AddDotNetHosting(9, 18, 'https://aka.ms/dotnet/9.0/dotnet-hosting-win.exe'); end;
 procedure Dependency_AddDotNet100Hosting; begin Dependency_AddDotNetHosting(10, 10, 'https://aka.ms/dotnet/10.0/dotnet-hosting-win.exe'); end;
-
-function Dependency_IsMsiProductInstalled(const UpgradeCode: String; const PackedMinVersion: Int64): Boolean;
-begin
-  try
-    Result := IsMsiProductInstalled(UpgradeCode, PackedMinVersion);
-  except
-    // IsMsiProductInstalled raises an exception when Windows Installer itself is not functional
-    // (e.g. corrupted MSI configuration data), which would abort setup before any UI is shown.
-    // Treat this as "not installed" so the dependency is still offered; the redistributable
-    // installers are idempotent, so a redundant install attempt is harmless.
-    Log('Failed to query MSI product ' + UpgradeCode + ': ' + GetExceptionMessage);
-    Result := False;
-  end;
-end;
 
 procedure Dependency_AddVC2005;
 begin
