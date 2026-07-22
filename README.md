@@ -110,8 +110,7 @@ Call any of these functions inside `InitializeSetup`. Every function first check
 | Visual Studio 2010 Tools for Office Runtime (VSTO) | `Dependency_AddVSTORuntime` |
 | DirectX End-User Runtime | `Dependency_AddDirectX` |
 | WebView2 Runtime | `Dependency_AddWebView2` |
-| Windows App SDK Runtime 2.0 (WinUI 3) | `Dependency_AddWinAppRuntime20` |
-| Windows App SDK Runtime 2.1 (WinUI 3) | `Dependency_AddWinAppRuntime21` |
+| Windows App SDK Runtime 2 (WinUI 3) | `Dependency_AddWinAppRuntime2` |
 | OpenJDK 8 (Eclipse Temurin, x86/x64) | `Dependency_AddJava8` |
 | OpenJDK 11 (Microsoft Build of OpenJDK, x64/arm64) | `Dependency_AddJava11` |
 | OpenJDK 17 (Microsoft Build of OpenJDK, x64/arm64) | `Dependency_AddJava17` |

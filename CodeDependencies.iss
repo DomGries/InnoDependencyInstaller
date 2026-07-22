@@ -88,12 +88,10 @@ begin
             if Dependency_DownloadPage.AbortedByUser then begin
               Log('Download aborted by user: ' + Dependency_List[DependencyIndex].Title);
               Result := Dependency_List[DependencyIndex].Title;
-              DependencyIndex := DependencyCount;
             end else begin
               case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
                 IDABORT: begin
                   Result := Dependency_List[DependencyIndex].Title;
-                  DependencyIndex := DependencyCount;
                 end;
                 IDRETRY: begin
                   Retry := True;
@@ -101,6 +99,9 @@ begin
               end;
             end;
           end;
+        end;
+        if Result <> '' then begin
+          break;
         end;
       end;
     end;
@@ -253,6 +254,11 @@ begin
   end;
 end;
 
+function Dependency_StringX64(const x86, x64: String): String;
+begin
+  Result := Dependency_String(x86, x64, x64);
+end;
+
 function Dependency_ArchSuffix: String;
 begin
   Result := Dependency_String('', '_x64', '_arm64');
@@ -312,7 +318,7 @@ begin
     Path := AddBackslash(Path);
   end;
   if not FileExists(Path + 'dotnet.exe') then begin
-    Path := ExpandConstant(Dependency_String('{commonpf32}', '{commonpf64}', '{commonpf64}')) + '\dotnet\';
+    Path := ExpandConstant(Dependency_StringX64('{commonpf32}', '{commonpf64}')) + '\dotnet\';
   end;
   if ExecAndCaptureOutput(Path + 'dotnet.exe', '--list-runtimes', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
     Dependency_NetCoreRuntimes := Output.StdOut;
@@ -331,7 +337,7 @@ begin
   for LineIndex := 0 to Length(Dependency_NetCoreRuntimes) - 1 do begin
     LineParts := StringSplit(Trim(Dependency_NetCoreRuntimes[LineIndex]), [' '], stExcludeEmpty);
 
-    if (Length(LineParts) > 1) and (Lowercase(LineParts[0]) = Lowercase(Runtime)) and StrToVersion(LineParts[1], PackedVersion) then begin
+    if (Length(LineParts) > 1) and SameText(LineParts[0], Runtime) and StrToVersion(LineParts[1], PackedVersion) then begin
       UnpackVersionComponents(PackedVersion, LineMajor, LineMinor, LineRevision, LineBuild);
 
       if (LineMajor = Major) and (LineMinor = Minor) and (LineRevision >= Revision) then begin
@@ -436,164 +442,39 @@ begin
     '', False, False);
 end;
 
-procedure Dependency_AddNetCore31;
+procedure Dependency_AddNetCoreRuntime(const Runtime, Prefix, Title: String; Major, Minor, Revision: Word; const URL: String);
 begin
-  // https://dotnet.microsoft.com/download/dotnet-core/3.1
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 3, 1, 32) then begin
-    Dependency_AddNetCore('netcore31', '.NET Core Runtime 3.1.32', Dependency_String('https://download.visualstudio.microsoft.com/download/pr/de4b3438-24a2-4d1d-a845-97355cf97b71/515abb880478b49f7c1bced8fbf07b16/dotnet-runtime-3.1.32-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/476eba79-f17f-49c8-a213-0f24a22cd026/37c02de81ff5b76ac57a5427462395f1/dotnet-runtime-3.1.32-win-x64.exe', 'https://download.visualstudio.microsoft.com/download/pr/476eba79-f17f-49c8-a213-0f24a22cd026/37c02de81ff5b76ac57a5427462395f1/dotnet-runtime-3.1.32-win-x64.exe'));
+  if not Dependency_IsNetCoreInstalled(Runtime, Major, Minor, Revision) then begin
+    Dependency_AddNetCore(Prefix, Title + ' ' + IntToStr(Major) + '.' + IntToStr(Minor) + '.' + IntToStr(Revision), URL);
   end;
 end;
 
-procedure Dependency_AddNetCore31Asp;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 3, 1, 32) then begin
-    Dependency_AddNetCore('netcore31asp', 'ASP.NET Core Runtime 3.1.32', Dependency_String('https://download.visualstudio.microsoft.com/download/pr/63b482d2-04b2-4dd4-baaf-d1e78de80738/40321091c872f4e77337b68fc61a5a07/aspnetcore-runtime-3.1.32-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/98910750-2644-472c-ab2b-17f315ccb953/c2a4c223ee11e2eec7d13744e7a45547/aspnetcore-runtime-3.1.32-win-x64.exe', 'https://download.visualstudio.microsoft.com/download/pr/98910750-2644-472c-ab2b-17f315ccb953/c2a4c223ee11e2eec7d13744e7a45547/aspnetcore-runtime-3.1.32-win-x64.exe'));
-  end;
-end;
-
-procedure Dependency_AddNetCore31Desktop;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 3, 1, 32) then begin
-    Dependency_AddNetCore('netcore31desktop', '.NET Desktop Runtime 3.1.32', Dependency_String('https://download.visualstudio.microsoft.com/download/pr/3f353d2c-0431-48c5-bdf6-fbbe8f901bb5/542a4af07c1df5136a98a1c2df6f3d62/windowsdesktop-runtime-3.1.32-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe', 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet50;
-begin
-  // https://dotnet.microsoft.com/download/dotnet/5.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 5, 0, 17) then begin
-    Dependency_AddNetCore('dotnet50', '.NET Runtime 5.0.17', Dependency_String('https://aka.ms/dotnet/5.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/5.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/5.0/dotnet-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet50Asp;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 5, 0, 17) then begin
-    Dependency_AddNetCore('dotnet50asp', 'ASP.NET Core Runtime 5.0.17', Dependency_String('https://aka.ms/dotnet/5.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/5.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/5.0/aspnetcore-runtime-win-x64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet50Desktop;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 5, 0, 17) then begin
-    Dependency_AddNetCore('dotnet50desktop', '.NET Desktop Runtime 5.0.17', Dependency_String('https://aka.ms/dotnet/5.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/5.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/5.0/windowsdesktop-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet60;
-begin
-  // https://dotnet.microsoft.com/download/dotnet/6.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 6, 0, 36) then begin
-    Dependency_AddNetCore('dotnet60', '.NET Runtime 6.0.36', Dependency_String('https://aka.ms/dotnet/6.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/6.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/6.0/dotnet-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet60Asp;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 6, 0, 36) then begin
-    Dependency_AddNetCore('dotnet60asp', 'ASP.NET Core Runtime 6.0.36', Dependency_String('https://aka.ms/dotnet/6.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/6.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/6.0/aspnetcore-runtime-win-x64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet60Desktop;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 6, 0, 36) then begin
-    Dependency_AddNetCore('dotnet60desktop', '.NET Desktop Runtime 6.0.36', Dependency_String('https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet70;
-begin
-  // https://dotnet.microsoft.com/download/dotnet/7.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 7, 0, 20) then begin
-    Dependency_AddNetCore('dotnet70', '.NET Runtime 7.0.20', Dependency_String('https://aka.ms/dotnet/7.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/7.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/7.0/dotnet-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet70Asp;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 7, 0, 20) then begin
-    Dependency_AddNetCore('dotnet70asp', 'ASP.NET Core Runtime 7.0.20', Dependency_String('https://aka.ms/dotnet/7.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/7.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/7.0/aspnetcore-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet70Desktop;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 7, 0, 20) then begin
-    Dependency_AddNetCore('dotnet70desktop', '.NET Desktop Runtime 7.0.20', Dependency_String('https://aka.ms/dotnet/7.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/7.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/7.0/windowsdesktop-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet80;
-begin
-  // https://dotnet.microsoft.com/download/dotnet/8.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 8, 0, 29) then begin
-    Dependency_AddNetCore('dotnet80', '.NET Runtime 8.0.29', Dependency_String('https://aka.ms/dotnet/8.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet80Asp;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 8, 0, 29) then begin
-    Dependency_AddNetCore('dotnet80asp', 'ASP.NET Core Runtime 8.0.29', Dependency_String('https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet80Desktop;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 8, 0, 29) then begin
-    Dependency_AddNetCore('dotnet80desktop', '.NET Desktop Runtime 8.0.29', Dependency_String('https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet90;
-begin
-  // https://dotnet.microsoft.com/download/dotnet/9.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 9, 0, 18) then begin
-    Dependency_AddNetCore('dotnet90', '.NET Runtime 9.0.18', Dependency_String('https://aka.ms/dotnet/9.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/dotnet-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet90Asp;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 9, 0, 18) then begin
-    Dependency_AddNetCore('dotnet90asp', 'ASP.NET Core Runtime 9.0.18', Dependency_String('https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet90Desktop;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 9, 0, 18) then begin
-    Dependency_AddNetCore('dotnet90desktop', '.NET Desktop Runtime 9.0.18', Dependency_String('https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet100;
-begin
-  // https://dotnet.microsoft.com/download/dotnet/10.0
-  if not Dependency_IsNetCoreInstalled('Microsoft.NETCore.App', 10, 0, 10) then begin
-    Dependency_AddNetCore('dotnet100', '.NET Runtime 10.0.10', Dependency_String('https://aka.ms/dotnet/10.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/dotnet-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet100Asp;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', 10, 0, 10) then begin
-    Dependency_AddNetCore('dotnet100asp', 'ASP.NET Core Runtime 10.0.10', Dependency_String('https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-arm64.exe'));
-  end;
-end;
-
-procedure Dependency_AddDotNet100Desktop;
-begin
-  if not Dependency_IsNetCoreInstalled('Microsoft.WindowsDesktop.App', 10, 0, 10) then begin
-    Dependency_AddNetCore('dotnet100desktop', '.NET Desktop Runtime 10.0.10', Dependency_String('https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-arm64.exe'));
-  end;
-end;
+procedure Dependency_AddNetCore31; begin Dependency_AddNetCoreRuntime('Microsoft.NETCore.App', 'netcore31', '.NET Core Runtime', 3, 1, 32, Dependency_StringX64('https://download.visualstudio.microsoft.com/download/pr/de4b3438-24a2-4d1d-a845-97355cf97b71/515abb880478b49f7c1bced8fbf07b16/dotnet-runtime-3.1.32-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/476eba79-f17f-49c8-a213-0f24a22cd026/37c02de81ff5b76ac57a5427462395f1/dotnet-runtime-3.1.32-win-x64.exe')); end;
+procedure Dependency_AddNetCore31Asp; begin Dependency_AddNetCoreRuntime('Microsoft.AspNetCore.App', 'netcore31asp', 'ASP.NET Core Runtime', 3, 1, 32, Dependency_StringX64('https://download.visualstudio.microsoft.com/download/pr/63b482d2-04b2-4dd4-baaf-d1e78de80738/40321091c872f4e77337b68fc61a5a07/aspnetcore-runtime-3.1.32-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/98910750-2644-472c-ab2b-17f315ccb953/c2a4c223ee11e2eec7d13744e7a45547/aspnetcore-runtime-3.1.32-win-x64.exe')); end;
+procedure Dependency_AddNetCore31Desktop; begin Dependency_AddNetCoreRuntime('Microsoft.WindowsDesktop.App', 'netcore31desktop', '.NET Desktop Runtime', 3, 1, 32, Dependency_StringX64('https://download.visualstudio.microsoft.com/download/pr/3f353d2c-0431-48c5-bdf6-fbbe8f901bb5/542a4af07c1df5136a98a1c2df6f3d62/windowsdesktop-runtime-3.1.32-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe')); end;
+procedure Dependency_AddDotNet50; begin Dependency_AddNetCoreRuntime('Microsoft.NETCore.App', 'dotnet50', '.NET Runtime', 5, 0, 17, Dependency_String('https://aka.ms/dotnet/5.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/5.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/5.0/dotnet-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet50Asp; begin Dependency_AddNetCoreRuntime('Microsoft.AspNetCore.App', 'dotnet50asp', 'ASP.NET Core Runtime', 5, 0, 17, Dependency_StringX64('https://aka.ms/dotnet/5.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/5.0/aspnetcore-runtime-win-x64.exe')); end;
+procedure Dependency_AddDotNet50Desktop; begin Dependency_AddNetCoreRuntime('Microsoft.WindowsDesktop.App', 'dotnet50desktop', '.NET Desktop Runtime', 5, 0, 17, Dependency_String('https://aka.ms/dotnet/5.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/5.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/5.0/windowsdesktop-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet60; begin Dependency_AddNetCoreRuntime('Microsoft.NETCore.App', 'dotnet60', '.NET Runtime', 6, 0, 36, Dependency_String('https://aka.ms/dotnet/6.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/6.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/6.0/dotnet-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet60Asp; begin Dependency_AddNetCoreRuntime('Microsoft.AspNetCore.App', 'dotnet60asp', 'ASP.NET Core Runtime', 6, 0, 36, Dependency_StringX64('https://aka.ms/dotnet/6.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/6.0/aspnetcore-runtime-win-x64.exe')); end;
+procedure Dependency_AddDotNet60Desktop; begin Dependency_AddNetCoreRuntime('Microsoft.WindowsDesktop.App', 'dotnet60desktop', '.NET Desktop Runtime', 6, 0, 36, Dependency_String('https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/6.0/windowsdesktop-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet70; begin Dependency_AddNetCoreRuntime('Microsoft.NETCore.App', 'dotnet70', '.NET Runtime', 7, 0, 20, Dependency_String('https://aka.ms/dotnet/7.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/7.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/7.0/dotnet-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet70Asp; begin Dependency_AddNetCoreRuntime('Microsoft.AspNetCore.App', 'dotnet70asp', 'ASP.NET Core Runtime', 7, 0, 20, Dependency_String('https://aka.ms/dotnet/7.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/7.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/7.0/aspnetcore-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet70Desktop; begin Dependency_AddNetCoreRuntime('Microsoft.WindowsDesktop.App', 'dotnet70desktop', '.NET Desktop Runtime', 7, 0, 20, Dependency_String('https://aka.ms/dotnet/7.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/7.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/7.0/windowsdesktop-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet80; begin Dependency_AddNetCoreRuntime('Microsoft.NETCore.App', 'dotnet80', '.NET Runtime', 8, 0, 29, Dependency_String('https://aka.ms/dotnet/8.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/dotnet-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet80Asp; begin Dependency_AddNetCoreRuntime('Microsoft.AspNetCore.App', 'dotnet80asp', 'ASP.NET Core Runtime', 8, 0, 29, Dependency_String('https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/aspnetcore-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet80Desktop; begin Dependency_AddNetCoreRuntime('Microsoft.WindowsDesktop.App', 'dotnet80desktop', '.NET Desktop Runtime', 8, 0, 29, Dependency_String('https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/8.0/windowsdesktop-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet90; begin Dependency_AddNetCoreRuntime('Microsoft.NETCore.App', 'dotnet90', '.NET Runtime', 9, 0, 18, Dependency_String('https://aka.ms/dotnet/9.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/dotnet-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet90Asp; begin Dependency_AddNetCoreRuntime('Microsoft.AspNetCore.App', 'dotnet90asp', 'ASP.NET Core Runtime', 9, 0, 18, Dependency_String('https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/aspnetcore-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet90Desktop; begin Dependency_AddNetCoreRuntime('Microsoft.WindowsDesktop.App', 'dotnet90desktop', '.NET Desktop Runtime', 9, 0, 18, Dependency_String('https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/9.0/windowsdesktop-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet100; begin Dependency_AddNetCoreRuntime('Microsoft.NETCore.App', 'dotnet100', '.NET Runtime', 10, 0, 10, Dependency_String('https://aka.ms/dotnet/10.0/dotnet-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/dotnet-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/dotnet-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet100Asp; begin Dependency_AddNetCoreRuntime('Microsoft.AspNetCore.App', 'dotnet100asp', 'ASP.NET Core Runtime', 10, 0, 10, Dependency_String('https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/aspnetcore-runtime-win-arm64.exe')); end;
+procedure Dependency_AddDotNet100Desktop; begin Dependency_AddNetCoreRuntime('Microsoft.WindowsDesktop.App', 'dotnet100desktop', '.NET Desktop Runtime', 10, 0, 10, Dependency_String('https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x86.exe', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-x64.exe', 'https://aka.ms/dotnet/10.0/windowsdesktop-runtime-win-arm64.exe')); end;
 
 procedure Dependency_AddDotNetHosting(const Major, Patch: Integer; const URL: String);
 begin
   // https://dotnet.microsoft.com/download/dotnet
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', Major, 0, Patch) or not FileExists(ExpandConstant(Dependency_String('{commonpf32}', '{commonpf64}', '{commonpf64}')) + '\IIS\Asp.Net Core Module\V2\aspnetcorev2.dll') then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', Major, 0, Patch) or not FileExists(ExpandConstant(Dependency_StringX64('{commonpf32}', '{commonpf64}')) + '\IIS\Asp.Net Core Module\V2\aspnetcorev2.dll') then begin
     Dependency_Add('dotnet' + IntToStr(Major) + '0hosting.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
       'ASP.NET Core ' + IntToStr(Major) + '.0 Hosting Bundle',
@@ -606,65 +487,18 @@ procedure Dependency_AddDotNet80Hosting; begin Dependency_AddDotNetHosting(8, 29
 procedure Dependency_AddDotNet90Hosting; begin Dependency_AddDotNetHosting(9, 18, 'https://aka.ms/dotnet/9.0/dotnet-hosting-win.exe'); end;
 procedure Dependency_AddDotNet100Hosting; begin Dependency_AddDotNetHosting(10, 10, 'https://aka.ms/dotnet/10.0/dotnet-hosting-win.exe'); end;
 
-procedure Dependency_AddVC2005;
+procedure Dependency_AddVCMsi(const Year, Title, UpgradeCodeX86, UpgradeCodeX64: String; Major, Minor, Build, Revision: Word; const Parameters, URLX86, URLX64: String);
 begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=26347
-  if not Dependency_IsMsiProductInstalled(Dependency_String('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), PackVersionComponents(8, 0, 61000, 0)) then begin
-    Dependency_Add('vcredist2005' + Dependency_ArchSuffix + '.exe',
-      '/q',
-      'Visual C++ 2005 Service Pack 1 Redistributable' + Dependency_ArchTitle,
-      Dependency_String('https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x86.EXE', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.EXE', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.EXE'),
-      '', False, False);
+  if not Dependency_IsMsiProductInstalled(Dependency_StringX64(UpgradeCodeX86, UpgradeCodeX64), PackVersionComponents(Major, Minor, Build, Revision)) then begin
+    Dependency_Add('vcredist' + Year + Dependency_ArchSuffix + '.exe', Parameters, Title + Dependency_ArchTitle, Dependency_StringX64(URLX86, URLX64), '', False, False);
   end;
 end;
 
-procedure Dependency_AddVC2008;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=26368
-  if not Dependency_IsMsiProductInstalled(Dependency_String('{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}'), PackVersionComponents(9, 0, 30729, 6161)) then begin
-    Dependency_Add('vcredist2008' + Dependency_ArchSuffix + '.exe',
-      '/q',
-      'Visual C++ 2008 Service Pack 1 Redistributable' + Dependency_ArchTitle,
-      Dependency_String('https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe', 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe', 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe'),
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddVC2010;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=26999
-  if not Dependency_IsMsiProductInstalled(Dependency_String('{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}'), PackVersionComponents(10, 0, 40219, 0)) then begin
-    Dependency_Add('vcredist2010' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart',
-      'Visual C++ 2010 Service Pack 1 Redistributable' + Dependency_ArchTitle,
-      Dependency_String('https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe', 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe', 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe'),
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddVC2012;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=30679
-  if not Dependency_IsMsiProductInstalled(Dependency_String('{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}'), PackVersionComponents(11, 0, 61030, 0)) then begin
-    Dependency_Add('vcredist2012' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
-      'Visual C++ 2012 Update 4 Redistributable' + Dependency_ArchTitle,
-      Dependency_String('https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe', 'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe', 'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe'),
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddVC2013;
-begin
-  // https://support.microsoft.com/en-us/help/4032938
-  if not Dependency_IsMsiProductInstalled(Dependency_String('{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}'), PackVersionComponents(12, 0, 40664, 0)) then begin
-    Dependency_Add('vcredist2013' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
-      'Visual C++ 2013 Update 5 Redistributable' + Dependency_ArchTitle,
-      Dependency_String('https://download.visualstudio.microsoft.com/download/pr/10912113/5da66ddebb0ad32ebd4b922fd82e8e25/vcredist_x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe', 'https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe'),
-      '', False, False);
-  end;
-end;
+procedure Dependency_AddVC2005; begin Dependency_AddVCMsi('2005', 'Visual C++ 2005 Service Pack 1 Redistributable', '{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}', 8, 0, 61000, 0, '/q', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x86.EXE', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.EXE'); end;
+procedure Dependency_AddVC2008; begin Dependency_AddVCMsi('2008', 'Visual C++ 2008 Service Pack 1 Redistributable', '{DE2C306F-A067-38EF-B86C-03DE4B0312F9}', '{FDA45DDF-8E17-336F-A3ED-356B7B7C688A}', 9, 0, 30729, 6161, '/q', 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x86.exe', 'https://download.microsoft.com/download/5/D/8/5D8C65CB-C849-4025-8E95-C3966CAFD8AE/vcredist_x64.exe'); end;
+procedure Dependency_AddVC2010; begin Dependency_AddVCMsi('2010', 'Visual C++ 2010 Service Pack 1 Redistributable', '{1F4F1D2A-D9DA-32CF-9909-48485DA06DD5}', '{5B75F761-BAC8-33BC-A381-464DDDD813A3}', 10, 0, 40219, 0, Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart', 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x86.exe', 'https://download.microsoft.com/download/1/6/5/165255E7-1014-4D0A-B094-B6A430A6BFFC/vcredist_x64.exe'); end;
+procedure Dependency_AddVC2012; begin Dependency_AddVCMsi('2012', 'Visual C++ 2012 Update 4 Redistributable', '{4121ED58-4BD9-3E7B-A8B5-9F8BAAE045B7}', '{EFA6AFA1-738E-3E00-8101-FD03B86B29D1}', 11, 0, 61030, 0, Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart', 'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe', 'https://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x64.exe'); end;
+procedure Dependency_AddVC2013; begin Dependency_AddVCMsi('2013', 'Visual C++ 2013 Update 5 Redistributable', '{B59F5BF1-67C8-3802-8E59-2CE551A39FC5}', '{20400CF0-DE7C-327E-9AE4-F0F38D9085F8}', 12, 0, 40664, 0, Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart', 'https://download.visualstudio.microsoft.com/download/pr/10912113/5da66ddebb0ad32ebd4b922fd82e8e25/vcredist_x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/10912041/cee5d6bca2ddbcd039da727bf4acb48a/vcredist_x64.exe'); end;
 
 procedure Dependency_AddVC14;
 var
@@ -697,125 +531,24 @@ begin
     '', True, False);
 end;
 
-procedure Dependency_AddSql2008Express;
+procedure Dependency_AddSqlExpress(const Year, Instance, Title: String; Major, Minor, Build, Revision: Word; const URLX86, URLX64: String);
 var
   Version: String;
   PackedVersion: Int64;
 begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=30438
-  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(10, 50, 4000, 0)) < 0) then begin
-    Dependency_Add('sql2008express' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2008 R2 Service Pack 2 Express',
-      Dependency_String('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe'),
-      '', False, False);
+  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\' + Instance + '\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(Major, Minor, Build, Revision)) < 0) then begin
+    Dependency_Add('sql' + Year + 'express' + Dependency_ArchSuffix + '.exe', Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER', Title, Dependency_StringX64(URLX86, URLX64), '', False, False);
   end;
 end;
 
-procedure Dependency_AddSql2012Express;
-var
-  Version: String;
-  PackedVersion: Int64;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=56042
-  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL11.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(11, 0, 7001, 0)) < 0) then begin
-    Dependency_Add('sql2012express' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2012 Service Pack 4 Express',
-      Dependency_String('https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe'),
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddSql2014Express;
-var
-  Version: String;
-  PackedVersion: Int64;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=57473
-  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(12, 0, 6024, 0)) < 0) then begin
-    Dependency_Add('sql2014express' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2014 Service Pack 3 Express',
-      Dependency_String('https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe'),
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddSql2016Express;
-var
-  Version: String;
-  PackedVersion: Int64;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=103447
-  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL13.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(13, 0, 6404, 1)) < 0) then begin
-    Dependency_Add('sql2016express' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2016 Service Pack 3 Express',
-      'https://download.microsoft.com/download/f/a/8/fa83d147-63d1-449c-b22d-5fef9bd5bb46/SQLServer2016-SSEI-Expr.exe',
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddSql2017Express;
-var
-  Version: String;
-  PackedVersion: Int64;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=55994
-  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(14, 0, 0, 0)) < 0) then begin
-    Dependency_Add('sql2017express' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2017 Express',
-      'https://download.microsoft.com/download/5/E/9/5E9B18CC-8FD5-467E-B5BF-BADE39C51F73/SQLServer2017-SSEI-Expr.exe',
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddSql2019Express;
-var
-  Version: String;
-  PackedVersion: Int64;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=101064
-  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(15, 0, 0, 0)) < 0) then begin
-    Dependency_Add('sql2019express' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2019 Express',
-      'https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe',
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddSql2022Express;
-var
-  Version: String;
-  PackedVersion: Int64;
-begin
-  // https://www.microsoft.com/en-us/download/details.aspx?id=104781
-  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(16, 0, 1000, 6)) < 0) then begin
-    Dependency_Add('sql2022express' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2022 Express',
-      'https://go.microsoft.com/fwlink/p/?linkid=2216019',
-      '', False, False);
-  end;
-end;
-
-procedure Dependency_AddSql2025Express;
-var
-  Version: String;
-  PackedVersion: Int64;
-begin
-  // https://www.microsoft.com/en-us/sql-server/sql-server-downloads
-  if not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL17.MSSQLSERVER\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(17, 0, 1000, 7)) < 0) then begin
-    Dependency_Add('sql2025express' + Dependency_ArchSuffix + '.exe',
-      Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER',
-      'SQL Server 2025 Express',
-      'https://download.microsoft.com/download/7ab8f535-7eb8-4b16-82eb-eca0fa2d38f3/SQL2025-SSEI-Expr.exe',
-      '', False, False);
-  end;
-end;
+procedure Dependency_AddSql2008Express; begin Dependency_AddSqlExpress('2008', 'MSSQL10_50.MSSQLSERVER', 'SQL Server 2008 R2 Service Pack 2 Express', 10, 50, 4000, 0, 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe'); end;
+procedure Dependency_AddSql2012Express; begin Dependency_AddSqlExpress('2012', 'MSSQL11.MSSQLSERVER', 'SQL Server 2012 Service Pack 4 Express', 11, 0, 7001, 0, 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe'); end;
+procedure Dependency_AddSql2014Express; begin Dependency_AddSqlExpress('2014', 'MSSQL12.MSSQLSERVER', 'SQL Server 2014 Service Pack 3 Express', 12, 0, 6024, 0, 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe'); end;
+procedure Dependency_AddSql2016Express; begin Dependency_AddSqlExpress('2016', 'MSSQL13.MSSQLSERVER', 'SQL Server 2016 Service Pack 3 Express', 13, 0, 6404, 1, 'https://download.microsoft.com/download/f/a/8/fa83d147-63d1-449c-b22d-5fef9bd5bb46/SQLServer2016-SSEI-Expr.exe', 'https://download.microsoft.com/download/f/a/8/fa83d147-63d1-449c-b22d-5fef9bd5bb46/SQLServer2016-SSEI-Expr.exe'); end;
+procedure Dependency_AddSql2017Express; begin Dependency_AddSqlExpress('2017', 'MSSQL14.MSSQLSERVER', 'SQL Server 2017 Express', 14, 0, 0, 0, 'https://download.microsoft.com/download/5/E/9/5E9B18CC-8FD5-467E-B5BF-BADE39C51F73/SQLServer2017-SSEI-Expr.exe', 'https://download.microsoft.com/download/5/E/9/5E9B18CC-8FD5-467E-B5BF-BADE39C51F73/SQLServer2017-SSEI-Expr.exe'); end;
+procedure Dependency_AddSql2019Express; begin Dependency_AddSqlExpress('2019', 'MSSQL15.MSSQLSERVER', 'SQL Server 2019 Express', 15, 0, 0, 0, 'https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe', 'https://download.microsoft.com/download/7/f/8/7f8a9c43-8c8a-4f7c-9f92-83c18d96b681/SQL2019-SSEI-Expr.exe'); end;
+procedure Dependency_AddSql2022Express; begin Dependency_AddSqlExpress('2022', 'MSSQL16.MSSQLSERVER', 'SQL Server 2022 Express', 16, 0, 1000, 6, 'https://go.microsoft.com/fwlink/p/?linkid=2216019', 'https://go.microsoft.com/fwlink/p/?linkid=2216019'); end;
+procedure Dependency_AddSql2025Express; begin Dependency_AddSqlExpress('2025', 'MSSQL17.MSSQLSERVER', 'SQL Server 2025 Express', 17, 0, 1000, 7, 'https://download.microsoft.com/download/7ab8f535-7eb8-4b16-82eb-eca0fa2d38f3/SQL2025-SSEI-Expr.exe', 'https://download.microsoft.com/download/7ab8f535-7eb8-4b16-82eb-eca0fa2d38f3/SQL2025-SSEI-Expr.exe'); end;
 
 procedure Dependency_AddSqlOleDb19;
 begin
@@ -824,7 +557,7 @@ begin
     Dependency_Add('msoledbsql' + Dependency_ArchSuffix + '.msi',
       '/qn /norestart IACCEPTMSOLEDBSQLLICENSETERMS=YES',
       'Microsoft OLE DB Driver 19 for SQL Server' + Dependency_ArchTitle,
-      Dependency_String('https://go.microsoft.com/fwlink/?linkid=2364026', 'https://go.microsoft.com/fwlink/?linkid=2364027', 'https://go.microsoft.com/fwlink/?linkid=2364027'),
+      Dependency_StringX64('https://go.microsoft.com/fwlink/?linkid=2364026', 'https://go.microsoft.com/fwlink/?linkid=2364027'),
       '', False, False);
   end;
 end;
@@ -861,7 +594,7 @@ begin
     Dependency_Add('AccessDatabaseEngine2016' + Dependency_ArchSuffix + '.exe',
       '/quiet',
       'Microsoft Access Database Engine 2016' + Dependency_ArchTitle,
-      Dependency_String('https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine.exe', 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe', 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'),
+      Dependency_StringX64('https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine.exe', 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'),
       '', False, False);
   end;
 end;
@@ -904,20 +637,17 @@ begin
   Result := False;
 end;
 
-procedure Dependency_AddWinAppRuntime(const Channel, URL: String);
+procedure Dependency_AddWinAppRuntime2;
 begin
   // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads
-  if not Dependency_IsWinAppRuntimeInstalled(Channel) then begin
-    Dependency_Add('windowsappruntime' + Channel + Dependency_ArchSuffix + '.exe',
+  if not Dependency_IsWinAppRuntimeInstalled('2') then begin
+    Dependency_Add('windowsappruntime2' + Dependency_ArchSuffix + '.exe',
       '--quiet',
-      'Windows App Runtime ' + Channel + Dependency_ArchTitle,
-      URL,
+      'Windows App Runtime 2' + Dependency_ArchTitle,
+      Dependency_String('https://aka.ms/windowsappsdk/2.3/2.3.1/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.3/2.3.1/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.3/2.3.1/windowsappruntimeinstall-arm64.exe'),
       '', False, False);
   end;
 end;
-
-procedure Dependency_AddWinAppRuntime20; begin Dependency_AddWinAppRuntime('2.0', Dependency_String('https://aka.ms/windowsappsdk/2.0/2.0.1/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.0/2.0.1/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.0/2.0.1/windowsappruntimeinstall-arm64.exe')); end;
-procedure Dependency_AddWinAppRuntime21; begin Dependency_AddWinAppRuntime('2.1', Dependency_String('https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.1/2.1.3/windowsappruntimeinstall-arm64.exe')); end;
 
 var
   Dependency_JavaMajor: Integer;
@@ -977,7 +707,7 @@ begin
 end;
 
 // Java 8 has no Microsoft build (and is still shipped 32-bit), so it comes from Eclipse Temurin
-procedure Dependency_AddJava8; begin Dependency_AddJava(8, Dependency_String('https://api.adoptium.net/v3/installer/latest/8/ga/windows/x86/jdk/hotspot/normal/eclipse', 'https://api.adoptium.net/v3/installer/latest/8/ga/windows/x64/jdk/hotspot/normal/eclipse', 'https://api.adoptium.net/v3/installer/latest/8/ga/windows/x64/jdk/hotspot/normal/eclipse')); end;
+procedure Dependency_AddJava8; begin Dependency_AddJava(8, Dependency_StringX64('https://api.adoptium.net/v3/installer/latest/8/ga/windows/x86/jdk/hotspot/normal/eclipse', 'https://api.adoptium.net/v3/installer/latest/8/ga/windows/x64/jdk/hotspot/normal/eclipse')); end;
 procedure Dependency_AddJava11; begin Dependency_AddJava(11, Dependency_String('', 'https://aka.ms/download-jdk/microsoft-jdk-11-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-11-windows-aarch64.msi')); end;
 procedure Dependency_AddJava17; begin Dependency_AddJava(17, Dependency_String('', 'https://aka.ms/download-jdk/microsoft-jdk-17-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-17-windows-aarch64.msi')); end;
 procedure Dependency_AddJava21; begin Dependency_AddJava(21, Dependency_String('', 'https://aka.ms/download-jdk/microsoft-jdk-21-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21-windows-aarch64.msi')); end;
@@ -1006,11 +736,11 @@ procedure Dependency_AddPython314; begin Dependency_AddPython('3.14', Dependency
 procedure Dependency_AddPowerShell7;
 begin
   // https://github.com/PowerShell/PowerShell/releases
-  if not FileExists(ExpandConstant(Dependency_String('{commonpf32}', '{commonpf64}', '{commonpf64}')) + '\PowerShell\7\pwsh.exe') then begin
+  if not FileExists(ExpandConstant(Dependency_StringX64('{commonpf32}', '{commonpf64}')) + '\PowerShell\7\pwsh.exe') then begin
     Dependency_Add('powershell7' + Dependency_ArchSuffix + '.msi',
       Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
-      'PowerShell 7.6.2' + Dependency_ArchTitle,
-      Dependency_String('https://github.com/PowerShell/PowerShell/releases/download/v7.6.2/PowerShell-7.6.2-win-x86.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.2/PowerShell-7.6.2-win-x64.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.2/PowerShell-7.6.2-win-arm64.msi'),
+      'PowerShell 7' + Dependency_ArchTitle,
+      Dependency_String('https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/PowerShell-7.6.3-win-x86.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/PowerShell-7.6.3-win-x64.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/PowerShell-7.6.3-win-arm64.msi'),
       '', False, False);
   end;
 end;

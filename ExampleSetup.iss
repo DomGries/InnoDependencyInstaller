@@ -120,8 +120,7 @@ begin
 
   Dependency_AddWebView2;
 
-  Dependency_AddWinAppRuntime20;
-  Dependency_AddWinAppRuntime21;
+  Dependency_AddWinAppRuntime2;
 
   Dependency_AddAccessDatabaseEngine2016;
 
@@ -134,6 +133,7 @@ begin
   Dependency_AddJava25;
 
   Dependency_AddPython313;
+  Dependency_AddPython314;
   Dependency_AddPowerShell7;
 
   Result := True;
