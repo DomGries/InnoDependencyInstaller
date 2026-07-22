@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Check for .NET updates
         id: check-updates
@@ -26,6 +26,7 @@ jobs:
 
           $updatesFound = $false
           $updateSummary = @()
+          $failures = @()
 
           $issContent = Get-Content -Path "CodeDependencies.iss" -Raw
 
@@ -48,9 +49,9 @@ jobs:
 
           # Runtime versions within a release can differ, so resolve each product individually
           $products = @(
-            @{ Runtime = 'Microsoft\.NETCore\.App';        JsonProperty = 'runtime';            TitlePattern = '\.NET Runtime' }
-            @{ Runtime = 'Microsoft\.AspNetCore\.App';     JsonProperty = 'aspnetcore-runtime'; TitlePattern = 'ASP\.NET Core Runtime' }
-            @{ Runtime = 'Microsoft\.WindowsDesktop\.App'; JsonProperty = 'windowsdesktop';     TitlePattern = '\.NET Desktop Runtime' }
+            @{ Runtime = 'Microsoft\.NETCore\.App';        JsonProperty = 'runtime' }
+            @{ Runtime = 'Microsoft\.AspNetCore\.App';     JsonProperty = 'aspnetcore-runtime' }
+            @{ Runtime = 'Microsoft\.WindowsDesktop\.App'; JsonProperty = 'windowsdesktop' }
           )
 
           foreach ($versionInfo in $channels) {
@@ -64,7 +65,7 @@ jobs:
             try {
               $releases = Invoke-RestMethod -Uri $releasesUrl -MaximumRetryCount 3 -RetryIntervalSec 5 -ErrorAction Stop
             } catch {
-              Write-Warning "Failed to fetch releases for .NET $channel : $_"
+              $failures += "Failed to fetch releases for .NET $channel : $_"
               continue
             }
 
@@ -85,15 +86,16 @@ jobs:
             foreach ($product in $products) {
               $latestVersion = $latestRelease.($product.JsonProperty).version
               if (-not $latestVersion -or $latestVersion -match '-') {
+                $failures += "$($product.JsonProperty) $channel has no stable version metadata"
                 continue
               }
               $latestPatch = [int]($latestVersion -split '\.')[2]
 
-              $currentPatchPattern = "Dependency_IsNetCoreInstalled\('$($product.Runtime)',\s*$major,\s*$minor,\s*(\d+)\)"
+              $currentPatchPattern = "Dependency_AddNetCoreRuntime\('$($product.Runtime)',\s*'[^']+',\s*'[^']+',\s*$major,\s*$minor,\s*(\d+),"
               $currentMatch = [regex]::Match($issContent, $currentPatchPattern)
 
               if (-not $currentMatch.Success) {
-                Write-Host "$($product.JsonProperty) $channel not found in CodeDependencies.iss - may need to be added"
+                $failures += "$($product.JsonProperty) $channel is stable but not supported in CodeDependencies.iss"
                 continue
               }
 
@@ -104,11 +106,7 @@ jobs:
                 $channelUpdates += $latestVersion
 
                 $issContent = $issContent -replace `
-                  "(Dependency_IsNetCoreInstalled\('$($product.Runtime)',\s*$major,\s*$minor,\s*)$currentPatch(\))", `
-                  "`${1}$latestPatch`${2}"
-
-                $issContent = $issContent -replace `
-                  "('$($product.TitlePattern) $major\.$minor\.)$currentPatch(')", `
+                  "(Dependency_AddNetCoreRuntime\('$($product.Runtime)',\s*'[^']+',\s*'[^']+',\s*$major,\s*$minor,\s*)$currentPatch(,)", `
                   "`${1}$latestPatch`${2}"
               } else {
                 Write-Host "$($product.JsonProperty) $channel is up to date"
@@ -139,6 +137,11 @@ jobs:
             }
           }
 
+          if ($failures.Count -gt 0) {
+            $failures | ForEach-Object { Write-Error $_ }
+            exit 1
+          }
+
           if ($updatesFound) {
             # Write the updated content back to the files
             [System.IO.File]::WriteAllText("CodeDependencies.iss", $issContent)
@@ -156,7 +159,7 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         if: steps.check-updates.outputs.updates_found == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
