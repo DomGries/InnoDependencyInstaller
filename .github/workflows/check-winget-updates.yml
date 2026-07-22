@@ -1,4 +1,4 @@
-name: Check Winget Manifest Updates
+name: Check Dependency Updates
 
 on:
   schedule:
@@ -15,93 +15,174 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Check for updates
         id: check-updates
         shell: pwsh
         run: |
-          $apiBase = "https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/m"
+          $apiBase = "https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests"
           $issPath = "CodeDependencies.iss"
           $content = Get-Content -Path $issPath -Raw
           $updates = @()
+          $failures = @()
 
-          # Each target maps a winget-pkgs manifest path to the PackVersionComponents(...)
-          # call in the .iss. The pattern is scoped by a unique registry-path anchor so
-          # unrelated checks sharing the same major (e.g. SQL 2017 also uses major 14)
-          # are not clobbered.
           $targets = @(
             @{
               Name    = 'VC++ 2015-2022'
-              Path    = 'Microsoft/VCRedist/2015+/x64'
+              Path    = 'm/Microsoft/VCRedist/2015+/x64'
               Major   = 14
+              Kind    = 'components'
               Pattern = '(VisualStudio\\14\.0\\VC\\Runtimes[\s\S]*?PackVersionComponents\(14,\s*)(\d+),\s*(\d+),\s*(\d+)(\))'
             },
             @{
               Name    = 'SQL Server 2022 Express'
-              Path    = 'Microsoft/SQLServer/2022/Express'
+              Path    = 'm/Microsoft/SQLServer/2022/Express'
               Major   = 16
-              Pattern = '(MSSQL16\.MSSQLSERVER[\s\S]*?PackVersionComponents\(16,\s*)(\d+),\s*(\d+),\s*(\d+)(\))'
+              Kind    = 'components'
+              Pattern = "(Dependency_AddSqlExpress\('2022',\s*'MSSQL16\.MSSQLSERVER',\s*'[^']+',\s*16,\s*)(\d+),\s*(\d+),\s*(\d+)(,)"
             },
             @{
               Name    = 'SQL Server 2025 Express'
-              Path    = 'Microsoft/SQLServer/2025/Express'
+              Path    = 'm/Microsoft/SQLServer/2025/Express'
               Major   = 17
-              Pattern = '(MSSQL17\.MSSQLSERVER[\s\S]*?PackVersionComponents\(17,\s*)(\d+),\s*(\d+),\s*(\d+)(\))'
+              Kind    = 'components'
+              Pattern = "(Dependency_AddSqlExpress\('2025',\s*'MSSQL17\.MSSQLSERVER',\s*'[^']+',\s*17,\s*)(\d+),\s*(\d+),\s*(\d+)(,)"
+            },
+            @{
+              Name    = 'Windows App Runtime 2'
+              Repo    = 'microsoft/WindowsAppSDK'
+              Major   = 2
+              Kind    = 'text'
+              Pattern = '(?ms)^procedure Dependency_AddWinAppRuntime2;.*?^end;'
+              VersionPattern = '/windowsappsdk/\d+\.\d+/(\d+\.\d+\.\d+)/'
+              UrlPattern = '/windowsappsdk/\d+\.\d+/\d+\.\d+\.\d+/'
+            },
+            @{
+              Name    = 'Python 3.13'
+              Path    = 'p/Python/Python/3/13'
+              Major   = 3
+              Minor   = 13
+              Kind    = 'text'
+              Pattern = '(?m)^procedure Dependency_AddPython313;.*$'
+              VersionPattern = '/python/(\d+\.\d+\.\d+)/'
+            },
+            @{
+              Name    = 'Python 3.14'
+              Path    = 'p/Python/Python/3/14'
+              Major   = 3
+              Minor   = 14
+              Kind    = 'text'
+              Pattern = '(?m)^procedure Dependency_AddPython314;.*$'
+              VersionPattern = '/python/(\d+\.\d+\.\d+)/'
+            },
+            @{
+              Name    = 'PowerShell 7'
+              Path    = 'm/Microsoft/PowerShell'
+              Major   = 7
+              Kind    = 'text'
+              Pattern = '(?ms)^procedure Dependency_AddPowerShell7;.*?^end;'
+              VersionPattern = '/download/v(\d+\.\d+\.\d+)/'
             }
           )
 
           $headers = @{ 'Accept' = 'application/vnd.github.v3+json' }
           if ($env:GITHUB_TOKEN) { $headers['Authorization'] = "Bearer $env:GITHUB_TOKEN" }
 
+          try {
+            $pythonChannels = Invoke-RestMethod "$apiBase/p/Python/Python/3" -Headers $headers -ErrorAction Stop
+            $latestPythonMinor = $pythonChannels |
+              Where-Object { $_.type -eq 'dir' -and $_.name -match '^\d+$' } |
+              ForEach-Object { [int]$_.name } |
+              Sort-Object |
+              Select-Object -Last 1
+            $supportedPythonMinor = ($targets | Where-Object { $_.Name -like 'Python *' } | ForEach-Object { [int]$_.Minor } | Measure-Object -Maximum).Maximum
+            if ($null -eq $latestPythonMinor) {
+              $failures += "No Python 3 channels found"
+            } elseif ($latestPythonMinor -gt $supportedPythonMinor) {
+              $failures += "Python 3.$latestPythonMinor is available but not supported in CodeDependencies.iss"
+            }
+          } catch {
+            $failures += "Failed to discover Python channels: $_"
+          }
+
           foreach ($target in $targets) {
             Write-Host "`nChecking $($target.Name)..."
 
             try {
-              $data = Invoke-RestMethod "$apiBase/$($target.Path)" -Headers $headers -ErrorAction Stop
+              if ($target.Repo) {
+                $data = Invoke-RestMethod "https://api.github.com/repos/$($target.Repo)/releases?per_page=100" -Headers $headers -ErrorAction Stop
+                $versions = @($data |
+                  Where-Object { -not $_.draft -and -not $_.prerelease -and $_.tag_name -match '^v\d+\.\d+\.\d+$' } |
+                  ForEach-Object { [Version]$_.tag_name.Substring(1) })
+              } else {
+                $data = Invoke-RestMethod "$apiBase/$($target.Path)" -Headers $headers -ErrorAction Stop
+                $versions = @()
+                foreach ($entry in $data) {
+                  if ($entry.type -ne 'dir') { continue }
+                  try { $versions += [Version]$entry.name } catch { }
+                }
+              }
             } catch {
-              Write-Warning "  Failed to fetch manifest listing: $_"
+              $failures += "Failed to fetch $($target.Name) release metadata: $_"
               continue
             }
 
-            $versions = @()
-            foreach ($entry in $data) {
-              if ($entry.type -ne 'dir') { continue }
-              try { $versions += [Version]$entry.name } catch { }
-            }
-
             if ($versions.Count -eq 0) {
-              Write-Warning "  No version folders found under $($target.Path)"
+              $failures += "No versions found for $($target.Name)"
               continue
             }
 
             $latest = ($versions | Sort-Object | Select-Object -Last 1)
-            if ($latest.Major -ne $target.Major) {
-              Write-Warning "  Latest version $latest has major $($latest.Major), expected $($target.Major) — skipping"
+            if (($latest.Major -ne $target.Major) -or (($null -ne $target.Minor) -and ($latest.Minor -ne $target.Minor))) {
+              $failures += "$($target.Name) latest version $latest is outside its expected channel"
               continue
             }
-            Write-Host "  Latest in winget-pkgs: $latest"
+            if ($target.Kind -eq 'text') {
+              $latest = [Version]"$($latest.Major).$($latest.Minor).$($latest.Build)"
+            }
+            Write-Host "  Latest release: $latest"
 
             $match = [regex]::Match($content, $target.Pattern)
             if (-not $match.Success) {
-              Write-Warning "  PackVersionComponents pattern not found in .iss"
+              $failures += "$($target.Name) version pattern not found in CodeDependencies.iss"
               continue
             }
 
-            $currentMinor    = [int]$match.Groups[2].Value
-            $currentBuild    = [int]$match.Groups[3].Value
-            $currentRevision = [int]$match.Groups[4].Value
-            $current = [Version]"$($target.Major).$currentMinor.$currentBuild.$currentRevision"
+            if ($target.Kind -eq 'components') {
+              $current = [Version]"$($target.Major).$($match.Groups[2].Value).$($match.Groups[3].Value).$($match.Groups[4].Value)"
+              $replacement = "`${1}$($latest.Minor), $($latest.Build), $($latest.Revision)`${5}"
+            } else {
+              $versionMatch = [regex]::Match($match.Value, $target.VersionPattern)
+              if (-not $versionMatch.Success) {
+                $failures += "$($target.Name) current version not found in CodeDependencies.iss"
+                continue
+              }
+              $current = [Version]$versionMatch.Groups[1].Value
+              if ($target.UrlPattern) {
+                $replacement = [regex]::Replace($match.Value, $target.UrlPattern, "/windowsappsdk/$($latest.Major).$($latest.Minor)/$latest/")
+              } else {
+                $replacement = $match.Value.Replace($versionMatch.Groups[1].Value, "$latest")
+              }
+            }
             Write-Host "  Current in .iss: $current"
 
             if ($latest -gt $current) {
               Write-Host "  Update: $current -> $latest"
-              $replacement = "`${1}$($latest.Minor), $($latest.Build), $($latest.Revision)`${5}"
-              $content = [regex]::Replace($content, $target.Pattern, $replacement)
+              if ($target.Kind -eq 'text') {
+                $content = $content.Replace($match.Value, $replacement)
+              } else {
+                $content = [regex]::Replace($content, $target.Pattern, $replacement)
+              }
               $updates += "$($target.Name) $latest"
             } else {
               Write-Host "  Up to date"
             }
+          }
+
+          if ($failures.Count -gt 0) {
+            $failures | ForEach-Object { Write-Error $_ }
+            exit 1
           }
 
           if ($updates.Count -gt 0) {
@@ -120,7 +201,7 @@ jobs:
       - name: Create Pull Request
         id: create-pr
         if: steps.check-updates.outputs.updates_found == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
@@ -128,7 +209,7 @@ jobs:
           commit-message: "Update ${{ steps.check-updates.outputs.summary }}"
           title: "Update ${{ steps.check-updates.outputs.summary }}"
           body: |
-            Automated update based on the latest [microsoft/winget-pkgs](https://github.com/microsoft/winget-pkgs) manifests:
+            Automated update based on official release metadata:
             ${{ steps.check-updates.outputs.summary }}
           branch: update-winget-dependencies
           delete-branch: true
