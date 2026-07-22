@@ -5,7 +5,7 @@
 
 ![Inno Setup Dependency Installer](https://user-images.githubusercontent.com/341158/122873592-3e2e9d80-d332-11eb-8055-8a4c6064ac4e.gif)
 
-**Inno Setup Dependency Installer** automatically downloads and installs any dependency such as .NET, Visual C++, SQL Server or WebView2 during your application's installation. One line per dependency is all it takes — missing ones are installed before your application, anything already present is skipped. More than 60 dependencies are [built in](#supported-dependencies) and you can [add your own](#adding-your-own-dependency).
+**Inno Setup Dependency Installer** automatically downloads and installs any dependency such as .NET, Visual C++, SQL Server, and more during your application's installation. One line per dependency is all it takes — missing ones are installed before your application, anything already present is skipped. More than 60 dependencies are [built in](#supported-dependencies) and you can [add your own](#adding-your-own-dependency).
 
 Requires [Inno Setup 6.4 or newer](https://www.jrsoftware.org/isinfo.php).
 
@@ -118,6 +118,7 @@ Call any of these functions inside `InitializeSetup`. Every function first check
 | OpenJDK 21 (Microsoft Build of OpenJDK, x64/arm64) | `Dependency_AddJava21` |
 | OpenJDK 25 (Microsoft Build of OpenJDK, x64/arm64) | `Dependency_AddJava25` |
 | Python 3.13 | `Dependency_AddPython313` |
+| Python 3.14 | `Dependency_AddPython314` |
 | PowerShell 7 | `Dependency_AddPowerShell7` |
 
 ## What happens during the setup

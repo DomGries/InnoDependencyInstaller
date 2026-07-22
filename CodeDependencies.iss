@@ -985,9 +985,7 @@ procedure Dependency_AddJava25; begin Dependency_AddJava(25, Dependency_String('
 
 function Dependency_IsPythonInstalled(const Tag: String): Boolean;
 begin
-  Result := RegKeyExists(HKLM, 'Software\Python\PythonCore\' + Tag + '\InstallPath')
-    or RegKeyExists(HKLM, 'Software\Wow6432Node\Python\PythonCore\' + Tag + '\InstallPath')
-    or RegKeyExists(HKCU, 'Software\Python\PythonCore\' + Tag + '\InstallPath');
+  Result := RegKeyExists(Dependency_ArchHKLM, 'Software\Python\PythonCore\' + Tag + '\InstallPath') or RegKeyExists(HKCU, 'Software\Python\PythonCore\' + Tag + '\InstallPath');
 end;
 
 procedure Dependency_AddPython(const Minor, URL: String);
@@ -1002,7 +1000,8 @@ begin
   end;
 end;
 
-procedure Dependency_AddPython313; begin Dependency_AddPython('3.13', Dependency_String('https://www.python.org/ftp/python/3.13.13/python-3.13.13.exe', 'https://www.python.org/ftp/python/3.13.13/python-3.13.13-amd64.exe', 'https://www.python.org/ftp/python/3.13.13/python-3.13.13-arm64.exe')); end;
+procedure Dependency_AddPython313; begin Dependency_AddPython('3.13', Dependency_String('https://www.python.org/ftp/python/3.13.14/python-3.13.14.exe', 'https://www.python.org/ftp/python/3.13.14/python-3.13.14-amd64.exe', 'https://www.python.org/ftp/python/3.13.14/python-3.13.14-arm64.exe')); end;
+procedure Dependency_AddPython314; begin Dependency_AddPython('3.14', Dependency_String('https://www.python.org/ftp/python/3.14.6/python-3.14.6.exe', 'https://www.python.org/ftp/python/3.14.6/python-3.14.6-amd64.exe', 'https://www.python.org/ftp/python/3.14.6/python-3.14.6-arm64.exe')); end;
 
 procedure Dependency_AddPowerShell7;
 begin
