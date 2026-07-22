@@ -131,15 +131,15 @@ begin
           if ShellExec('', ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
 #endif
             Log('Dependency exit code ' + IntToStr(ResultCode) + ': ' + Dependency_List[DependencyIndex].Title);
-            if Dependency_List[DependencyIndex].RestartAfter then begin
-              if DependencyIndex = DependencyCount - 1 then begin
-                Dependency_NeedToRestart := True;
-              end else begin
-                NeedsRestart := True;
-                Result := Dependency_List[DependencyIndex].Title;
+            if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
+              if Dependency_List[DependencyIndex].RestartAfter then begin
+                if ActiveIndex = ActiveCount then begin
+                  Dependency_NeedToRestart := True;
+                end else begin
+                  NeedsRestart := True;
+                  Result := Dependency_List[DependencyIndex].Title;
+                end;
               end;
-              break;
-            end else if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
               break;
             end else if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
               NeedsRestart := True;
@@ -171,7 +171,7 @@ begin
 
       if NeedsRestart then begin
         Log('Dependency requires restart: registering RunOnce to resume setup');
-        TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + WizardDirValue + '" /GROUP="' + WizardGroupValue + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
+        TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + RemoveBackslashUnlessRoot(WizardDirValue) + '" /GROUP="' + RemoveBackslashUnlessRoot(WizardGroupValue) + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
         if WizardNoIcons then begin
           TempValue := TempValue + ' /NOICONS';
         end;
@@ -239,7 +239,7 @@ end;
 
 function Dependency_IsX64: Boolean;
 begin
-  Result := not Dependency_ForceX86 and (Is64BitInstallMode or (Dependency_ForceX64 and IsX64Compatible));
+  Result := not Dependency_IsArm64 and not Dependency_ForceX86 and (Is64BitInstallMode or (Dependency_ForceX64 and IsX64Compatible));
 end;
 
 function Dependency_String(const x86, x64, arm64: String): String;
@@ -308,7 +308,10 @@ begin
   Dependency_NetCoreRuntimesArch := Arch;
   SetArrayLength(Dependency_NetCoreRuntimes, 0);
 
-  if not RegQueryStringValue(HKLM32, 'SOFTWARE\dotnet\Setup\InstalledVersions\' + Arch, 'InstallLocation', Path) or not FileExists(Path + 'dotnet.exe') then begin
+  if RegQueryStringValue(HKLM32, 'SOFTWARE\dotnet\Setup\InstalledVersions\' + Arch, 'InstallLocation', Path) then begin
+    Path := AddBackslash(Path);
+  end;
+  if not FileExists(Path + 'dotnet.exe') then begin
     Path := ExpandConstant(Dependency_String('{commonpf32}', '{commonpf64}', '{commonpf64}')) + '\dotnet\';
   end;
   if ExecAndCaptureOutput(Path + 'dotnet.exe', '--list-runtimes', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
@@ -590,7 +593,7 @@ end;
 procedure Dependency_AddDotNetHosting(const Major, Patch: Integer; const URL: String);
 begin
   // https://dotnet.microsoft.com/download/dotnet
-  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', Major, 0, Patch) then begin
+  if not Dependency_IsNetCoreInstalled('Microsoft.AspNetCore.App', Major, 0, Patch) or not FileExists(ExpandConstant(Dependency_String('{commonpf32}', '{commonpf64}', '{commonpf64}')) + '\IIS\Asp.Net Core Module\V2\aspnetcorev2.dll') then begin
     Dependency_Add('dotnet' + IntToStr(Major) + '0hosting.exe',
       '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
       'ASP.NET Core ' + IntToStr(Major) + '.0 Hosting Bundle',
@@ -887,7 +890,7 @@ var
 begin
   if not Dependency_WinAppRuntimePackagesListed then begin
     Dependency_WinAppRuntimePackagesListed := True;
-    if ExecAndCaptureOutput('powershell.exe', '-NoProfile -ExecutionPolicy Bypass -Command "(Get-AppxPackage -AllUsers Microsoft.WindowsAppRuntime.*).Name"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
+    if ExecAndCaptureOutput(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'), '-NoProfile -ExecutionPolicy Bypass -Command "(Get-AppxPackage -AllUsers Microsoft.WindowsAppRuntime.*).Name"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
       Dependency_WinAppRuntimePackages := Output.StdOut;
     end;
   end;
@@ -932,9 +935,9 @@ begin
     Dependency_JavaMajor := 0;
 
     // detect whichever java.exe an app would actually use: JAVA_HOME, else PATH
-    JavaExe := GetEnv('JAVA_HOME');
-    if (JavaExe <> '') and FileExists(JavaExe + '\bin\java.exe') then begin
-      JavaExe := JavaExe + '\bin\java.exe';
+    JavaExe := RemoveQuotes(GetEnv('JAVA_HOME'));
+    if (JavaExe <> '') and FileExists(AddBackslash(JavaExe) + 'bin\java.exe') then begin
+      JavaExe := AddBackslash(JavaExe) + 'bin\java.exe';
     end else begin
       JavaExe := 'java.exe';
     end;
