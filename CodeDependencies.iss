@@ -61,9 +61,9 @@ end;
 <event('PrepareToInstall')>
 function Dependency_PrepareToInstall(var NeedsRestart: Boolean): String;
 var
-  DependencyCount, DependencyIndex, ActiveCount, ActiveIndex, ResultCode: Integer;
+  DependencyCount, DependencyIndex, ActiveCount, ActiveIndex, ResultCode, ParameterIndex: Integer;
   Retry: Boolean;
-  TempValue: String;
+  Parameter, TempValue: String;
 begin
   DependencyCount := GetArrayLength(Dependency_List);
 
@@ -173,6 +173,12 @@ begin
       if NeedsRestart then begin
         Log('Dependency requires restart: registering RunOnce to resume setup');
         TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + RemoveBackslashUnlessRoot(WizardDirValue) + '" /GROUP="' + RemoveBackslashUnlessRoot(WizardGroupValue) + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
+        for ParameterIndex := 1 to ParamCount do begin
+          Parameter := Uppercase(ParamStr(ParameterIndex));
+          if (Parameter = '/SP-') or (Parameter = '/SILENT') or (Parameter = '/VERYSILENT') or (Parameter = '/SUPPRESSMSGBOXES') or (Parameter = '/NOCANCEL') or (Parameter = '/NORESTART') or (Parameter = '/ALLUSERS') or (Parameter = '/CURRENTUSER') then begin
+            TempValue := TempValue + ' ' + Parameter;
+          end;
+        end;
         if WizardNoIcons then begin
           TempValue := TempValue + ' /NOICONS';
         end;
