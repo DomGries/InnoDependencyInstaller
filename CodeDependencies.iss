@@ -89,7 +89,7 @@ begin
               Log('Download aborted by user: ' + Dependency_List[DependencyIndex].Title);
               Result := Dependency_List[DependencyIndex].Title;
             end else begin
-              case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
+              case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
                 IDABORT: begin
                   Result := Dependency_List[DependencyIndex].Title;
                 end;
@@ -154,7 +154,7 @@ begin
             end;
           end;
 
-          case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[DependencyIndex].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDIGNORE) of
+          case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[DependencyIndex].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
             IDABORT: begin
               Result := Dependency_List[DependencyIndex].Title;
               break;
