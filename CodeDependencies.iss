@@ -746,7 +746,7 @@ begin
     Dependency_Add('powershell7' + Dependency_ArchSuffix + '.msi',
       Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
       'PowerShell 7' + Dependency_ArchTitle,
-      Dependency_String('https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/PowerShell-7.6.3-win-x86.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/PowerShell-7.6.3-win-x64.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.3/PowerShell-7.6.3-win-arm64.msi'),
+      Dependency_String('https://github.com/PowerShell/PowerShell/releases/download/v7.6.4/PowerShell-7.6.4-win-x86.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.4/PowerShell-7.6.4-win-x64.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.4/PowerShell-7.6.4-win-arm64.msi'),
       '', False, False);
   end;
 end;
