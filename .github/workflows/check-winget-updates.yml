@@ -72,6 +72,12 @@ jobs:
             $Installer
           }
 
+          function Test-UpdateAvailable {
+            param([string] $Name, [Version] $Current, [Version] $Latest)
+            Write-Host "`nChecking $Name`: $Current -> $Latest"
+            $Latest -gt $Current
+          }
+
           function Set-BlockHashes {
             param([string] $Block)
             $urls = @([regex]::Matches($Block, "'(https?://[^']+)'") |
@@ -188,8 +194,6 @@ jobs:
           }
 
           foreach ($target in $targets) {
-            Write-Host "`nChecking $($target.Name)..."
-
             try {
               if ($target.Repo) {
                 $data = Invoke-RestMethod "https://api.github.com/repos/$($target.Repo)/releases?per_page=100" -Headers $headers -ErrorAction Stop
@@ -217,7 +221,6 @@ jobs:
             if ($target.Kind -eq 'text') {
               $latest = [Version]"$($latest.Major).$($latest.Minor).$($latest.Build)"
             }
-            Write-Host "  Latest release: $latest"
 
             $match = [regex]::Match($content, $target.Pattern)
             if (-not $match.Success) {
@@ -241,37 +244,31 @@ jobs:
                 $replacement = $match.Value.Replace($versionMatch.Groups[1].Value, "$latest")
               }
             }
-            Write-Host "  Current in .iss: $current"
-
-            if ($latest -gt $current) {
-              Write-Host "  Update: $current -> $latest"
-              if ($target.Kind -eq 'text') {
-                $content = $content.Replace($match.Value, $replacement)
-              } else {
-                $content = [regex]::Replace($content, $target.Pattern, $replacement)
-              }
-
-              $blockPattern = if ($target.BlockPattern) { $target.BlockPattern } else { $target.Pattern }
-              $block = [regex]::Match($content, $blockPattern)
-              if (-not $block.Success) { throw "$($target.Name) dependency block not found after version update" }
-              $updatedBlock = $block.Value
-              if ($target.Name -eq 'VC++ 2015-2022') {
-                foreach ($arch in 'x86', 'x64', 'arm64') {
-                  $response = [System.Net.WebRequest]::Create("https://aka.ms/vc14/vc_redist.$arch.exe").GetResponse()
-                  try { $url = $response.ResponseUri.AbsoluteUri } finally { $response.Close() }
-                  $updatedBlock = [regex]::Replace(
-                    $updatedBlock,
-                    "https://download\.visualstudio\.microsoft\.com/download/pr/[^']*/VC_redist\.$arch\.exe",
-                    $url
-                  )
-                }
-              }
-              $content = $content.Replace($block.Value, (Set-BlockHashes $updatedBlock))
-              $summaryName = $target.Name -replace " $($latest.Major)(?:\.$($latest.Minor))?$", ''
-              $updates += "$summaryName $latest"
+            if (-not (Test-UpdateAvailable $target.Name $current $latest)) { continue }
+            if ($target.Kind -eq 'text') {
+              $content = $content.Replace($match.Value, $replacement)
             } else {
-              Write-Host "  Up to date"
+              $content = [regex]::Replace($content, $target.Pattern, $replacement)
             }
+
+            $blockPattern = if ($target.BlockPattern) { $target.BlockPattern } else { $target.Pattern }
+            $block = [regex]::Match($content, $blockPattern)
+            if (-not $block.Success) { throw "$($target.Name) dependency block not found after version update" }
+            $updatedBlock = $block.Value
+            if ($target.Name -eq 'VC++ 2015-2022') {
+              foreach ($arch in 'x86', 'x64', 'arm64') {
+                $response = [System.Net.WebRequest]::Create("https://aka.ms/vc14/vc_redist.$arch.exe").GetResponse()
+                try { $url = $response.ResponseUri.AbsoluteUri } finally { $response.Close() }
+                $updatedBlock = [regex]::Replace(
+                  $updatedBlock,
+                  "https://download\.visualstudio\.microsoft\.com/download/pr/[^']*/VC_redist\.$arch\.exe",
+                  $url
+                )
+              }
+            }
+            $content = $content.Replace($block.Value, (Set-BlockHashes $updatedBlock))
+            $summaryName = $target.Name -replace " $($latest.Major)(?:\.$($latest.Minor))?$", ''
+            $updates += "$summaryName $latest"
           }
 
           $dotnetFamilies = [ordered]@{
@@ -299,7 +296,8 @@ jobs:
 
           try {
             $supportedDotnetMajor = $dotnetMajors | Select-Object -Last 1
-            $newDotnetMajors = Invoke-RestMethod "$apiBase/m/Microsoft/DotNet/Runtime" -Headers $headers -ErrorAction Stop |
+            $dotnetChannels = Invoke-RestMethod "$apiBase/m/Microsoft/DotNet/Runtime" -Headers $headers -ErrorAction Stop
+            $newDotnetMajors = $dotnetChannels |
               Where-Object { $_.type -eq 'dir' -and $_.name -match '^\d+$' -and [int]$_.name -gt $supportedDotnetMajor } |
               ForEach-Object { [int]$_.name }
             foreach ($major in $newDotnetMajors) {
@@ -326,8 +324,7 @@ jobs:
               if (-not $match.Success) { throw "Dependency line not found" }
               $minor = if ($package.Runtime) { $match.Groups['minor'].Value } else { 0 }
               $current = [Version]"$($package.Major).$minor.$($match.Groups['patch'].Value)"
-              Write-Host "`nChecking $label`: $current -> $latest"
-              if ($latest -le $current) { continue }
+              if (-not (Test-UpdateAvailable $label $current $latest)) { continue }
 
               $installers = @(Get-WingetInstallers $path $latest)
               $line = $match.Groups['line'].Value
