@@ -1,1 +1,2 @@
 *.iss whitespace=trailing-space,cr-at-eol,diff
+*.yml whitespace=trailing-space,cr-at-eol

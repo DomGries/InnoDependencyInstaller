@@ -124,7 +124,7 @@ Call any of these functions inside `InitializeSetup`. Every function first check
 
 1. When the setup starts, every added dependency is checked and only the missing ones are kept.
 2. The user sees the pending dependencies listed on the _Ready to Install_ page.
-3. After clicking _Install_, the missing installers are downloaded from their official sources, with a progress bar and a retry prompt if a download fails.
+3. After clicking _Install_, the missing installers are downloaded from their official sources, with a progress bar and a retry prompt if a download fails. Every built-in download is verified against a pinned SHA-256 checksum, so a corrupted or tampered file is rejected before it runs.
 4. Each dependency installs unattended, one after another, and then your application is installed as usual.
 5. If a dependency requires a Windows restart, the setup takes care of it: it prompts for the restart at the end — or, when other dependencies are still pending, offers to restart right away and resumes the setup after the reboot.
 6. If an installer fails, the user can retry, ignore or abort. Setups running with `/SILENT` or `/VERYSILENT` install all dependencies fully silently, and `/SUPPRESSMSGBOXES` continues automatically on errors.
@@ -146,6 +146,8 @@ end;
 ```
 
 For architecture-dependent downloads use `Dependency_String(x86Url, x64Url, arm64Url)`, which returns the URL matching the target system. `Dependency_IsX64` and `Dependency_IsArm64` can likewise be used as `Check:` functions in `[Files]` to install the matching binaries of your own application (see _ExampleSetup.iss_).
+
+Pass a SHA-256 checksum to have the download verified; leaving it empty (as above) leaves the download unverified. The built-in dependencies keep the checksum right next to the URL — for multi-architecture downloads use a matching `Dependency_String(x86Hash, x64Hash, arm64Hash)`. To calculate one for a custom or new installer, run `pwsh ./tools/Get-UrlSha256.ps1 'https://example.com/installer.exe'`. The dependency update workflow refreshes built-in checksums whenever it bumps a download.
 
 ## Bundling installers instead of downloading
 
