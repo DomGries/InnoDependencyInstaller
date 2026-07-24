@@ -42,15 +42,20 @@ jobs:
             $entry = $files | Where-Object name -like '*.installer.yaml' | Select-Object -First 1
             if (-not $entry) { throw "Installer manifest not found for $Path $Version" }
 
-            $manifest = (Invoke-WebRequest $entry.download_url -Headers $headers -ErrorAction Stop).Content
-            $installers = @([regex]::Matches(
-              $manifest,
-              '(?ms)^- Architecture:\s*(?<arch>\S+).*?^\s*InstallerUrl:\s*(?<url>\S+).*?^\s*InstallerSha256:\s*(?<hash>[0-9A-Fa-f]{64})\s*$'
-            ) | ForEach-Object {
-              [pscustomobject]@{
-                Architecture = $_.Groups['arch'].Value
-                Url          = $_.Groups['url'].Value
-                Checksum     = $_.Groups['hash'].Value.ToLowerInvariant()
+            $manifest = (Invoke-WebRequest $entry.download_url -Headers $headers -UseBasicParsing -ErrorAction Stop).Content
+            $installers = @([regex]::Matches($manifest, '(?ms)^- .*?(?=^- |\z)') | ForEach-Object {
+              $block = $_.Value
+              $arch = [regex]::Match($block, '(?m)^\s*(?:-\s*)?Architecture:\s*(\S+)')
+              $url = [regex]::Match($block, '(?m)^\s*InstallerUrl:\s*(\S+)')
+              $hash = [regex]::Match($block, '(?m)^\s*InstallerSha256:\s*([0-9A-Fa-f]{64})\s*$')
+              $locale = [regex]::Match($block, '(?m)^\s*(?:-\s*)?InstallerLocale:\s*(\S+)')
+              if ($arch.Success -and $url.Success -and $hash.Success) {
+                [pscustomobject]@{
+                  Architecture = $arch.Groups[1].Value
+                  Url          = $url.Groups[1].Value
+                  Checksum     = $hash.Groups[1].Value.ToLowerInvariant()
+                  Locale       = if ($locale.Success) { $locale.Groups[1].Value } else { $null }
+                }
               }
             })
             if ($installers.Count -eq 0) { throw "No installers found in manifest for $Path $Version" }
@@ -63,13 +68,21 @@ jobs:
             "$name(" + (($Values | ForEach-Object { "'$_'" }) -join ', ') + ')'
           }
 
-          function Confirm-DotNetInstaller {
-            param($Installer)
-            $allowedHosts = 'builds.dotnet.microsoft.com', 'download.visualstudio.microsoft.com'
-            if (([Uri]$Installer.Url).Host -notin $allowedHosts) {
-              throw "Unexpected .NET installer host: $($Installer.Url)"
+          function Assert-InstallerUrl {
+            param([string] $Url, $Target)
+            $uri = [Uri]$Url
+            $hostName = $uri.DnsSafeHost.ToLowerInvariant()
+            $trustedHost = if ($Target.MicrosoftOwned) {
+              $hostName -eq 'aka.ms' -or
+                $hostName -eq 'microsoft.com' -or
+                $hostName.EndsWith('.microsoft.com', [StringComparison]::Ordinal)
+            } else {
+              $hostName -in $Target.AllowedHosts
             }
-            $Installer
+            $allowed = $uri.Scheme -eq 'https' -and $trustedHost
+            if (-not $allowed) {
+              throw "Unexpected $($Target.Name) installer host: $Url"
+            }
           }
 
           function Test-UpdateAvailable {
@@ -100,7 +113,107 @@ jobs:
             $Block
           }
 
+          function Set-WingetInstallerMetadata {
+            param([string] $Block, $Target, [Version] $Version)
+            $installers = @(Get-WingetInstallers $Target.Path $Version)
+            if ($Target.InstallerUrlPattern) {
+              $installers = @($installers | Where-Object Url -match $Target.InstallerUrlPattern)
+            }
+            if ($Target.InstallerLocale) {
+              $installers = @($installers | Where-Object Locale -eq $Target.InstallerLocale)
+            }
+            if ($Target.SingleInstaller) {
+              $installer = $installers | Select-Object -First 1
+              if (-not $installer) { throw "No installer found for $($Target.Name)" }
+              Assert-InstallerUrl $installer.Url $Target
+              $urlPattern = [regex]"'https?://[^']+'"
+              $hashPattern = [regex]"'[0-9a-fA-F]{64}'"
+              if ($urlPattern.Matches($Block).Count -ne 1 -or $hashPattern.Matches($Block).Count -ne 1) {
+                throw "Expected one URL/checksum pair"
+              }
+              $Block = $urlPattern.Replace($Block, "'$($installer.Url)'", 1)
+              return $hashPattern.Replace($Block, "'$($installer.Checksum)'", 1)
+            }
+
+            $architectures = @($Target.Architectures | Where-Object { $_ })
+            if ($architectures.Count -eq 0) {
+              $architectures = if ($Block -match "Dependency_StringX64\('https") {
+                'x86', 'x64'
+              } else {
+                'x86', 'x64', 'arm64'
+              }
+            }
+            $selected = @($architectures | ForEach-Object {
+              $arch = $_
+              $architectureInstallers = $installers
+              if ($Target.InstallerPaths) {
+                $installerPath = $Target.InstallerPaths[$arch]
+                if (-not $installerPath) { throw "No installer path configured for $arch" }
+                $installerVersion = if ($installerPath -eq $Target.Path) {
+                  $Version
+                } else {
+                  Get-WingetVersions $installerPath | Sort-Object | Select-Object -Last 1
+                }
+                if (-not $installerVersion) { throw "No installer version found for $installerPath" }
+                $architectureInstallers = @(Get-WingetInstallers $installerPath $installerVersion)
+              }
+              $candidates = @($architectureInstallers |
+                Where-Object Architecture -eq $arch |
+                Sort-Object Url, Checksum -Unique)
+              if ($candidates.Count -eq 0 -and $arch -eq 'arm64' -and $Target.Arm64Fallback) {
+                $candidates = @($architectureInstallers |
+                  Where-Object Architecture -eq 'x64' |
+                  Sort-Object Url, Checksum -Unique)
+              }
+              if ($candidates.Count -ne 1) {
+                throw "Expected one unique $arch installer, found $($candidates.Count)"
+              }
+              Assert-InstallerUrl $candidates[0].Url $Target
+              $candidates[0]
+            })
+            $urlPattern = [regex]"Dependency_String(?:X64)?\('https?://[^)]*\)"
+            $hashPattern = [regex]"Dependency_String(?:X64)?\('[0-9a-fA-F]{64}'(?:,\s*'[0-9a-fA-F]{64}'){1,2}\)"
+            if ($urlPattern.Matches($Block).Count -ne 1 -or $hashPattern.Matches($Block).Count -ne 1) {
+              throw "Expected one architecture URL/checksum pair"
+            }
+            $Block = $urlPattern.Replace(
+              $Block, [System.Text.RegularExpressions.MatchEvaluator] { param($m) New-DependencyString @($selected.Url) }, 1)
+            $hashPattern.Replace(
+              $Block, [System.Text.RegularExpressions.MatchEvaluator] { param($m) New-DependencyString @($selected.Checksum) }, 1)
+          }
+
+          $legacyVc = @(
+            @{ Year = 2005; Major = 8;  VersionPath = 'x64' },
+            @{ Year = 2008; Major = 9;  VersionPath = 'x64' },
+            @{ Year = 2010; Major = 10; VersionPath = 'x64' },
+            @{ Year = 2012; Major = 11; VersionPath = 'x64' },
+            @{ Year = 2013; Major = 12; VersionPath = 'x64' }
+          )
+          $sqlExpress = @(
+            @{ Year = 2017; Major = 14 },
+            @{ Year = 2019; Major = 15 },
+            @{ Year = 2022; Major = 16 },
+            @{ Year = 2025; Major = 17 }
+          )
+
           $targets = @(
+            foreach ($vc in $legacyVc) {
+              @{
+                Name         = "VC++ $($vc.Year)"
+                Path         = "m/Microsoft/VCRedist/$($vc.Year)/$($vc.VersionPath)"
+                Major        = $vc.Major
+                Kind         = 'components'
+                Pattern      = "(Dependency_AddVCMsi\('$($vc.Year)',[^\r\n]*?,\s*$($vc.Major),\s*)(\d+),\s*(\d+),\s*(\d+)(,)"
+                BlockPattern = "(?m)^procedure Dependency_AddVC$($vc.Year);.*$"
+                Architectures = 'x86', 'x64'
+                InstallerPaths = @{
+                  x86 = "m/Microsoft/VCRedist/$($vc.Year)/x86"
+                  x64 = "m/Microsoft/VCRedist/$($vc.Year)/x64"
+                }
+                MicrosoftOwned = $true
+                InstallerMetadata = $true
+              }
+            }
             @{
               Name    = 'VC++ 2015-2022'
               Path    = 'm/Microsoft/VCRedist/2015+/x64'
@@ -108,23 +221,20 @@ jobs:
               Kind    = 'components'
               Pattern = '(VisualStudio\\14\.0\\VC\\Runtimes[\s\S]*?PackVersionComponents\(14,\s*)(\d+),\s*(\d+),\s*(\d+)(\))'
               BlockPattern = '(?ms)^procedure Dependency_AddVC14;.*?^end;'
-            },
-            @{
-              Name    = 'SQL Server 2022 Express'
-              Path    = 'm/Microsoft/SQLServer/2022/Express'
-              Major   = 16
-              Kind    = 'components'
-              Pattern = "(Dependency_AddSqlExpress\('2022',\s*'MSSQL16\.MSSQLSERVER',\s*'[^']+',\s*16,\s*)(\d+),\s*(\d+),\s*(\d+)(,)"
-              BlockPattern = '(?m)^procedure Dependency_AddSql2022Express;.*$'
-            },
-            @{
-              Name    = 'SQL Server 2025 Express'
-              Path    = 'm/Microsoft/SQLServer/2025/Express'
-              Major   = 17
-              Kind    = 'components'
-              Pattern = "(Dependency_AddSqlExpress\('2025',\s*'MSSQL17\.MSSQLSERVER',\s*'[^']+',\s*17,\s*)(\d+),\s*(\d+),\s*(\d+)(,)"
-              BlockPattern = '(?m)^procedure Dependency_AddSql2025Express;.*$'
-            },
+            }
+            foreach ($sql in $sqlExpress) {
+              @{
+                Name              = "SQL Server $($sql.Year) Express"
+                Path              = "m/Microsoft/SQLServer/$($sql.Year)/Express"
+                Major             = $sql.Major
+                Kind              = 'components'
+                Pattern           = "(Dependency_AddSqlExpress\('$($sql.Year)',\s*'MSSQL$($sql.Major)\.MSSQLSERVER',\s*'[^']+',\s*$($sql.Major),\s*)(\d+),\s*(\d+),\s*(\d+)(,)"
+                BlockPattern      = "(?m)^procedure Dependency_AddSql$($sql.Year)Express;.*$"
+                Architectures     = 'x64', 'x64'
+                MicrosoftOwned    = $true
+                InstallerMetadata = $true
+              }
+            }
             @{
               Name    = 'Windows App Runtime 2'
               Repo    = 'microsoft/WindowsAppSDK'
@@ -133,6 +243,56 @@ jobs:
               Pattern = '(?ms)^procedure Dependency_AddWinAppRuntime2;.*?^end;'
               VersionPattern = '/windowsappsdk/\d+\.\d+/(\d+\.\d+\.\d+)/'
               UrlPattern = '/windowsappsdk/\d+\.\d+/\d+\.\d+\.\d+/'
+            },
+            @{
+              Name          = 'WebView2 Runtime'
+              Path          = 'm/Microsoft/EdgeWebView2Runtime'
+              Kind          = 'installers'
+              Pattern       = '(?ms)^procedure Dependency_AddWebView2;.*?^end;'
+              VersionPattern = '/EdgeWebView2Runtime/(\d+\.\d+\.\d+\.\d+)'
+              Architectures = 'x86', 'x64', 'arm64'
+              MicrosoftOwned = $true
+              InstallerMetadata = $true
+            },
+            @{
+              Name                = 'DirectX Runtime'
+              Path                = 'm/Microsoft/DirectX'
+              Kind                = 'installers'
+              Pattern             = '(?ms)^procedure Dependency_AddDirectX;.*?^end;'
+              VersionPattern      = '/Microsoft/DirectX/(\d+\.\d+\.\d+\.\d+)'
+              InstallerUrlPattern = '(?i)/dxwebsetup\.exe$'
+              MicrosoftOwned      = $true
+              SingleInstaller     = $true
+              InstallerMetadata   = $true
+            },
+            @{
+              Name              = 'ODBC Driver 18'
+              Path              = 'm/Microsoft/msodbcsql/18'
+              Kind              = 'installers'
+              Pattern           = '(?ms)^procedure Dependency_AddSqlOdbc18;.*?^end;'
+              VersionPattern    = '/msodbcsql/18/(\d+\.\d+\.\d+\.\d+)'
+              MicrosoftOwned    = $true
+              InstallerLocale   = 'en-US'
+              InstallerMetadata = $true
+            },
+            @{
+              Name              = 'Access Database Engine 2016'
+              Path              = 'm/Microsoft/AccessDatabaseEngine2016'
+              Kind              = 'installers'
+              Pattern           = '(?ms)^procedure Dependency_AddAccessDatabaseEngine2016;.*?^end;'
+              VersionPattern    = '/AccessDatabaseEngine2016/(\d+\.\d+\.\d+\.\d+)'
+              MicrosoftOwned    = $true
+              InstallerMetadata = $true
+            },
+            @{
+              Name              = 'VSTO Runtime'
+              Path              = 'm/Microsoft/VSTOR'
+              Kind              = 'installers'
+              Pattern           = '(?ms)^procedure Dependency_AddVSTORuntime;.*?^end;'
+              VersionPattern    = '/VSTOR/(\d+\.\d+\.\d+)'
+              MicrosoftOwned    = $true
+              SingleInstaller   = $true
+              InstallerMetadata = $true
             },
             @{
               Name    = 'Python 3.13'
@@ -173,6 +333,56 @@ jobs:
             }
           }
 
+          $dotnet = @{
+            HostingMajors = 8, 9, 10
+            Channels      = @(
+              @{ Label = '3.1'; Path = '3_1'; Major = 3; Minor = 1 },
+              @{ Label = '5';   Path = '5';   Major = 5 },
+              @{ Label = '6';   Path = '6';   Major = 6 },
+              @{ Label = '7';   Path = '7';   Major = 7 },
+              @{ Label = '8';   Path = '8';   Major = 8 },
+              @{ Label = '9';   Path = '9';   Major = 9 },
+              @{ Label = '10';  Path = '10';  Major = 10 }
+            )
+            Families      = @(
+              @{ Name = 'Runtime';        Runtime = 'Microsoft.NETCore.App' },
+              @{ Name = 'AspNetCore';     Runtime = 'Microsoft.AspNetCore.App' },
+              @{ Name = 'DesktopRuntime'; Runtime = 'Microsoft.WindowsDesktop.App' }
+            )
+          }
+          $targets += @(
+            foreach ($family in $dotnet.Families) {
+              foreach ($channel in $dotnet.Channels) {
+                $runtime = [regex]::Escape($family.Runtime)
+                @{
+                  Name          = ".NET $($channel.Label) $($family.Name)"
+                  SummaryName   = '.NET'
+                  Path          = "m/Microsoft/DotNet/$($family.Name)/$($channel.Path)"
+                  Major         = $channel.Major
+                  Minor         = $channel.Minor
+                  Kind          = 'dotnet-runtime'
+                  Pattern       = "(?m)^[^\r\n]*Dependency_AddDotNetRuntime\('$runtime',\s*'[^']+',\s*'[^']+',\s*$($channel.Major),\s*(?<minor>\d+),\s*(?<patch>\d+),[^\r\n]*"
+                  MicrosoftOwned = $true
+                  Arm64Fallback = $true
+                  InstallerMetadata = $true
+                }
+              }
+            }
+            foreach ($major in $dotnet.HostingMajors) {
+              @{
+                Name            = ".NET $major HostingBundle"
+                SummaryName     = '.NET'
+                Path            = "m/Microsoft/DotNet/HostingBundle/$major"
+                Major           = $major
+                Kind            = 'dotnet-hosting'
+                Pattern         = "(?m)^[^\r\n]*Dependency_AddDotNetHosting\($major,\s*(?<patch>\d+),[^\r\n]*"
+                MicrosoftOwned  = $true
+                SingleInstaller = $true
+                InstallerMetadata = $true
+              }
+            }
+          )
+
           $headers = @{ 'Accept' = 'application/vnd.github.v3+json' }
           if ($env:GITHUB_TOKEN) { $headers['Authorization'] = "Bearer $env:GITHUB_TOKEN" }
 
@@ -191,6 +401,21 @@ jobs:
             }
           } catch {
             $failures += "Failed to discover Python channels: $_"
+          }
+
+          try {
+            $supportedDotnetMajor = ($dotnet.Channels.Major | Measure-Object -Maximum).Maximum
+            $dotnetChannels = Invoke-RestMethod "$apiBase/m/Microsoft/DotNet/Runtime" -Headers $headers -ErrorAction Stop
+            $newDotnetMajors = $dotnetChannels |
+              Where-Object { $_.type -eq 'dir' -and $_.name -match '^\d+$' -and [int]$_.name -gt $supportedDotnetMajor } |
+              ForEach-Object { [int]$_.name }
+            foreach ($major in $newDotnetMajors) {
+              if ((Get-WingetVersions "m/Microsoft/DotNet/Runtime/$major").Count -gt 0) {
+                $failures += ".NET $major is stable but not supported in CodeDependencies.iss"
+              }
+            }
+          } catch {
+            $failures += "Failed to discover .NET channels: $_"
           }
 
           foreach ($target in $targets) {
@@ -214,12 +439,15 @@ jobs:
             }
 
             $latest = ($versions | Sort-Object | Select-Object -Last 1)
-            if (($latest.Major -ne $target.Major) -or (($null -ne $target.Minor) -and ($latest.Minor -ne $target.Minor))) {
+            if ((($null -ne $target.Major) -and ($latest.Major -ne $target.Major)) -or
+              (($null -ne $target.Minor) -and ($latest.Minor -ne $target.Minor))) {
               $failures += "$($target.Name) latest version $latest is outside its expected channel"
               continue
             }
             if ($target.Kind -eq 'text') {
               $latest = [Version]"$($latest.Major).$($latest.Minor).$($latest.Build)"
+            } elseif ($target.Kind -eq 'components' -and $latest.Revision -lt 0) {
+              $latest = [Version]"$($latest.Major).$($latest.Minor).$($latest.Build).0"
             }
 
             $match = [regex]::Match($content, $target.Pattern)
@@ -231,6 +459,16 @@ jobs:
             if ($target.Kind -eq 'components') {
               $current = [Version]"$($target.Major).$($match.Groups[2].Value).$($match.Groups[3].Value).$($match.Groups[4].Value)"
               $replacement = "`${1}$($latest.Minor), $($latest.Build), $($latest.Revision)`${5}"
+            } elseif ($target.Kind -eq 'dotnet-runtime') {
+              $current = [Version]"$($target.Major).$($match.Groups['minor'].Value).$($match.Groups['patch'].Value)"
+              $replacement = $match.Value.Replace(
+                "$($current.Major), $($current.Minor), $($current.Build),",
+                "$($latest.Major), $($latest.Minor), $($latest.Build),")
+            } elseif ($target.Kind -eq 'dotnet-hosting') {
+              $current = [Version]"$($target.Major).0.$($match.Groups['patch'].Value)"
+              $replacement = $match.Value.Replace(
+                "$($current.Major), $($current.Build),",
+                "$($latest.Major), $($latest.Build),")
             } else {
               $versionMatch = [regex]::Match($match.Value, $target.VersionPattern)
               if (-not $versionMatch.Success) {
@@ -245,12 +483,23 @@ jobs:
               }
             }
             if (-not (Test-UpdateAvailable $target.Name $current $latest)) { continue }
-            if ($target.Kind -eq 'text') {
+            if ($target.InstallerMetadata) {
+              if ($replacement -eq $match.Value) {
+                throw "$($target.Name) version fields not updated"
+              }
+              $replacement = Set-WingetInstallerMetadata $replacement $target $latest
+            }
+            if ($target.Kind -eq 'text' -or $target.InstallerMetadata) {
               $content = $content.Replace($match.Value, $replacement)
             } else {
               $content = [regex]::Replace($content, $target.Pattern, $replacement)
             }
 
+            if ($target.InstallerMetadata) {
+              $summaryName = if ($target.SummaryName) { $target.SummaryName } else { $target.Name }
+              $updates += "$summaryName $latest"
+              continue
+            }
             $blockPattern = if ($target.BlockPattern) { $target.BlockPattern } else { $target.Pattern }
             $block = [regex]::Match($content, $blockPattern)
             if (-not $block.Success) { throw "$($target.Name) dependency block not found after version update" }
@@ -269,96 +518,6 @@ jobs:
             $content = $content.Replace($block.Value, (Set-BlockHashes $updatedBlock))
             $summaryName = $target.Name -replace " $($latest.Major)(?:\.$($latest.Minor))?$", ''
             $updates += "$summaryName $latest"
-          }
-
-          $dotnetFamilies = [ordered]@{
-            Runtime        = 'Microsoft.NETCore.App'
-            AspNetCore     = 'Microsoft.AspNetCore.App'
-            DesktopRuntime = 'Microsoft.WindowsDesktop.App'
-          }
-          $dotnetMajors = @([regex]::Matches(
-            $content,
-            "Dependency_AddDotNetRuntime\('[^']+',\s*'[^']+',\s*'[^']+',\s*(?<major>\d+),"
-          ) | ForEach-Object { [int]$_.Groups['major'].Value } |
-            Where-Object { $_ -ge 5 } | Sort-Object -Unique)
-          $hostingMajors = @([regex]::Matches($content, 'Dependency_AddDotNetHosting\((?<major>\d+),') |
-            ForEach-Object { [int]$_.Groups['major'].Value } | Sort-Object -Unique)
-          $dotnetPackages = @(
-            foreach ($family in $dotnetFamilies.GetEnumerator()) {
-              foreach ($major in $dotnetMajors) {
-                [pscustomobject]@{ Name=$family.Key; Runtime=$family.Value; Major=$major }
-              }
-            }
-            foreach ($major in $hostingMajors) {
-              [pscustomobject]@{ Name='HostingBundle'; Runtime=$null; Major=$major }
-            }
-          )
-
-          try {
-            $supportedDotnetMajor = $dotnetMajors | Select-Object -Last 1
-            $dotnetChannels = Invoke-RestMethod "$apiBase/m/Microsoft/DotNet/Runtime" -Headers $headers -ErrorAction Stop
-            $newDotnetMajors = $dotnetChannels |
-              Where-Object { $_.type -eq 'dir' -and $_.name -match '^\d+$' -and [int]$_.name -gt $supportedDotnetMajor } |
-              ForEach-Object { [int]$_.name }
-            foreach ($major in $newDotnetMajors) {
-              if ((Get-WingetVersions "m/Microsoft/DotNet/Runtime/$major").Count -gt 0) {
-                $failures += ".NET $major is stable but not supported in CodeDependencies.iss"
-              }
-            }
-          } catch {
-            $failures += "Failed to discover .NET channels: $_"
-          }
-
-          foreach ($package in $dotnetPackages) {
-            $path = "m/Microsoft/DotNet/$($package.Name)/$($package.Major)"
-            $label = ".NET $($package.Major) $($package.Name)"
-            try {
-              $latest = Get-WingetVersions $path | Sort-Object | Select-Object -Last 1
-              if (-not $latest) { throw "No versions found" }
-              $pattern = if (-not $package.Runtime) {
-                "(?m)^(?<line>[^\r\n]*Dependency_AddDotNetHosting\($($package.Major),\s*(?<patch>\d+),[^\r\n]*)"
-              } else {
-                "(?m)^(?<line>[^\r\n]*Dependency_AddDotNetRuntime\('$([regex]::Escape($package.Runtime))',\s*'[^']+',\s*'[^']+',\s*$($package.Major),\s*(?<minor>\d+),\s*(?<patch>\d+),[^\r\n]*)"
-              }
-              $match = [regex]::Match($content, $pattern)
-              if (-not $match.Success) { throw "Dependency line not found" }
-              $minor = if ($package.Runtime) { $match.Groups['minor'].Value } else { 0 }
-              $current = [Version]"$($package.Major).$minor.$($match.Groups['patch'].Value)"
-              if (-not (Test-UpdateAvailable $label $current $latest)) { continue }
-
-              $installers = @(Get-WingetInstallers $path $latest)
-              $line = $match.Groups['line'].Value
-              $oldVersion = if ($package.Runtime) { "$($current.Major), $($current.Minor), $($current.Build)," } else { "$($package.Major), $($current.Build)," }
-              $newVersion = if ($package.Runtime) { "$($latest.Major), $($latest.Minor), $($latest.Build)," } else { "$($package.Major), $($latest.Build)," }
-              $updatedLine = $line.Replace($oldVersion, $newVersion)
-              if ($updatedLine -eq $line) { throw "Version fields not updated" }
-              if (-not $package.Runtime) {
-                $installer = Confirm-DotNetInstaller ($installers | Select-Object -First 1)
-                $updatedLine = ([regex]"'https?://[^']+'").Replace($updatedLine, "'$($installer.Url)'", 1)
-                $updatedLine = ([regex]"'[0-9a-fA-F]{64}'").Replace($updatedLine, "'$($installer.Checksum)'", 1)
-              } else {
-                $arches = if ($line -match "Dependency_StringX64\('https") { 'x86', 'x64' } else { 'x86', 'x64', 'arm64' }
-                $selected = @($arches | ForEach-Object {
-                  $arch = $_
-                  $installer = $installers | Where-Object Architecture -eq $arch | Select-Object -First 1
-                  if (-not $installer -and $arch -eq 'arm64') {
-                    $installer = $installers | Where-Object Architecture -eq 'x64' | Select-Object -First 1
-                  }
-                  if (-not $installer) { throw "No $arch installer in $path $latest" }
-                  Confirm-DotNetInstaller $installer
-                })
-                $urlWrapper = New-DependencyString @($selected.Url)
-                $hashWrapper = New-DependencyString @($selected.Checksum)
-                $updatedLine = ([regex]"Dependency_String(?:X64)?\('https?://[^)]*\)").Replace(
-                  $updatedLine, [System.Text.RegularExpressions.MatchEvaluator] { param($m) $urlWrapper }, 1)
-                $updatedLine = ([regex]"Dependency_String(?:X64)?\('[0-9a-fA-F]{64}'(?:,\s*'[0-9a-fA-F]{64}'){1,2}\)").Replace(
-                  $updatedLine, [System.Text.RegularExpressions.MatchEvaluator] { param($m) $hashWrapper }, 1)
-              }
-              $content = $content.Replace($line, $updatedLine)
-              $updates += ".NET $latest"
-            } catch {
-              $failures += "$label`: $_"
-            }
           }
 
           if ($failures.Count -gt 0) {
