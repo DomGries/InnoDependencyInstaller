@@ -414,15 +414,14 @@ end;
 
 procedure Dependency_AddDotNet35;
 begin
-  // https://dotnet.microsoft.com/download/dotnet-framework/net35-sp1
-  if not IsDotNetInstalled(net35, 1) then begin
-    Dependency_Add('dotnetfx35.exe',
-      '/lang:enu ' + Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart',
-      '.NET Framework 3.5 Service Pack 1',
-      'https://download.microsoft.com/download/2/0/E/20E90413-712F-438C-988E-FDAA79A8AC3D/dotnetfx35.exe',
-      '0582515bde321e072f8673e829e175ed2e7a53e803127c50253af76528e66bc1',
-      False, False);
-  end;
+  // https://learn.microsoft.com/en-us/dotnet/framework/install/dotnet-35-windows
+  Dependency_AddIfMissing(not IsDotNetInstalled(net35, 1),
+    GetSysNativeDir + '\dism.exe',
+    '/online /enable-feature /featurename:NetFx3 /all /quiet /norestart',
+    '.NET Framework 3.5 Service Pack 1',
+    '',
+    '',
+    False, False);
 end;
 
 procedure Dependency_AddDotNet40;
