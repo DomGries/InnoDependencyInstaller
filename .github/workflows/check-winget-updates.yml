@@ -235,6 +235,21 @@ jobs:
                 InstallerMetadata = $true
               }
             }
+            foreach ($channel in 6, 7, 8) {
+              @{
+                Name              = "Windows App Runtime 1.$channel"
+                SummaryName       = 'Windows App Runtime'
+                Path              = "m/Microsoft/WindowsAppRuntime/1/$channel"
+                Major             = 1
+                Minor             = $channel
+                Kind              = 'installers'
+                Pattern           = "(?ms)^procedure Dependency_AddWinAppRuntime1$channel;.*?^end;"
+                VersionPattern    = "/WindowsAppRuntime/1/$channel/(\d+\.\d+\.\d+)"
+                Architectures     = 'x86', 'x64', 'arm64'
+                MicrosoftOwned    = $true
+                InstallerMetadata = $true
+              }
+            }
             @{
               Name    = 'Windows App Runtime 2'
               Repo    = 'microsoft/WindowsAppSDK'
@@ -450,7 +465,14 @@ jobs:
               $latest = [Version]"$($latest.Major).$($latest.Minor).$($latest.Build).0"
             }
 
-            $match = [regex]::Match($content, $target.Pattern)
+            $blockPattern = if ($target.BlockPattern) { $target.BlockPattern } else { $target.Pattern }
+            $block = [regex]::Match($content, $blockPattern)
+            if (-not $block.Success) {
+              $failures += "$($target.Name) dependency block not found in CodeDependencies.iss"
+              continue
+            }
+
+            $match = [regex]::Match($block.Value, $target.Pattern)
             if (-not $match.Success) {
               $failures += "$($target.Name) version pattern not found in CodeDependencies.iss"
               continue
@@ -483,40 +505,33 @@ jobs:
               }
             }
             if (-not (Test-UpdateAvailable $target.Name $current $latest)) { continue }
-            if ($target.InstallerMetadata) {
-              if ($replacement -eq $match.Value) {
-                throw "$($target.Name) version fields not updated"
-              }
-              $replacement = Set-WingetInstallerMetadata $replacement $target $latest
-            }
-            if ($target.Kind -eq 'text' -or $target.InstallerMetadata) {
-              $content = $content.Replace($match.Value, $replacement)
+
+            $updatedBlock = if ($target.Kind -eq 'components') {
+              ([regex]$target.Pattern).Replace($block.Value, $replacement, 1)
             } else {
-              $content = [regex]::Replace($content, $target.Pattern, $replacement)
+              $block.Value.Remove($match.Index, $match.Length).Insert($match.Index, $replacement)
             }
+            if ($updatedBlock -eq $block.Value) { throw "$($target.Name) version fields not updated" }
 
             if ($target.InstallerMetadata) {
+              $updatedBlock = Set-WingetInstallerMetadata $updatedBlock $target $latest
               $summaryName = if ($target.SummaryName) { $target.SummaryName } else { $target.Name }
-              $updates += "$summaryName $latest"
-              continue
-            }
-            $blockPattern = if ($target.BlockPattern) { $target.BlockPattern } else { $target.Pattern }
-            $block = [regex]::Match($content, $blockPattern)
-            if (-not $block.Success) { throw "$($target.Name) dependency block not found after version update" }
-            $updatedBlock = $block.Value
-            if ($target.Name -eq 'VC++ 2015-2022') {
-              foreach ($arch in 'x86', 'x64', 'arm64') {
-                $response = [System.Net.WebRequest]::Create("https://aka.ms/vc14/vc_redist.$arch.exe").GetResponse()
-                try { $url = $response.ResponseUri.AbsoluteUri } finally { $response.Close() }
-                $updatedBlock = [regex]::Replace(
-                  $updatedBlock,
-                  "https://download\.visualstudio\.microsoft\.com/download/pr/[^']*/VC_redist\.$arch\.exe",
-                  $url
-                )
+            } else {
+              if ($target.Name -eq 'VC++ 2015-2022') {
+                foreach ($arch in 'x86', 'x64', 'arm64') {
+                  $response = [System.Net.WebRequest]::Create("https://aka.ms/vc14/vc_redist.$arch.exe").GetResponse()
+                  try { $url = $response.ResponseUri.AbsoluteUri } finally { $response.Close() }
+                  $updatedBlock = [regex]::Replace(
+                    $updatedBlock,
+                    "https://download\.visualstudio\.microsoft\.com/download/pr/[^']*/VC_redist\.$arch\.exe",
+                    $url
+                  )
+                }
               }
+              $updatedBlock = Set-BlockHashes $updatedBlock
+              $summaryName = $target.Name -replace " $($latest.Major)(?:\.$($latest.Minor))?$", ''
             }
-            $content = $content.Replace($block.Value, (Set-BlockHashes $updatedBlock))
-            $summaryName = $target.Name -replace " $($latest.Major)(?:\.$($latest.Minor))?$", ''
+            $content = $content.Remove($block.Index, $block.Length).Insert($block.Index, $updatedBlock)
             $updates += "$summaryName $latest"
           }
 
