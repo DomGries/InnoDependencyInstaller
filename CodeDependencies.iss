@@ -25,6 +25,16 @@ begin
   Result := (Entry.Components = '') or WizardIsComponentSelected(Entry.Components);
 end;
 
+// a file name is downloaded to and run from {tmp}, a full path is run where it is
+function Dependency_FilePath(const Filename: String): String;
+begin
+  if PathIsRooted(Filename) then begin
+    Result := Filename;
+  end else begin
+    Result := ExpandConstant('{tmp}{\}') + Filename;
+  end;
+end;
+
 procedure Dependency_Add(const Filename, Parameters, Title, URL, Checksum: String; const ForceSuccess, RestartAfter: Boolean);
 var
   Dependency: TDependency_Entry;
@@ -34,9 +44,9 @@ begin
   Dependency.Parameters := Parameters;
   Dependency.Title := Title;
 
-  if FileExists(ExpandConstant('{tmp}{\}') + Filename) then begin
+  if FileExists(Dependency_FilePath(Filename)) then begin
     Dependency.URL := '';
-    Log('Dependency queued (already in tmp): ' + Title);
+    Log('Dependency queued (already present): ' + Title);
   end else begin
     Dependency.URL := URL;
     Log('Dependency queued for download: ' + Title);
@@ -127,9 +137,9 @@ begin
         while True do begin
           ResultCode := 0;
 #ifdef Dependency_CustomExecute
-          if {#Dependency_CustomExecute}(ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, ResultCode) then begin
+          if {#Dependency_CustomExecute}(Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, ResultCode) then begin
 #else
-          if ShellExec('', ExpandConstant('{tmp}{\}') + Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+          if ShellExec('', Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
 #endif
             Log('Dependency exit code ' + IntToStr(ResultCode) + ': ' + Dependency_List[DependencyIndex].Title);
             if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
@@ -320,13 +330,14 @@ begin
   Dependency_NetCoreRuntimesArch := Arch;
   SetArrayLength(Dependency_NetCoreRuntimes, 0);
 
-  if RegQueryStringValue(HKLM32, 'SOFTWARE\dotnet\Setup\InstalledVersions\' + Arch, 'InstallLocation', Path) then begin
-    Path := AddBackslash(Path);
+  // never keep a relative location: it would run whatever dotnet.exe sits in the current directory
+  if not (RegQueryStringValue(HKLM32, 'SOFTWARE\dotnet\Setup\InstalledVersions\' + Arch, 'InstallLocation', Path)
+    and PathIsRooted(Path) and FileExists(AddBackslash(Path) + 'dotnet.exe')) then begin
+    Path := ExpandConstant(Dependency_StringX64('{commonpf32}', '{commonpf64}')) + '\dotnet';
   end;
-  if not FileExists(Path + 'dotnet.exe') then begin
-    Path := ExpandConstant(Dependency_StringX64('{commonpf32}', '{commonpf64}')) + '\dotnet\';
-  end;
-  if ExecAndCaptureOutput(Path + 'dotnet.exe', '--list-runtimes', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
+  Path := AddBackslash(Path);
+
+  if FileExists(Path + 'dotnet.exe') and ExecAndCaptureOutput(Path + 'dotnet.exe', '--list-runtimes', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
     Dependency_NetCoreRuntimes := Output.StdOut;
   end;
 end;
@@ -685,14 +696,14 @@ begin
 
     // detect whichever java.exe an app would actually use: JAVA_HOME, else PATH
     JavaExe := RemoveQuotes(GetEnv('JAVA_HOME'));
-    if (JavaExe <> '') and FileExists(AddBackslash(JavaExe) + 'bin\java.exe') then begin
+    if (JavaExe <> '') and PathIsRooted(JavaExe) and FileExists(AddBackslash(JavaExe) + 'bin\java.exe') then begin
       JavaExe := AddBackslash(JavaExe) + 'bin\java.exe';
     end else begin
-      JavaExe := 'java.exe';
+      JavaExe := FileSearch('java.exe', GetEnv('PATH'));
     end;
 
     // `java -version` prints to stderr
-    if ExecAndCaptureOutput(JavaExe, '-version', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
+    if (JavaExe <> '') and ExecAndCaptureOutput(JavaExe, '-version', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
       for LineIndex := 0 to Length(Output.StdErr) - 1 do begin
         Line := Output.StdErr[LineIndex];
         QuotePos := Pos('version "', Line);

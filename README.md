@@ -7,7 +7,7 @@
 
 **Inno Setup Dependency Installer** automatically downloads and installs any dependency such as .NET, Visual C++, SQL Server, and more during your application's installation. One line per dependency is all it takes — missing ones are installed before your application, anything already present is skipped. More than 60 dependencies are [built in](#supported-dependencies) and you can [add your own](#adding-your-own-dependency).
 
-Requires [Inno Setup 6.4 or newer](https://www.jrsoftware.org/isinfo.php).
+Requires [Inno Setup 6.7 or newer](https://www.jrsoftware.org/isinfo.php).
 
 ## Getting started
 
