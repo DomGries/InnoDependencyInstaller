@@ -120,6 +120,9 @@ begin
 
   Dependency_AddWebView2;
 
+  Dependency_AddWinAppRuntime16;
+  Dependency_AddWinAppRuntime17;
+  Dependency_AddWinAppRuntime18;
   Dependency_AddWinAppRuntime2;
 
   Dependency_AddAccessDatabaseEngine2016;

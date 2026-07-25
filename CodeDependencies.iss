@@ -671,26 +671,90 @@ var
   Dependency_WinAppRuntimePackages: TArrayOfString;
   Dependency_WinAppRuntimePackagesListed: Boolean;
 
-// the Windows App Runtime ships per channel side-by-side; apps need the channel they were built against
-function Dependency_IsWinAppRuntimeInstalled(const Channel: String): Boolean;
+function Dependency_HasWinAppRuntimePackage(const PackageName, Architecture: String; const PrefixMatch: Boolean): Boolean;
 var
-  ResultCode, LineIndex: Integer;
-  Output: TExecOutput;
+  LineIndex: Integer;
+  PackageFields: TArrayOfString;
 begin
-  if not Dependency_WinAppRuntimePackagesListed then begin
-    Dependency_WinAppRuntimePackagesListed := True;
-    if ExecAndCaptureOutput(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'), '-NoProfile -ExecutionPolicy Bypass -Command "(Get-AppxPackage -AllUsers Microsoft.WindowsAppRuntime.*).Name"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
-      Dependency_WinAppRuntimePackages := Output.StdOut;
-    end;
-  end;
-
   for LineIndex := 0 to Length(Dependency_WinAppRuntimePackages) - 1 do begin
-    if Trim(Dependency_WinAppRuntimePackages[LineIndex]) = 'Microsoft.WindowsAppRuntime.' + Channel then begin
+    PackageFields := StringSplit(Trim(Dependency_WinAppRuntimePackages[LineIndex]), ['|'], stExcludeEmpty);
+    if (Length(PackageFields) = 2)
+      and ((not PrefixMatch and SameText(PackageFields[0], PackageName))
+        or (PrefixMatch and SameText(Copy(PackageFields[0], 1, Length(PackageName)), PackageName)))
+      and SameText(PackageFields[1], Architecture) then begin
       Result := True;
       exit;
     end;
   end;
   Result := False;
+end;
+
+// a usable runtime needs all four package types registered for the current user
+function Dependency_IsWinAppRuntimeInstalled(const Channel: String): Boolean;
+var
+  PackageArchitecture, SystemArchitecture: String;
+  ResultCode: Integer;
+  Output: TExecOutput;
+begin
+  if not Dependency_WinAppRuntimePackagesListed then begin
+    Dependency_WinAppRuntimePackagesListed := True;
+    if ExecAndCaptureOutput(GetSysNativeDir + '\WindowsPowerShell\v1.0\powershell.exe',
+      '-NoProfile -ExecutionPolicy Bypass -Command "$pattern = ''^(Microsoft\.WindowsAppRuntime\.|MicrosoftCorporationII\.WinAppRuntime\.|Microsoft\.WinAppRuntime\.DDLM\.)''; Get-AppxPackage | Where-Object { $_.Name -match $pattern } | ForEach-Object { ''{0}|{1}'' -f $_.Name, $_.Architecture }"',
+      '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
+      Dependency_WinAppRuntimePackages := Output.StdOut;
+    end;
+  end;
+
+  PackageArchitecture := Dependency_String('X86', 'X64', 'Arm64');
+  if IsArm64 then begin
+    SystemArchitecture := 'Arm64';
+  end else if IsX64Compatible then begin
+    SystemArchitecture := 'X64';
+  end else begin
+    SystemArchitecture := 'X86';
+  end;
+
+  Result :=
+    Dependency_HasWinAppRuntimePackage('Microsoft.WindowsAppRuntime.' + Channel, PackageArchitecture, False)
+    and Dependency_HasWinAppRuntimePackage('MicrosoftCorporationII.WinAppRuntime.Main.' + Channel, SystemArchitecture, False)
+    and Dependency_HasWinAppRuntimePackage('MicrosoftCorporationII.WinAppRuntime.Singleton', SystemArchitecture, False)
+    and Dependency_HasWinAppRuntimePackage('Microsoft.WinAppRuntime.DDLM.', PackageArchitecture, True);
+end;
+
+procedure Dependency_AddWinAppRuntime16;
+begin
+  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/WindowsAppRuntime/1/6/1.6.9
+  Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('1.6'),
+    'windowsappruntime16' + Dependency_ArchSuffix + '.exe',
+    '--quiet',
+    'Windows App Runtime 1.6' + Dependency_ArchTitle,
+    Dependency_String('https://aka.ms/windowsappsdk/1.6/1.6.250602001/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/1.6/1.6.250602001/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/1.6/1.6.250602001/windowsappruntimeinstall-arm64.exe'),
+    Dependency_String('6219474e62cdc52509df78c31943e61cb896e10517602dd7d55b9b8a9a0b79c7', 'c7cd988425b76ea087e2e1d7b096b585f853e20bb826b8f38d45a5175410a877', '69b8ab5fcff480cc8324c36f9e38140907a6aaa02a4065716c7a2ba74ff177ae'),
+    False, False);
+end;
+
+procedure Dependency_AddWinAppRuntime17;
+begin
+  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/WindowsAppRuntime/1/7/1.7.9
+  Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('1.7'),
+    'windowsappruntime17' + Dependency_ArchSuffix + '.exe',
+    '--quiet',
+    'Windows App Runtime 1.7' + Dependency_ArchTitle,
+    Dependency_String('https://aka.ms/windowsappsdk/1.7/1.7.260224002/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/1.7/1.7.260224002/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/1.7/1.7.260224002/windowsappruntimeinstall-arm64.exe'),
+    Dependency_String('470b6fe2db339b90b845c90c3368f39b38b15e1a4d3dc7aebea5fa12f1483169', '8de73b13a010c6aeb84040e5587a46d21b36decce0ccd582c346536cad63ae73', '993f54077e747d3f9026745ec860cbe57ec545bcc9054c76746a3acbe99bf8ab'),
+    False, False);
+end;
+
+procedure Dependency_AddWinAppRuntime18;
+begin
+  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/WindowsAppRuntime/1/8/1.8.9
+  Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('1.8'),
+    'windowsappruntime18' + Dependency_ArchSuffix + '.exe',
+    '--quiet',
+    'Windows App Runtime 1.8' + Dependency_ArchTitle,
+    Dependency_String('https://aka.ms/windowsappsdk/1.8/1.8.260529003/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/1.8/1.8.260529003/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/1.8/1.8.260529003/windowsappruntimeinstall-arm64.exe'),
+    Dependency_String('53b5a8225889b3beaa12106bfad4d2bc137c329aa21953895148f998c1bb4a74', '02aadd7fb8957b41f282638062347201e64886c6832f4f90cd70428362a1b812', 'ef00f566f8cd8977ccb8df29c2cdd7e13ed9aa5d3a519b92ad767965a7ed2547'),
+    False, False);
 end;
 
 procedure Dependency_AddWinAppRuntime2;
