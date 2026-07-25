@@ -91,6 +91,7 @@ function Dependency_PrepareToInstall(var NeedsRestart: Boolean): String;
 var
   DependencyCount, DependencyIndex, ActiveCount, ActiveIndex, ResultCode, ParameterIndex, Attempt: Integer;
   Parameter, TempValue: String;
+  Retry: Boolean;
 begin
   DependencyCount := GetArrayLength(Dependency_List);
 
@@ -107,15 +108,15 @@ begin
           Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
 
           Attempt := 0;
-          while True do begin
+          Retry := True;
+          while Retry do begin
+            Retry := False;
             try
               Dependency_DownloadPage.Download;
-              break;
             except
               if Dependency_DownloadPage.AbortedByUser then begin
                 Log('Download aborted by user: ' + Dependency_List[DependencyIndex].Title);
                 Result := Dependency_List[DependencyIndex].Title;
-                break;
               end else begin
                 Log('Download failed: ' + Dependency_List[DependencyIndex].Title + ': ' + GetExceptionMessage);
                 Attempt := Attempt + 1;
@@ -123,19 +124,19 @@ begin
                 if Attempt <= {#Dependency_DownloadRetryCount} then begin
                   Log('Retrying download (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_DownloadRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
                   Sleep(Attempt * 2000);
+                  Retry := True;
                 end else begin
                   case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
                     IDABORT: begin
                       Result := Dependency_List[DependencyIndex].Title;
-                      break;
                     end;
                     IDRETRY: begin
                       Attempt := 0;
+                      Retry := True;
                     end;
                     IDIGNORE: begin
                       Dependency_List[DependencyIndex].SkipInstall := True;
                       Log('Dependency skipped after failed download: ' + Dependency_List[DependencyIndex].Title);
-                      break;
                     end;
                   end;
                 end;
