@@ -124,10 +124,10 @@ Call any of these functions inside `InitializeSetup`. Every function first check
 
 1. When the setup starts, every added dependency is checked and only the missing ones are kept.
 2. The user sees the pending dependencies listed on the _Ready to Install_ page.
-3. After clicking _Install_, the missing installers are downloaded from their official sources, with a progress bar and a retry prompt if a download fails. Every built-in download is verified against a pinned SHA-256 checksum, so a corrupted or tampered file is rejected before it runs.
-4. Each dependency installs unattended, one after another, and then your application is installed as usual.
+3. After clicking _Install_, the missing installers are downloaded from their official sources, with a progress bar. A failed download is retried automatically a few times before the user is asked whether to retry, ignore or abort. Every built-in download is verified against a pinned SHA-256 checksum, so a corrupted or tampered file is rejected before it runs.
+4. Each dependency installs unattended, one after another, and then your application is installed as usual. When another installation is already running on the machine — Windows Update, for example — the setup waits for it instead of failing.
 5. If a dependency requires a Windows restart, the setup takes care of it: it prompts for the restart at the end — or, when other dependencies are still pending, offers to restart right away and resumes the setup after the reboot.
-6. If an installer fails, the user can retry, ignore or abort. Setups running with `/SILENT` or `/VERYSILENT` install all dependencies fully silently, and `/SUPPRESSMSGBOXES` continues automatically on errors.
+6. If an installer fails, the user can retry, ignore or abort. Setups running with `/SILENT` or `/VERYSILENT` install all dependencies fully silently; with `/SUPPRESSMSGBOXES` there is nobody to ask, so a dependency that still fails after the automatic retries aborts the setup.
 
 ## Adding your own dependency
 

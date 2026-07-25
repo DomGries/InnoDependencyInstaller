@@ -1,3 +1,10 @@
+#ifndef Dependency_DownloadRetryCount
+  #define Dependency_DownloadRetryCount 3
+#endif
+#ifndef Dependency_InstallBusyRetryCount
+  #define Dependency_InstallBusyRetryCount 30
+#endif
+
 [Code]
 // https://github.com/DomGries/InnoDependencyInstaller
 
@@ -12,6 +19,7 @@ type
     ForceSuccess: Boolean;
     RestartAfter: Boolean;
     Components: String;
+    SkipInstall: Boolean;
   end;
 
 var
@@ -56,6 +64,7 @@ begin
   Dependency.ForceSuccess := ForceSuccess;
   Dependency.RestartAfter := RestartAfter;
   Dependency.Components := Dependency_Components;
+  Dependency.SkipInstall := False;
 
   DependencyCount := GetArrayLength(Dependency_List);
   SetArrayLength(Dependency_List, DependencyCount + 1);
@@ -71,132 +80,160 @@ end;
 <event('PrepareToInstall')>
 function Dependency_PrepareToInstall(var NeedsRestart: Boolean): String;
 var
-  DependencyCount, DependencyIndex, ActiveCount, ActiveIndex, ResultCode, ParameterIndex: Integer;
-  Retry: Boolean;
+  DependencyCount, DependencyIndex, ActiveCount, ActiveIndex, ResultCode, ParameterIndex, Attempt: Integer;
   Parameter, TempValue: String;
 begin
   DependencyCount := GetArrayLength(Dependency_List);
 
   if DependencyCount > 0 then begin
     Dependency_DownloadPage.Show;
-
-    for DependencyIndex := 0 to DependencyCount - 1 do begin
-      if not Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
-        continue;
-      end;
-      if Dependency_List[DependencyIndex].URL <> '' then begin
-        Dependency_DownloadPage.Clear;
-        Dependency_DownloadPage.Add(Dependency_List[DependencyIndex].URL, Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Checksum);
-
-        Retry := True;
-        while Retry do begin
-          Retry := False;
-
-          try
-            Dependency_DownloadPage.Download;
-          except
-            if Dependency_DownloadPage.AbortedByUser then begin
-              Log('Download aborted by user: ' + Dependency_List[DependencyIndex].Title);
-              Result := Dependency_List[DependencyIndex].Title;
-            end else begin
-              case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
-                IDABORT: begin
-                  Result := Dependency_List[DependencyIndex].Title;
-                end;
-                IDRETRY: begin
-                  Retry := True;
-                end;
-              end;
-            end;
-          end;
-        end;
-        if Result <> '' then begin
-          break;
-        end;
-      end;
-    end;
-
-    if Result = '' then begin
-      ActiveCount := 0;
-      for DependencyIndex := 0 to DependencyCount - 1 do begin
-        if Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
-          ActiveCount := ActiveCount + 1;
-        end;
-      end;
-
-      ActiveIndex := 0;
+    try
       for DependencyIndex := 0 to DependencyCount - 1 do begin
         if not Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
-          Log('Dependency skipped (component not selected): ' + Dependency_List[DependencyIndex].Title);
           continue;
         end;
-        ActiveIndex := ActiveIndex + 1;
-        Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
-        Dependency_DownloadPage.SetProgress(ActiveIndex, ActiveCount + 1);
+        if Dependency_List[DependencyIndex].URL <> '' then begin
+          Dependency_DownloadPage.Clear;
+          Dependency_DownloadPage.Add(Dependency_List[DependencyIndex].URL, Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Checksum);
+          Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
 
-        while True do begin
-          ResultCode := 0;
-#ifdef Dependency_CustomExecute
-          if {#Dependency_CustomExecute}(Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, ResultCode) then begin
-#else
-          if ShellExec('', Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
-#endif
-            Log('Dependency exit code ' + IntToStr(ResultCode) + ': ' + Dependency_List[DependencyIndex].Title);
-            if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
-              if Dependency_List[DependencyIndex].RestartAfter then begin
-                if ActiveIndex = ActiveCount then begin
-                  Dependency_NeedToRestart := True;
+          Attempt := 0;
+          while True do begin
+            try
+              Dependency_DownloadPage.Download;
+              break;
+            except
+              if Dependency_DownloadPage.AbortedByUser then begin
+                Log('Download aborted by user: ' + Dependency_List[DependencyIndex].Title);
+                Result := Dependency_List[DependencyIndex].Title;
+                break;
+              end else begin
+                Log('Download failed: ' + Dependency_List[DependencyIndex].Title + ': ' + GetExceptionMessage);
+                Attempt := Attempt + 1;
+                // a transient network error must not fail an unattended setup on the first try
+                if Attempt <= {#Dependency_DownloadRetryCount} then begin
+                  Log('Retrying download (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_DownloadRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
+                  Sleep(Attempt * 2000);
                 end else begin
-                  NeedsRestart := True;
-                  Result := Dependency_List[DependencyIndex].Title;
+                  case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
+                    IDABORT: begin
+                      Result := Dependency_List[DependencyIndex].Title;
+                      break;
+                    end;
+                    IDRETRY: begin
+                      Attempt := 0;
+                    end;
+                    IDIGNORE: begin
+                      Dependency_List[DependencyIndex].SkipInstall := True;
+                      Log('Dependency skipped after failed download: ' + Dependency_List[DependencyIndex].Title);
+                      break;
+                    end;
+                  end;
                 end;
               end;
-              break;
-            end else if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
-              NeedsRestart := True;
-              Result := Dependency_List[DependencyIndex].Title;
-              break;
-            end else if ResultCode = 3010 then begin // ERROR_SUCCESS_REBOOT_REQUIRED (3010)
-              Dependency_NeedToRestart := True;
-              break;
-            end else if ResultCode = 1638 then begin // ERROR_PRODUCT_VERSION (1638)
-              break;
             end;
           end;
-
-          case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[DependencyIndex].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
-            IDABORT: begin
-              Result := Dependency_List[DependencyIndex].Title;
-              break;
-            end;
-            IDIGNORE: begin
-              break;
-            end;
+          if Result <> '' then begin
+            break;
           end;
-        end;
-
-        if Result <> '' then begin
-          break;
         end;
       end;
 
-      if NeedsRestart then begin
-        Log('Dependency requires restart: registering RunOnce to resume setup');
-        TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + RemoveBackslashUnlessRoot(WizardDirValue) + '" /GROUP="' + RemoveBackslashUnlessRoot(WizardGroupValue) + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
-        for ParameterIndex := 1 to ParamCount do begin
-          Parameter := Uppercase(ParamStr(ParameterIndex));
-          if (Parameter = '/SP-') or (Parameter = '/SILENT') or (Parameter = '/VERYSILENT') or (Parameter = '/SUPPRESSMSGBOXES') or (Parameter = '/NOCANCEL') or (Parameter = '/NORESTART') or (Parameter = '/ALLUSERS') or (Parameter = '/CURRENTUSER') then begin
-            TempValue := TempValue + ' ' + Parameter;
+      if Result = '' then begin
+        ActiveCount := 0;
+        for DependencyIndex := 0 to DependencyCount - 1 do begin
+          if Dependency_IsEntryActive(Dependency_List[DependencyIndex]) and not Dependency_List[DependencyIndex].SkipInstall then begin
+            ActiveCount := ActiveCount + 1;
           end;
         end;
-        if WizardNoIcons then begin
-          TempValue := TempValue + ' /NOICONS';
+
+        ActiveIndex := 0;
+        for DependencyIndex := 0 to DependencyCount - 1 do begin
+          if not Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
+            Log('Dependency skipped (component not selected): ' + Dependency_List[DependencyIndex].Title);
+            continue;
+          end;
+          if Dependency_List[DependencyIndex].SkipInstall then begin
+            continue;
+          end;
+          ActiveIndex := ActiveIndex + 1;
+          Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
+          Dependency_DownloadPage.SetProgress(ActiveIndex, ActiveCount + 1);
+
+          Attempt := 0;
+          while True do begin
+            ResultCode := 0;
+#ifdef Dependency_CustomExecute
+            if {#Dependency_CustomExecute}(Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, ResultCode) then begin
+#else
+            if ShellExec('', Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+#endif
+              Log('Dependency exit code ' + IntToStr(ResultCode) + ': ' + Dependency_List[DependencyIndex].Title);
+              if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
+                if Dependency_List[DependencyIndex].RestartAfter then begin
+                  if ActiveIndex = ActiveCount then begin
+                    Dependency_NeedToRestart := True;
+                  end else begin
+                    NeedsRestart := True;
+                    Result := Dependency_List[DependencyIndex].Title;
+                  end;
+                end;
+                break;
+              end else if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
+                NeedsRestart := True;
+                Result := Dependency_List[DependencyIndex].Title;
+                break;
+              end else if ResultCode = 3010 then begin // ERROR_SUCCESS_REBOOT_REQUIRED (3010)
+                Dependency_NeedToRestart := True;
+                break;
+              end else if ResultCode = 1638 then begin // ERROR_PRODUCT_VERSION (1638)
+                break;
+              end else if ResultCode = 1618 then begin // ERROR_INSTALL_ALREADY_RUNNING (1618)
+                Attempt := Attempt + 1;
+                // another installer (often Windows Update) holds the install mutex, so wait instead of failing
+                if Attempt <= {#Dependency_InstallBusyRetryCount} then begin
+                  Log('Another installation is in progress, waiting (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_InstallBusyRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
+                  Sleep(10000);
+                  continue;
+                end;
+              end;
+            end;
+
+            case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[DependencyIndex].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
+              IDABORT: begin
+                Result := Dependency_List[DependencyIndex].Title;
+                break;
+              end;
+              IDIGNORE: begin
+                break;
+              end;
+            end;
+          end;
+
+          if Result <> '' then begin
+            break;
+          end;
         end;
-        RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', '{#SetupSetting("AppName")}', TempValue);
+
       end;
+    finally
+      Dependency_DownloadPage.Hide;
     end;
 
-    Dependency_DownloadPage.Hide;
+    if NeedsRestart then begin
+      Log('Dependency requires restart: registering RunOnce to resume setup');
+      TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + RemoveBackslashUnlessRoot(WizardDirValue) + '" /GROUP="' + RemoveBackslashUnlessRoot(WizardGroupValue) + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
+      for ParameterIndex := 1 to ParamCount do begin
+        Parameter := Uppercase(ParamStr(ParameterIndex));
+        if (Parameter = '/SP-') or (Parameter = '/SILENT') or (Parameter = '/VERYSILENT') or (Parameter = '/SUPPRESSMSGBOXES') or (Parameter = '/NOCANCEL') or (Parameter = '/NORESTART') or (Parameter = '/ALLUSERS') or (Parameter = '/CURRENTUSER') then begin
+          TempValue := TempValue + ' ' + Parameter;
+        end;
+      end;
+      if WizardNoIcons then begin
+        TempValue := TempValue + ' /NOICONS';
+      end;
+      RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', '{#SetupSetting("AppName")}', TempValue);
+    end;
   end;
 end;
 
