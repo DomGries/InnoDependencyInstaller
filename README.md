@@ -134,18 +134,28 @@ Call any of these functions inside `InitializeSetup`. Every function first check
 
 ## Adding your own dependency
 
-Any installer that supports unattended command-line arguments works. Check whether your dependency is missing, then describe it with `Dependency_Add`:
+Any installer that supports unattended command-line arguments works. Describe it with `Dependency_AddIfMissing`, whose first argument is your own check for whether the dependency is missing:
 
 ```iss
-if not RegKeyExists(HKLM, 'SOFTWARE\MyRuntime') then begin
-  Dependency_Add('myruntime.exe',        // file name in the setup's temporary directory
-    '/quiet /norestart',                 // arguments for an unattended installation
-    'My Runtime 1.0',                    // name shown to the user
-    'https://example.com/myruntime.exe', // download URL
-    '',                                  // optional SHA-256 checksum the download must match
-    False,                               // ForceSuccess: treat any exit code as success
-    False);                              // RestartAfter: request a Windows restart afterwards
-end;
+Dependency_AddIfMissing(not RegKeyExists(HKLM, 'SOFTWARE\MyRuntime'),
+  'myruntime.exe',                     // file name in the setup's temporary directory
+  '/quiet /norestart',                 // arguments for an unattended installation
+  'My Runtime 1.0',                    // name shown to the user
+  'https://example.com/myruntime.exe', // download URL
+  '',                                  // optional SHA-256 checksum the download must match
+  False,                               // ForceSuccess: treat any exit code as success
+  False);                              // RestartAfter: request a Windows restart afterwards
+```
+
+Both decisions end up in the setup log, which is what you want when a user reports that a dependency was or was not installed. `Dependency_Add` with the same arguments minus the first one is still available if you prefer to write the `if` yourself.
+
+Instead of a file name you can pass a path to a program that is already on the machine, which is how the built-in .NET Framework 3.5 dependency enables the corresponding Windows feature:
+
+```iss
+Dependency_AddIfMissing(not IsDotNetInstalled(net35, 1),
+  GetSysNativeDir + '\dism.exe',
+  '/online /enable-feature /featurename:NetFx3 /all /quiet /norestart',
+  '.NET Framework 3.5', '', '', False, False);
 ```
 
 For architecture-dependent downloads use `Dependency_String(x86Url, x64Url, arm64Url)`, which returns the URL matching the target system. `Dependency_IsX64` and `Dependency_IsArm64` can likewise be used as `Check:` functions in `[Files]` to install the matching binaries of your own application (see _ExampleSetup.iss_).
@@ -204,6 +214,25 @@ Dependency_Components := ''; // disable component gating again
 | --- | --- |
 | `Dependency_NoUpdateReadyMemo` | Don't attach the `UpdateReadyMemo` event — for scripts implementing their own (call `Dependency_UpdateReadyMemo` from it to keep the dependency listing) |
 | `Dependency_CustomExecute` | Name of your own function `function MyExecute(const File, Parameters: String; var ResultCode: Integer): Boolean;` used to run the installers instead of `ShellExec` |
+| `Dependency_DownloadRetryCount` | How often a failed download is retried automatically before the user is asked (default `3`, set to `0` to ask immediately) |
+| `Dependency_InstallBusyRetryCount` | How often an installer that reports "another installation is in progress" is retried, once every 10 seconds (default `30`) |
+
+## Troubleshooting
+
+Run your setup with `/LOG="C:\setup.log"` (or find the log Inno writes to `%TEMP%` when started with `/LOG`) — every decision this library makes is recorded there:
+
+| Log entry | Meaning |
+| --- | --- |
+| `Dependency already installed: X` | The check for _X_ found it on the machine, so nothing was downloaded or installed |
+| `Dependency queued for download: X` | _X_ is missing and will be downloaded |
+| `Dependency queued (already present): X` | _X_ is missing, but its installer is already in the temporary directory (or is a program on the machine), so it is not downloaded |
+| `Dependency skipped after failed download: X` | The user ignored a download failure, so _X_ will not be executed |
+| `Dependency skipped (component not selected): X` | _X_ belongs to a component the user did not select |
+| `Dependency exit code N: X` | The installer of _X_ finished with exit code _N_ |
+
+Exit codes `0` (success), `1638` (a newer version is already installed), `3010` (restart required) and `1641` (installer started a restart) count as success. `1618` means another installation is already running, which the setup waits out. Everything else is an error.
+
+A dependency that requires a restart resumes the setup after the reboot through a `RunOnce` registry entry. The resumed setup is started with the original command line plus `/restart=1`, which your script can check with `ParamStr` if it needs to behave differently on the second run.
 
 ## Credits
 
