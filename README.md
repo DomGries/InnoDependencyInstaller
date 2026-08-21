@@ -215,7 +215,9 @@ Dependency_Components := ''; // disable component gating again
 | `Dependency_NoUpdateReadyMemo` | Don't attach the `UpdateReadyMemo` event — for scripts implementing their own (call `Dependency_UpdateReadyMemo` from it to keep the dependency listing) |
 | `Dependency_CustomExecute` | Name of your own function `function MyExecute(const File, Parameters: String; var ResultCode: Integer): Boolean;` used to run the installers instead of `ShellExec` |
 | `Dependency_DownloadRetryCount` | How often a failed download is retried automatically before the user is asked (default `3`, set to `0` to ask immediately) |
+| `Dependency_DownloadRetryBackoffMs` | Base delay in milliseconds between automatic download retries; the delay grows with each attempt (default `2000`) |
 | `Dependency_InstallBusyRetryCount` | How often an installer that reports "another installation is in progress" is retried, once every 10 seconds (default `30`) |
+| `Dependency_InstallBusyRetryDelayMs` | Delay in milliseconds between "another installation is in progress" retries (default `10000`) |
 
 ## Troubleshooting
 

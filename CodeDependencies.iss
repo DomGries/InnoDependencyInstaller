@@ -1,8 +1,14 @@
 #ifndef Dependency_DownloadRetryCount
   #define Dependency_DownloadRetryCount 3
 #endif
+#ifndef Dependency_DownloadRetryBackoffMs
+  #define Dependency_DownloadRetryBackoffMs 2000
+#endif
 #ifndef Dependency_InstallBusyRetryCount
   #define Dependency_InstallBusyRetryCount 30
+#endif
+#ifndef Dependency_InstallBusyRetryDelayMs
+  #define Dependency_InstallBusyRetryDelayMs 10000
 #endif
 
 [Code]
@@ -123,7 +129,7 @@ begin
                 // a transient network error must not fail an unattended setup on the first try
                 if Attempt <= {#Dependency_DownloadRetryCount} then begin
                   Log('Retrying download (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_DownloadRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
-                  Sleep(Attempt * 2000);
+                  Sleep(Attempt * {#Dependency_DownloadRetryBackoffMs});
                   Retry := True;
                 end else begin
                   case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
@@ -203,7 +209,7 @@ begin
                 // another installer (often Windows Update) holds the install mutex, so wait instead of failing
                 if Attempt <= {#Dependency_InstallBusyRetryCount} then begin
                   Log('Another installation is in progress, waiting (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_InstallBusyRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
-                  Sleep(10000);
+                  Sleep({#Dependency_InstallBusyRetryDelayMs});
                   continue;
                 end;
               end;
