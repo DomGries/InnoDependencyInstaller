@@ -251,6 +251,8 @@ jobs:
               $Block, [System.Text.RegularExpressions.MatchEvaluator] { param($m) New-DependencyString @($selected.Checksum) }, 1)
           }
 
+          $commentVersionPattern = '(?m)^\s*// \S+ - (\d+(?:\.\d+)+)\s*$'
+
           $legacyVc = @(
             @{ Year = 2005; Major = 8;  VersionPath = 'x64' },
             @{ Year = 2008; Major = 9;  VersionPath = 'x64' },
@@ -313,7 +315,7 @@ jobs:
                 Minor             = $channel
                 Kind              = 'installers'
                 Pattern           = "(?ms)^procedure Dependency_AddWinAppRuntime1$channel;.*?^end;"
-                VersionPattern    = "/WindowsAppRuntime/1/$channel/(\d+\.\d+\.\d+)"
+                VersionPattern    = $commentVersionPattern
                 Architectures     = 'x86', 'x64', 'arm64'
                 MicrosoftOwned    = $true
                 InstallerMetadata = $true
@@ -333,7 +335,7 @@ jobs:
               Path          = 'm/Microsoft/EdgeWebView2Runtime'
               Kind          = 'installers'
               Pattern       = '(?ms)^procedure Dependency_AddWebView2;.*?^end;'
-              VersionPattern = '/EdgeWebView2Runtime/(\d+\.\d+\.\d+\.\d+)'
+              VersionPattern = $commentVersionPattern
               Architectures = 'x86', 'x64', 'arm64'
               MicrosoftOwned = $true
               InstallerMetadata = $true
@@ -343,7 +345,7 @@ jobs:
               Path                = 'm/Microsoft/DirectX'
               Kind                = 'installers'
               Pattern             = '(?ms)^procedure Dependency_AddDirectX;.*?^end;'
-              VersionPattern      = '/Microsoft/DirectX/(\d+\.\d+\.\d+\.\d+)'
+              VersionPattern      = $commentVersionPattern
               InstallerUrlPattern = '(?i)/dxwebsetup\.exe$'
               MicrosoftOwned      = $true
               SingleInstaller     = $true
@@ -354,7 +356,7 @@ jobs:
               Path              = 'm/Microsoft/msodbcsql/18'
               Kind              = 'installers'
               Pattern           = '(?ms)^procedure Dependency_AddSqlOdbc18;.*?^end;'
-              VersionPattern    = '/msodbcsql/18/(\d+\.\d+\.\d+\.\d+)'
+              VersionPattern    = $commentVersionPattern
               MicrosoftOwned    = $true
               InstallerLocale   = 'en-US'
               InstallerMetadata = $true
@@ -364,7 +366,7 @@ jobs:
               Path              = 'm/Microsoft/AccessDatabaseEngine2016'
               Kind              = 'installers'
               Pattern           = '(?ms)^procedure Dependency_AddAccessDatabaseEngine2016;.*?^end;'
-              VersionPattern    = '/AccessDatabaseEngine2016/(\d+\.\d+\.\d+\.\d+)'
+              VersionPattern    = $commentVersionPattern
               MicrosoftOwned    = $true
               InstallerMetadata = $true
             },
@@ -373,7 +375,7 @@ jobs:
               Path              = 'm/Microsoft/VSTOR'
               Kind              = 'installers'
               Pattern           = '(?ms)^procedure Dependency_AddVSTORuntime;.*?^end;'
-              VersionPattern    = '/VSTOR/(\d+\.\d+\.\d+)'
+              VersionPattern    = $commentVersionPattern
               MicrosoftOwned    = $true
               SingleInstaller   = $true
               InstallerMetadata = $true
@@ -617,7 +619,7 @@ jobs:
       - name: Generate app token
         id: app-token
         if: steps.check-updates.outputs.updates_found == 'true'
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
