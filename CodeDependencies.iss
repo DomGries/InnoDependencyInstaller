@@ -639,14 +639,14 @@ end;
 
 procedure Dependency_AddWebView2;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/EdgeWebView2Runtime/151.0.4129.93
+  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/EdgeWebView2Runtime/151.0.4129.107
   Dependency_AddIfMissing(not (RegValueExists(HKLM32, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')
     or RegValueExists(HKCU, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')),
     'MicrosoftEdgeWebView2RuntimeInstaller' + Dependency_ArchSuffix + '.exe',
     '/silent /install',
     'WebView2 Runtime',
-    Dependency_String('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/bd43c065-9a9d-4364-858f-ad8c0cd9e853/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/1e6286cf-3a77-4ed7-9d9f-789e5c9c6e10/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/1b872b66-0ef3-4e17-9324-3e22e5f51026/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
-    Dependency_String('1dadaa18d5f4f5467e467bbc011cbc7c0496898a4cd7fe04fcb75efdb11f6509', '57b4b8731044f5c7e60a045a22bbb115428e7eff43e54645cdde2c5ff1f9cbf1', '120a644e22fb612e7ac75c1baf5b7b07a27e056f7adfdd905585651f10c7d35a'),
+    Dependency_String('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/1b812551-325d-4596-92b8-f78bf7407f7b/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/89620190-81af-46a2-bb59-6228918a312e/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/33d63ad1-358a-47c3-b77f-945a93529ecc/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
+    Dependency_String('8979e3d864f501d4693aca1dc3b5a0e1a2a2db1a83e87aec32329aa2cc606896', '358a11cff88ce519301c3b60bcefe848f922688ab0a333fc0f18ddf83bb3b4f3', 'acce8e646ca88c5d49e41da7d9f8959b750d994a8a54196ba7625899918a2b04'),
     False, False);
 end;
 
