@@ -20,28 +20,104 @@ jobs:
         id: check-updates
         shell: pwsh
         run: |
-          $apiBase = "https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests"
+          $indexUri = "https://cdn.winget.microsoft.com/cache/source2.msix"
+          $rawBase = "https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests"
           $issPath = "CodeDependencies.iss"
           $content = Get-Content -Path $issPath -Raw
           $updates = @()
           $failures = @()
           $hashCache = @{}
+          $manifestCache = @{}
 
-          function Get-WingetVersions {
+          $headers = @{
+            'Accept'               = 'application/vnd.github+json'
+            'X-GitHub-Api-Version' = '2022-11-28'
+            'User-Agent'           = 'InnoDependencyInstaller-dependency-check'
+          }
+          if ($env:GITHUB_TOKEN) { $headers['Authorization'] = "Bearer $env:GITHUB_TOKEN" }
+
+          function Invoke-WithRetry {
+            param([scriptblock] $Action, [string] $Description)
+            $delay = 10
+            for ($attempt = 1; ; $attempt++) {
+              try {
+                $result = & $Action
+                Start-Sleep -Milliseconds 200
+                return $result
+              } catch {
+                $response = $_.Exception.Response
+                $status = if ($response) { [int] $response.StatusCode } else { 0 }
+                $isNetworkError = $_.Exception -is [System.Net.Http.HttpRequestException] -or
+                  $_.Exception -is [System.Net.WebException] -or
+                  $_.Exception -is [System.Threading.Tasks.TaskCanceledException]
+                $retryable = ($status -in @(403, 408, 429)) -or ($status -ge 500) -or
+                  ($status -eq 0 -and $isNetworkError)
+                if (-not $retryable -or $attempt -ge 6) { throw }
+                $wait = $delay
+                $retryAfter = if ($response) { $response.Headers.RetryAfter } else { $null }
+                if ($retryAfter -and $retryAfter.Delta) { $wait = [int] $retryAfter.Delta.TotalSeconds }
+                $wait = [Math]::Min([Math]::Max($wait, 1), 300)
+                Write-Host "$Description failed with status $status (attempt $attempt), retrying in $wait s"
+                Start-Sleep -Seconds $wait
+                $delay = [Math]::Min($delay * 2, 120)
+              }
+            }
+          }
+
+          function Invoke-GitHubApi {
+            param([string] $Uri)
+            Invoke-WithRetry { Invoke-RestMethod $Uri -Headers $headers -ErrorAction Stop } $Uri
+          }
+
+          $temporaryDirectory = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { [System.IO.Path]::GetTempPath() }
+          $indexPackage = Join-Path $temporaryDirectory 'winget-source.msix'
+          $indexDatabase = Join-Path $temporaryDirectory 'winget-index.db'
+          Invoke-WithRetry {
+            Invoke-WebRequest $indexUri -OutFile $indexPackage -UseBasicParsing -ErrorAction Stop
+          } $indexUri
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $archive = [System.IO.Compression.ZipFile]::OpenRead($indexPackage)
+          try {
+            $entry = $archive.GetEntry('Public/index.db')
+            if (-not $entry) { throw "Public/index.db not found in $indexUri" }
+            [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $indexDatabase, $true)
+          } finally {
+            $archive.Dispose()
+          }
+
+          $wingetVersions = @{}
+          foreach ($row in (sqlite3 -separator "`t" $indexDatabase 'select id, latest_version from packages')) {
+            $fields = $row -split "`t", 2
+            if ($fields.Count -eq 2) { $wingetVersions[$fields[0]] = $fields[1] }
+          }
+          if ($LASTEXITCODE -ne 0 -or $wingetVersions.Count -eq 0) {
+            throw "Failed to read the WinGet source index"
+          }
+          Write-Host "Loaded $($wingetVersions.Count) packages from the WinGet source index"
+
+          function Get-PackageIdentifier {
             param([string] $Path)
-            $entries = Invoke-RestMethod "$apiBase/$Path" -Headers $headers -ErrorAction Stop
-            @($entries | Where-Object type -eq 'dir' | ForEach-Object {
-              try { [Version]$_.name } catch { }
-            })
+            (($Path -split '/') | Select-Object -Skip 1) -join '.'
+          }
+
+          function Get-WingetLatestVersion {
+            param([string] $Path)
+            $identifier = Get-PackageIdentifier $Path
+            $version = $wingetVersions[$identifier]
+            if (-not $version) { throw "Package $identifier not found in the WinGet source index" }
+            $version
           }
 
           function Get-WingetInstallers {
-            param([string] $Path, [Version] $Version)
-            $files = Invoke-RestMethod "$apiBase/$Path/$Version" -Headers $headers -ErrorAction Stop
-            $entry = $files | Where-Object name -like '*.installer.yaml' | Select-Object -First 1
-            if (-not $entry) { throw "Installer manifest not found for $Path $Version" }
-
-            $manifest = (Invoke-WebRequest $entry.download_url -Headers $headers -UseBasicParsing -ErrorAction Stop).Content
+            param([string] $Path)
+            $identifier = Get-PackageIdentifier $Path
+            $uri = "$rawBase/$Path/$(Get-WingetLatestVersion $Path)/$identifier.installer.yaml"
+            if (-not $manifestCache.ContainsKey($uri)) {
+              $manifestCache[$uri] = Invoke-WithRetry {
+                (Invoke-WebRequest $uri -UseBasicParsing -ErrorAction Stop).Content
+              } $uri
+            }
+            $manifest = $manifestCache[$uri]
             $installers = @([regex]::Matches($manifest, '(?ms)^- .*?(?=^- |\z)') | ForEach-Object {
               $block = $_.Value
               $arch = [regex]::Match($block, '(?m)^\s*(?:-\s*)?Architecture:\s*(\S+)')
@@ -57,7 +133,7 @@ jobs:
                 }
               }
             })
-            if ($installers.Count -eq 0) { throw "No installers found in manifest for $Path $Version" }
+            if ($installers.Count -eq 0) { throw "No installers found in $uri" }
             $installers
           }
 
@@ -113,8 +189,8 @@ jobs:
           }
 
           function Set-WingetInstallerMetadata {
-            param([string] $Block, $Target, [Version] $Version)
-            $installers = @(Get-WingetInstallers $Target.Path $Version)
+            param([string] $Block, $Target)
+            $installers = @(Get-WingetInstallers $Target.Path)
             if ($Target.InstallerUrlPattern) {
               $installers = @($installers | Where-Object Url -match $Target.InstallerUrlPattern)
             }
@@ -148,13 +224,7 @@ jobs:
               if ($Target.InstallerPaths) {
                 $installerPath = $Target.InstallerPaths[$arch]
                 if (-not $installerPath) { throw "No installer path configured for $arch" }
-                $installerVersion = if ($installerPath -eq $Target.Path) {
-                  $Version
-                } else {
-                  Get-WingetVersions $installerPath | Sort-Object | Select-Object -Last 1
-                }
-                if (-not $installerVersion) { throw "No installer version found for $installerPath" }
-                $architectureInstallers = @(Get-WingetInstallers $installerPath $installerVersion)
+                $architectureInstallers = @(Get-WingetInstallers $installerPath)
               }
               $candidates = @($architectureInstallers |
                 Where-Object Architecture -eq $arch |
@@ -397,16 +467,11 @@ jobs:
             }
           )
 
-          $headers = @{ 'Accept' = 'application/vnd.github.v3+json' }
-          if ($env:GITHUB_TOKEN) { $headers['Authorization'] = "Bearer $env:GITHUB_TOKEN" }
-
           try {
-            $pythonChannels = Invoke-RestMethod "$apiBase/p/Python/Python/3" -Headers $headers -ErrorAction Stop
-            $latestPythonMinor = $pythonChannels |
-              Where-Object { $_.type -eq 'dir' -and $_.name -match '^\d+$' } |
-              ForEach-Object { [int]$_.name } |
-              Sort-Object |
-              Select-Object -Last 1
+            $pythonMinors = @($wingetVersions.Keys | ForEach-Object {
+              if ($_ -match '^Python\.Python\.3\.(\d+)$') { [int] $Matches[1] }
+            })
+            $latestPythonMinor = ($pythonMinors | Measure-Object -Maximum).Maximum
             $supportedPythonMinor = ($targets | Where-Object { $_.Name -like 'Python *' } | ForEach-Object { [int]$_.Minor } | Measure-Object -Maximum).Maximum
             if ($null -eq $latestPythonMinor) {
               $failures += "No Python 3 channels found"
@@ -419,14 +484,11 @@ jobs:
 
           try {
             $supportedDotnetMajor = ($dotnet.Channels.Major | Measure-Object -Maximum).Maximum
-            $dotnetChannels = Invoke-RestMethod "$apiBase/m/Microsoft/DotNet/Runtime" -Headers $headers -ErrorAction Stop
-            $newDotnetMajors = $dotnetChannels |
-              Where-Object { $_.type -eq 'dir' -and $_.name -match '^\d+$' -and [int]$_.name -gt $supportedDotnetMajor } |
-              ForEach-Object { [int]$_.name }
-            foreach ($major in $newDotnetMajors) {
-              if ((Get-WingetVersions "m/Microsoft/DotNet/Runtime/$major").Count -gt 0) {
-                $failures += ".NET $major is stable but not supported in CodeDependencies.iss"
-              }
+            $dotnetMajors = @($wingetVersions.Keys | ForEach-Object {
+              if ($_ -match '^Microsoft\.DotNet\.Runtime\.(\d+)$') { [int] $Matches[1] }
+            })
+            foreach ($major in ($dotnetMajors | Where-Object { $_ -gt $supportedDotnetMajor })) {
+              $failures += ".NET $major is stable but not supported in CodeDependencies.iss"
             }
           } catch {
             $failures += "Failed to discover .NET channels: $_"
@@ -435,12 +497,12 @@ jobs:
           foreach ($target in $targets) {
             try {
               if ($target.Repo) {
-                $data = Invoke-RestMethod "https://api.github.com/repos/$($target.Repo)/releases?per_page=100" -Headers $headers -ErrorAction Stop
+                $data = Invoke-GitHubApi "https://api.github.com/repos/$($target.Repo)/releases?per_page=100"
                 $versions = @($data |
                   Where-Object { -not $_.draft -and -not $_.prerelease -and $_.tag_name -match '^v\d+\.\d+\.\d+$' } |
                   ForEach-Object { [Version]$_.tag_name.Substring(1) })
               } else {
-                $versions = @(Get-WingetVersions $target.Path)
+                $versions = @([Version] (Get-WingetLatestVersion $target.Path))
               }
             } catch {
               $failures += "Failed to fetch $($target.Name) release metadata: $_"
@@ -513,7 +575,7 @@ jobs:
             if ($updatedBlock -eq $block.Value) { throw "$($target.Name) version fields not updated" }
 
             if ($target.InstallerMetadata) {
-              $updatedBlock = Set-WingetInstallerMetadata $updatedBlock $target $latest
+              $updatedBlock = Set-WingetInstallerMetadata $updatedBlock $target
               $summaryName = if ($target.SummaryName) { $target.SummaryName } else { $target.Name }
             } else {
               if ($target.Name -eq 'VC++ 2015-2022') {
