@@ -587,7 +587,7 @@ procedure Dependency_AddVC2015To2022; begin Dependency_AddVC14; end;
 
 procedure Dependency_AddDirectX;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/DirectX/9.29.1974.0
+  // https://www.microsoft.com/en-us/download/details.aspx?id=35 - 9.29.1974.0
   Dependency_Add('dxwebsetup.exe',
     '/q',
     'DirectX Runtime',
@@ -627,7 +627,7 @@ end;
 
 procedure Dependency_AddSqlOdbc18;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/msodbcsql/18/18.6.2.1
+  // https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server - 18.6.2.1
   Dependency_AddIfMissing(not RegKeyExists(Dependency_ArchHKLM, 'SOFTWARE\ODBC\ODBCINST.INI\ODBC Driver 18 for SQL Server'),
     'msodbcsql' + Dependency_ArchSuffix + '.msi',
     '/qn /norestart IACCEPTMSODBCSQLLICENSETERMS=YES',
@@ -639,7 +639,7 @@ end;
 
 procedure Dependency_AddWebView2;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/EdgeWebView2Runtime/151.0.4129.107
+  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 151.0.4129.107
   Dependency_AddIfMissing(not (RegValueExists(HKLM32, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')
     or RegValueExists(HKCU, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')),
     'MicrosoftEdgeWebView2RuntimeInstaller' + Dependency_ArchSuffix + '.exe',
@@ -652,7 +652,7 @@ end;
 
 procedure Dependency_AddAccessDatabaseEngine2016;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/AccessDatabaseEngine2016/16.0.5044.1000
+  // https://www.microsoft.com/en-us/download/details.aspx?id=54920 - 16.0.5044.1000
   Dependency_AddIfMissing(not RegKeyExists(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Office\16.0\Access Connectivity Engine\Engines\ACE'),
     'AccessDatabaseEngine2016' + Dependency_ArchSuffix + '.exe',
     '/quiet',
@@ -664,7 +664,7 @@ end;
 
 procedure Dependency_AddVSTORuntime;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/VSTOR/10.0.60917
+  // https://learn.microsoft.com/en-us/visualstudio/vsto/how-to-install-the-visual-studio-tools-for-office-runtime-redistributable - 10.0.60917
   Dependency_AddIfMissing(not RegKeyExists(HKLM32, 'SOFTWARE\Microsoft\VSTO Runtime Setup\v4R'),
     'vstor_redist.exe',
     '/q /norestart',
@@ -730,7 +730,7 @@ end;
 
 procedure Dependency_AddWinAppRuntime16;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/WindowsAppRuntime/1/6/1.6.9
+  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 1.6.9
   Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('1.6'),
     'windowsappruntime16' + Dependency_ArchSuffix + '.exe',
     '--quiet',
@@ -742,7 +742,7 @@ end;
 
 procedure Dependency_AddWinAppRuntime17;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/WindowsAppRuntime/1/7/1.7.9
+  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 1.7.9
   Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('1.7'),
     'windowsappruntime17' + Dependency_ArchSuffix + '.exe',
     '--quiet',
@@ -754,7 +754,7 @@ end;
 
 procedure Dependency_AddWinAppRuntime18;
 begin
-  // https://github.com/microsoft/winget-pkgs/tree/master/manifests/m/Microsoft/WindowsAppRuntime/1/8/1.8.9
+  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 1.8.9
   Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('1.8'),
     'windowsappruntime18' + Dependency_ArchSuffix + '.exe',
     '--quiet',
