@@ -199,17 +199,7 @@ begin
             if ShellExec('', Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
 #endif
               Log('Dependency exit code ' + IntToStr(ResultCode) + ': ' + Dependency_List[DependencyIndex].Title);
-              if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
-                if Dependency_List[DependencyIndex].RestartAfter then begin
-                  if ActiveIndex = ActiveCount then begin
-                    Dependency_NeedToRestart := True;
-                  end else begin
-                    NeedsRestart := True;
-                    Result := Dependency_List[DependencyIndex].Title;
-                  end;
-                end;
-                break;
-              end else if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
+              if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
                 NeedsRestart := True;
                 Result := Dependency_List[DependencyIndex].Title;
                 break;
@@ -226,6 +216,16 @@ begin
                   Dependency_Wait(Dependency_List[DependencyIndex].Title, SysErrorMessage(ResultCode), {#Dependency_InstallBusyRetryDelayMs});
                   continue;
                 end;
+              end else if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
+                if Dependency_List[DependencyIndex].RestartAfter then begin
+                  if ActiveIndex = ActiveCount then begin
+                    Dependency_NeedToRestart := True;
+                  end else begin
+                    NeedsRestart := True;
+                    Result := Dependency_List[DependencyIndex].Title;
+                  end;
+                end;
+                break;
               end;
             end;
 
@@ -269,7 +269,7 @@ begin
       if WizardNoIcons then begin
         TempValue := TempValue + ' /NOICONS';
       end;
-      RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', '{#SetupSetting("AppName")}', TempValue);
+      RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', ExpandConstant('{srcexe}'), TempValue);
     end;
   end;
 end;
@@ -420,6 +420,9 @@ begin
   if not (RegQueryStringValue(HKLM32, 'SOFTWARE\dotnet\Setup\InstalledVersions\' + Arch, 'InstallLocation', Path)
     and PathIsRooted(Path) and FileExists(AddBackslash(Path) + 'dotnet.exe')) then begin
     Path := ExpandConstant(Dependency_StringX64('{commonpf32}', '{commonpf64}')) + '\dotnet';
+    if IsArm64 and (Arch = 'x64') then begin
+      Path := Path + '\x64';
+    end;
   end;
   Path := AddBackslash(Path);
 
@@ -588,7 +591,7 @@ procedure Dependency_AddDotNet100Hosting; begin Dependency_AddDotNetHosting(10, 
 
 procedure Dependency_AddVCMsi(const Year, Title, UpgradeCode: String; Major, Minor, Build, Revision: Word; const Parameters, URL, Checksum: String);
 begin
-  Dependency_AddIfMissing(not Dependency_IsMsiProductInstalled(UpgradeCode, PackVersionComponents(Major, Minor, Build, Revision)), 'vcredist' + Year + Dependency_ArchSuffix + '.exe', Parameters, Title + Dependency_StringX64(' (x86)', ' (x64)'), URL, Checksum, False, False);
+  Dependency_AddIfMissing(not Dependency_IsMsiProductInstalled(UpgradeCode, PackVersionComponents(Major, Minor, Build, Revision)), 'vcredist' + Year + Dependency_StringX64('', '_x64') + '.exe', Parameters, Title + Dependency_StringX64(' (x86)', ' (x64)'), URL, Checksum, False, False);
 end;
 
 procedure Dependency_AddVC2005; begin Dependency_AddVCMsi('2005', 'Visual C++ 2005 Service Pack 1 Redistributable', Dependency_StringX64('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), 8, 0, 61000, 0, '/q', Dependency_StringX64('https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x86.EXE', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.EXE'), Dependency_StringX64('8648c5fc29c44b9112fe52f9a33f80e7fc42d10f3b5b42b2121542a13e44adfd', '4487570bd86e2e1aac29db2a1d0a91eb63361fcaac570808eb327cd4e0e2240d')); end;
@@ -700,7 +703,7 @@ procedure Dependency_AddAccessDatabaseEngine2016;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=54920 - 16.0.5044.1000
   Dependency_AddIfMissing(not RegKeyExists(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Office\16.0\Access Connectivity Engine\Engines\ACE'),
-    'AccessDatabaseEngine2016' + Dependency_ArchSuffix + '.exe',
+    'AccessDatabaseEngine2016' + Dependency_StringX64('', '_x64') + '.exe',
     '/quiet',
     'Microsoft Access Database Engine 2016' + Dependency_StringX64(' (x86)', ' (x64)'),
     Dependency_StringX64('https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine.exe', 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'),
@@ -846,7 +849,7 @@ begin
     end;
 
     // `java -version` prints to stderr
-    if (JavaExe <> '') and ExecAndCaptureOutput(JavaExe, '-version', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
+    if PathIsRooted(JavaExe) and ExecAndCaptureOutput(JavaExe, '-version', '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
       for LineIndex := 0 to Length(Output.StdErr) - 1 do begin
         Line := Output.StdErr[LineIndex];
         QuotePos := Pos('version "', Line);

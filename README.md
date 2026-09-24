@@ -235,7 +235,7 @@ Run your setup with `/LOG="C:\setup.log"` (or find the log Inno writes to `%TEMP
 
 Exit codes `0` (success), `1638` (a newer version is already installed), `3010` (restart required) and `1641` (installer started a restart) count as success. `1618` means another installation is already running, which the setup waits out. Everything else is an error.
 
-A dependency that requires a restart resumes the setup after the reboot through a `RunOnce` registry entry. The resumed setup is started with the original command line plus `/restart=1`, which your script can check with `ParamStr` if it needs to behave differently on the second run. A `/LOG="setup.log"` continues in `setup-2.log`.
+A dependency that requires a restart resumes the setup after the reboot through a `RunOnce` registry entry. The resumed setup is started with the wizard selections, the standard silent/restart/log switches and `/restart=1`, which your script can check with `ParamStr` if it needs to behave differently on the second run. A `/LOG="setup.log"` continues in `setup-2.log`.
 
 ## Credits
 
