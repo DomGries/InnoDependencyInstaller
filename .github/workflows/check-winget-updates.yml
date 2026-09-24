@@ -201,17 +201,16 @@ jobs:
                 }
               }
 
-              $urlCalls = [regex]::Matches($updated, "Dependency_String(?:X64)?\('(?:https://[^']*)?'(?:,\s*'https://[^']*')+\)")
-              $hashCalls = [regex]::Matches($updated, "Dependency_String(?:X64)?\('(?:[0-9a-f]{64})?'(?:,\s*'[0-9a-f]{64}')+\)")
+              $urlCalls = [regex]::Matches($updated, "Dependency_String\w*\('(?:https://[^']*)?'(?:,\s*'(?:https://[^']*)?')+\)")
+              $hashCalls = [regex]::Matches($updated, "Dependency_String\w*\('(?:[0-9a-f]{64})?'(?:,\s*'(?:[0-9a-f]{64})?')+\)")
               if ($urlCalls.Count -eq 1 -and $hashCalls.Count -eq 1) {
                 $urls = @([regex]::Matches($urlCalls[0].Value, "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
                 $newUrls = @()
                 $newHashes = @()
                 for ($i = 0; $i -lt $urls.Count; $i++) {
-                  # an empty slot stays unavailable and an arm64 slot reusing the x64 download keeps doing so
+                  # an empty slot stays unavailable
                   if (-not $urls[$i]) { $newUrls += ''; $newHashes += ''; continue }
                   $arch = @('x86', 'x64', 'arm64')[$i]
-                  if ($arch -eq 'arm64' -and $urls[2] -eq $urls[1]) { $arch = 'x64' }
                   $installer = Select-Installer $target $arch
                   $newUrls += $installer.Url
                   $newHashes += $installer.Checksum
