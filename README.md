@@ -158,7 +158,7 @@ Dependency_AddIfMissing(not IsDotNetInstalled(net35, 1),
   '.NET Framework 3.5', '', '', False, False);
 ```
 
-For architecture-dependent downloads use `Dependency_String(x86Url, x64Url, arm64Url)`, which returns the URL matching the target system. `Dependency_IsX64` and `Dependency_IsArm64` can likewise be used as `Check:` functions in `[Files]` to install the matching binaries of your own application (see _ExampleSetup.iss_).
+For architecture-dependent downloads use `Dependency_String(x86Url, x64Url, arm64Url)`, which returns the URL matching the target system, or `Dependency_StringWin` for machine-wide components that match Windows. `Dependency_IsX64` and `Dependency_IsArm64` can likewise be used as `Check:` functions in `[Files]` to install the matching binaries of your own application (see _ExampleSetup.iss_).
 
 Pass a SHA-256 checksum to have the download verified; leaving it empty (as above) leaves the download unverified. The built-in dependencies keep the checksum right next to the URL — for multi-architecture downloads use a matching `Dependency_String(x86Hash, x64Hash, arm64Hash)`. To calculate one for a custom or new installer, run `pwsh ./tools/Get-UrlSha256.ps1 'https://example.com/installer.exe'`. The dependency update workflow refreshes built-in checksums whenever it bumps a download.
 
@@ -196,7 +196,7 @@ Dependency_AddVC2013;
 Dependency_ForceX86 := False; // disable forced 32-bit install again
 ```
 
-`Dependency_ForceX64` works the same way to force x64 dependencies on ARM64 systems.
+`Dependency_ForceX64` works the same way to force x64 dependencies on ARM64 systems. Machine-wide components (SQL Server, OLE DB, ODBC, WebView2, OpenJDK, PowerShell) always match Windows.
 
 **Dependencies of optional [components](https://jrsoftware.org/ishelp/index.php?topic=componentssection)** — only downloaded and installed when the user selects a matching component:
 
@@ -216,7 +216,7 @@ Dependency_Components := ''; // disable component gating again
 | `Dependency_CustomExecute` | Name of your own function `function MyExecute(const File, Parameters: String; var ResultCode: Integer): Boolean;` used to run the installers instead of `ShellExec` |
 | `Dependency_DownloadRetryCount` | How often a failed download is retried automatically before the user is asked (default `3`, set to `0` to ask immediately) |
 | `Dependency_DownloadRetryBackoffMs` | Base delay in milliseconds between automatic download retries; the delay grows with each attempt (default `2000`) |
-| `Dependency_InstallBusyRetryCount` | How often an installer that reports "another installation is in progress" is retried, once every 10 seconds (default `30`) |
+| `Dependency_InstallBusyRetryCount` | How often an installer that reports "another installation is in progress" is retried (default `30`) |
 | `Dependency_InstallBusyRetryDelayMs` | Delay in milliseconds between "another installation is in progress" retries (default `10000`) |
 
 ## Troubleshooting
@@ -230,11 +230,12 @@ Run your setup with `/LOG="C:\setup.log"` (or find the log Inno writes to `%TEMP
 | `Dependency queued (already present): X` | _X_ is missing, but its installer is already in the temporary directory (or is a program on the machine), so it is not downloaded |
 | `Dependency skipped after failed download: X` | The user ignored a download failure, so _X_ will not be executed |
 | `Dependency skipped (component not selected): X` | _X_ belongs to a component the user did not select |
+| `Dependency not available for this architecture: X` | _X_ has no installer for the target system |
 | `Dependency exit code N: X` | The installer of _X_ finished with exit code _N_ |
 
 Exit codes `0` (success), `1638` (a newer version is already installed), `3010` (restart required) and `1641` (installer started a restart) count as success. `1618` means another installation is already running, which the setup waits out. Everything else is an error.
 
-A dependency that requires a restart resumes the setup after the reboot through a `RunOnce` registry entry. The resumed setup is started with the original command line plus `/restart=1`, which your script can check with `ParamStr` if it needs to behave differently on the second run.
+A dependency that requires a restart resumes the setup after the reboot through a `RunOnce` registry entry. The resumed setup is started with the original command line plus `/restart=1`, which your script can check with `ParamStr` if it needs to behave differently on the second run. A `/LOG="setup.log"` continues in `setup-2.log`.
 
 ## Credits
 

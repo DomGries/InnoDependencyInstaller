@@ -61,6 +61,9 @@ begin
   if FileExists(Dependency_FilePath(Filename)) then begin
     Dependency.URL := '';
     Log('Dependency queued (already present): ' + Title);
+  end else if URL = '' then begin
+    Log('Dependency not available for this architecture: ' + Title);
+    exit;
   end else begin
     Dependency.URL := URL;
     Log('Dependency queued for download: ' + Title);
@@ -90,6 +93,17 @@ end;
 procedure Dependency_InitializeWizard;
 begin
   Dependency_DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
+end;
+
+// Sleep alone would freeze the wizard
+procedure Dependency_Wait(const Title, Reason: String; const Milliseconds: Integer);
+var
+  Step: Integer;
+begin
+  for Step := 1 to Milliseconds div 100 do begin
+    Dependency_DownloadPage.SetText(Title, Reason);
+    Sleep(100);
+  end;
 end;
 
 <event('PrepareToInstall')>
@@ -129,7 +143,7 @@ begin
                 // a transient network error must not fail an unattended setup on the first try
                 if Attempt <= {#Dependency_DownloadRetryCount} then begin
                   Log('Retrying download (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_DownloadRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
-                  Sleep(Attempt * {#Dependency_DownloadRetryBackoffMs});
+                  Dependency_Wait(Dependency_List[DependencyIndex].Title, GetExceptionMessage, Attempt * {#Dependency_DownloadRetryBackoffMs});
                   Retry := True;
                 end else begin
                   case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
@@ -173,11 +187,11 @@ begin
             continue;
           end;
           ActiveIndex := ActiveIndex + 1;
-          Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
           Dependency_DownloadPage.SetProgress(ActiveIndex, ActiveCount + 1);
 
           Attempt := 0;
           while True do begin
+            Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
             ResultCode := 0;
 #ifdef Dependency_CustomExecute
             if {#Dependency_CustomExecute}(Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, ResultCode) then begin
@@ -209,7 +223,7 @@ begin
                 // another installer (often Windows Update) holds the install mutex, so wait instead of failing
                 if Attempt <= {#Dependency_InstallBusyRetryCount} then begin
                   Log('Another installation is in progress, waiting (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_InstallBusyRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
-                  Sleep({#Dependency_InstallBusyRetryDelayMs});
+                  Dependency_Wait(Dependency_List[DependencyIndex].Title, SysErrorMessage(ResultCode), {#Dependency_InstallBusyRetryDelayMs});
                   continue;
                 end;
               end;
@@ -219,6 +233,9 @@ begin
               IDABORT: begin
                 Result := Dependency_List[DependencyIndex].Title;
                 break;
+              end;
+              IDRETRY: begin
+                Attempt := 0;
               end;
               IDIGNORE: begin
                 break;
@@ -241,8 +258,12 @@ begin
       TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + RemoveBackslashUnlessRoot(WizardDirValue) + '" /GROUP="' + RemoveBackslashUnlessRoot(WizardGroupValue) + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
       for ParameterIndex := 1 to ParamCount do begin
         Parameter := Uppercase(ParamStr(ParameterIndex));
-        if (Parameter = '/SP-') or (Parameter = '/SILENT') or (Parameter = '/VERYSILENT') or (Parameter = '/SUPPRESSMSGBOXES') or (Parameter = '/NOCANCEL') or (Parameter = '/NORESTART') or (Parameter = '/ALLUSERS') or (Parameter = '/CURRENTUSER') then begin
+        if (Parameter = '/SP-') or (Parameter = '/SILENT') or (Parameter = '/VERYSILENT') or (Parameter = '/SUPPRESSMSGBOXES') or (Parameter = '/NOCANCEL') or (Parameter = '/NORESTART') or (Parameter = '/ALLUSERS') or (Parameter = '/CURRENTUSER') or (Parameter = '/LOG') then begin
           TempValue := TempValue + ' ' + Parameter;
+        end else if Copy(Parameter, 1, 5) = '/LOG=' then begin
+          // a fixed log file would be overwritten
+          Parameter := RemoveQuotes(Copy(ParamStr(ParameterIndex), 6, Length(Parameter)));
+          TempValue := TempValue + ' /LOG="' + ChangeFileExt(Parameter, '') + '-2' + ExtractFileExt(Parameter) + '"';
         end;
       end;
       if WizardNoIcons then begin
@@ -284,7 +305,7 @@ begin
   DependencyMemo := '';
   for DependencyIndex := 0 to GetArrayLength(Dependency_List) - 1 do begin
     if Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
-      DependencyMemo := DependencyMemo + #13#10 + '%1' + Dependency_List[DependencyIndex].Title;
+      DependencyMemo := DependencyMemo + NewLine + Space + Dependency_List[DependencyIndex].Title;
     end;
   end;
 
@@ -292,7 +313,7 @@ begin
     if MemoTasksInfo = '' then begin
       Result := Result + SetupMessage(msgReadyMemoTasks);
     end;
-    Result := Result + FmtMessage(DependencyMemo, [Space]);
+    Result := Result + DependencyMemo;
   end;
 end;
 
@@ -304,7 +325,7 @@ end;
 
 function Dependency_IsArm64: Boolean;
 begin
-  Result := not Dependency_ForceX86 and not Dependency_ForceX64 and IsArm64;
+  Result := not Dependency_ForceX86 and not Dependency_ForceX64 and IsArm64 and Is64BitInstallMode;
 end;
 
 function Dependency_IsX64: Boolean;
@@ -326,6 +347,18 @@ end;
 function Dependency_StringX64(const x86, x64: String): String;
 begin
   Result := Dependency_String(x86, x64, x64);
+end;
+
+// machine-wide components follow Windows rather than the setup
+function Dependency_StringWin(const x86, x64, arm64: String): String;
+begin
+  if IsArm64 and (arm64 <> '') then begin
+    Result := arm64;
+  end else if IsWin64 then begin
+    Result := x64;
+  end else begin
+    Result := x86;
+  end;
 end;
 
 function Dependency_ArchSuffix: String;
@@ -515,17 +548,17 @@ begin
     False, False);
 end;
 
-procedure Dependency_AddNetCore31; begin Dependency_AddDotNetRuntime('Microsoft.NETCore.App', 'netcore31', '.NET Core Runtime', 3, 1, 32, Dependency_StringX64('https://builds.dotnet.microsoft.com/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-win-x64.exe'), Dependency_StringX64('bc735b1a969cd03cbf1d0a70d5f16402e1030f309e5e58ca072307a30f0df164', '4393d2cdacecc096e964ea9761dfd5c336fb002b1b3ae0808e7d2d445e2dea89')); end;
-procedure Dependency_AddNetCore31Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'netcore31asp', 'ASP.NET Core Runtime', 3, 1, 32, Dependency_StringX64('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/3.1.32/aspnetcore-runtime-3.1.32-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/3.1.32/aspnetcore-runtime-3.1.32-win-x64.exe'), Dependency_StringX64('d3ebd94c684eb1ddb410a649d0a3185da05a7b21ef1d378d2e4a7ee21bfd27d2', '03035faabb028399f3fbe41fe565aec4204deb9373fa65fe7efc769066ba0502')); end;
-procedure Dependency_AddNetCore31Desktop; begin Dependency_AddDotNetRuntime('Microsoft.WindowsDesktop.App', 'netcore31desktop', '.NET Desktop Runtime', 3, 1, 32, Dependency_StringX64('https://download.visualstudio.microsoft.com/download/pr/3f353d2c-0431-48c5-bdf6-fbbe8f901bb5/542a4af07c1df5136a98a1c2df6f3d62/windowsdesktop-runtime-3.1.32-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe'), Dependency_StringX64('765436d4aa3de87af8b390d1cd16fce94c5f72dd04173adbb49c940b98b47704', '22f4050ae4b6cdfd109f229f7f7a56f3b3afde00f592babfe890177c76ad8e40')); end;
+procedure Dependency_AddNetCore31; begin Dependency_AddDotNetRuntime('Microsoft.NETCore.App', 'netcore31', '.NET Core Runtime', 3, 1, 32, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/3.1.32/dotnet-runtime-3.1.32-win-x64.exe', ''), Dependency_String('bc735b1a969cd03cbf1d0a70d5f16402e1030f309e5e58ca072307a30f0df164', '4393d2cdacecc096e964ea9761dfd5c336fb002b1b3ae0808e7d2d445e2dea89', '')); end;
+procedure Dependency_AddNetCore31Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'netcore31asp', 'ASP.NET Core Runtime', 3, 1, 32, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/3.1.32/aspnetcore-runtime-3.1.32-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/3.1.32/aspnetcore-runtime-3.1.32-win-x64.exe', ''), Dependency_String('d3ebd94c684eb1ddb410a649d0a3185da05a7b21ef1d378d2e4a7ee21bfd27d2', '03035faabb028399f3fbe41fe565aec4204deb9373fa65fe7efc769066ba0502', '')); end;
+procedure Dependency_AddNetCore31Desktop; begin Dependency_AddDotNetRuntime('Microsoft.WindowsDesktop.App', 'netcore31desktop', '.NET Desktop Runtime', 3, 1, 32, Dependency_String('https://download.visualstudio.microsoft.com/download/pr/3f353d2c-0431-48c5-bdf6-fbbe8f901bb5/542a4af07c1df5136a98a1c2df6f3d62/windowsdesktop-runtime-3.1.32-win-x86.exe', 'https://download.visualstudio.microsoft.com/download/pr/b92958c6-ae36-4efa-aafe-569fced953a5/1654639ef3b20eb576174c1cc200f33a/windowsdesktop-runtime-3.1.32-win-x64.exe', ''), Dependency_String('765436d4aa3de87af8b390d1cd16fce94c5f72dd04173adbb49c940b98b47704', '22f4050ae4b6cdfd109f229f7f7a56f3b3afde00f592babfe890177c76ad8e40', '')); end;
 procedure Dependency_AddDotNet50; begin Dependency_AddDotNetRuntime('Microsoft.NETCore.App', 'dotnet50', '.NET Runtime', 5, 0, 17, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/Runtime/5.0.17/dotnet-runtime-5.0.17-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/5.0.17/dotnet-runtime-5.0.17-win-x64.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/5.0.17/dotnet-runtime-5.0.17-win-arm64.exe'), Dependency_String('40a978da46efa7e66de2c40d952778118b2207ba2344f6d59032d114cbdb40da', '8387e162223ac2adc4d0f24765a886052b8c514bb4eb3d7cc9333c747cd9a03b', '2d1a5d53717e92d6def6415c81acea3d1fbd729ec3d06f3b4312d57ee5906b65')); end;
-procedure Dependency_AddDotNet50Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'dotnet50asp', 'ASP.NET Core Runtime', 5, 0, 17, Dependency_StringX64('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/5.0.17/aspnetcore-runtime-5.0.17-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/5.0.17/aspnetcore-runtime-5.0.17-win-x64.exe'), Dependency_StringX64('0d2d451bbe54f652905530a2c635be974b439cef7aefa7eced314780ae1a2a67', '5e4c82c13b406f0542793ea3cb2d510fd97fa186bfe5017c1c3ca1e942bb9ae8')); end;
+procedure Dependency_AddDotNet50Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'dotnet50asp', 'ASP.NET Core Runtime', 5, 0, 17, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/5.0.17/aspnetcore-runtime-5.0.17-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/5.0.17/aspnetcore-runtime-5.0.17-win-x64.exe', ''), Dependency_String('0d2d451bbe54f652905530a2c635be974b439cef7aefa7eced314780ae1a2a67', '5e4c82c13b406f0542793ea3cb2d510fd97fa186bfe5017c1c3ca1e942bb9ae8', '')); end;
 procedure Dependency_AddDotNet50Desktop; begin Dependency_AddDotNetRuntime('Microsoft.WindowsDesktop.App', 'dotnet50desktop', '.NET Desktop Runtime', 5, 0, 17, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/5.0.17/windowsdesktop-runtime-5.0.17-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/5.0.17/windowsdesktop-runtime-5.0.17-win-x64.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/5.0.17/windowsdesktop-runtime-5.0.17-win-arm64.exe'), Dependency_String('63fef76824c51df09ed6fc5b031796fad64435db0e72f1735021b55760360c98', '925cc68a346cf5692fc1b52f498db32edd278ade3f4331539b7914e23f3af417', '2de98cf23ac87178e703d608697ec2697d09a0715dc89967e89ffb1de8dbb532')); end;
 procedure Dependency_AddDotNet60; begin Dependency_AddDotNetRuntime('Microsoft.NETCore.App', 'dotnet60', '.NET Runtime', 6, 0, 36, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/Runtime/6.0.36/dotnet-runtime-6.0.36-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/6.0.36/dotnet-runtime-6.0.36-win-x64.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/6.0.36/dotnet-runtime-6.0.36-win-arm64.exe'), Dependency_String('3b3cb4636251a582158f4b6b340f20b3861e6793eb9a3e64bda29cbf32da3604', '6bdad7bc4c41fe93d4ae7b0312b1d017cfe369d28e7e2e421f5b675f9feefe84', 'e34775ff8723bf4e6d397473e302e246a18692e6ea3b3906eff3cb5a6f8c8f3b')); end;
-procedure Dependency_AddDotNet60Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'dotnet60asp', 'ASP.NET Core Runtime', 6, 0, 36, Dependency_StringX64('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/6.0.36/aspnetcore-runtime-6.0.36-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/6.0.36/aspnetcore-runtime-6.0.36-win-x64.exe'), Dependency_StringX64('af72a5b08fb14e95c1d05d2542d3de79d50e31e06cac181b2a1df3f87bc1f515', '06dbd26509079497c363b28060874d75d19c3797b83020f3c53f37faa755a61d')); end;
+procedure Dependency_AddDotNet60Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'dotnet60asp', 'ASP.NET Core Runtime', 6, 0, 36, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/6.0.36/aspnetcore-runtime-6.0.36-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/6.0.36/aspnetcore-runtime-6.0.36-win-x64.exe', ''), Dependency_String('af72a5b08fb14e95c1d05d2542d3de79d50e31e06cac181b2a1df3f87bc1f515', '06dbd26509079497c363b28060874d75d19c3797b83020f3c53f37faa755a61d', '')); end;
 procedure Dependency_AddDotNet60Desktop; begin Dependency_AddDotNetRuntime('Microsoft.WindowsDesktop.App', 'dotnet60desktop', '.NET Desktop Runtime', 6, 0, 36, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-x64.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/6.0.36/windowsdesktop-runtime-6.0.36-win-arm64.exe'), Dependency_String('4e77bd970df0a06528ee88d33e4a8c9fb85beedbdd7219b017083acf0c3aa39e', '0d20debb26fc8b2bc84f25fbd9d4596a6364af8517ebf012e8b871127b798941', '8bb01362d7525a42cc4f27e1b863242d8136c3f491bdf00efca627658735a118')); end;
 procedure Dependency_AddDotNet70; begin Dependency_AddDotNetRuntime('Microsoft.NETCore.App', 'dotnet70', '.NET Runtime', 7, 0, 20, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.20/dotnet-runtime-7.0.20-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.20/dotnet-runtime-7.0.20-win-x64.exe', 'https://builds.dotnet.microsoft.com/dotnet/Runtime/7.0.20/dotnet-runtime-7.0.20-win-arm64.exe'), Dependency_String('9bf79c94ab014b555167e61f3ce653fdf54c70bda6d6c74ab9f6f44652947a89', '10f48feee0f7fb4c2ed61ecef5e58699743afc9531f8a293680a99fc2d0a78a5', '04b97503bc1ca8b1fc0277e406a4875b003137b814ca20b5cb1778ccbc095cc6')); end;
-procedure Dependency_AddDotNet70Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'dotnet70asp', 'ASP.NET Core Runtime', 7, 0, 20, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/7.0.20/aspnetcore-runtime-7.0.20-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/7.0.20/aspnetcore-runtime-7.0.20-win-x64.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/7.0.20/aspnetcore-runtime-7.0.20-win-x64.exe'), Dependency_String('c4fa407e4e8324edd900b6a39ab7964a45b77bd5a22d4cdba945f1a17c595ab8', 'ab9a6bfed06369dbe22328f54c69ce0660629ea6fc31bc554ed8b585edb16a67', 'ab9a6bfed06369dbe22328f54c69ce0660629ea6fc31bc554ed8b585edb16a67')); end;
+procedure Dependency_AddDotNet70Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'dotnet70asp', 'ASP.NET Core Runtime', 7, 0, 20, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/7.0.20/aspnetcore-runtime-7.0.20-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/7.0.20/aspnetcore-runtime-7.0.20-win-x64.exe', ''), Dependency_String('c4fa407e4e8324edd900b6a39ab7964a45b77bd5a22d4cdba945f1a17c595ab8', 'ab9a6bfed06369dbe22328f54c69ce0660629ea6fc31bc554ed8b585edb16a67', '')); end;
 procedure Dependency_AddDotNet70Desktop; begin Dependency_AddDotNetRuntime('Microsoft.WindowsDesktop.App', 'dotnet70desktop', '.NET Desktop Runtime', 7, 0, 20, Dependency_String('https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/7.0.20/windowsdesktop-runtime-7.0.20-win-x86.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/7.0.20/windowsdesktop-runtime-7.0.20-win-x64.exe', 'https://builds.dotnet.microsoft.com/dotnet/WindowsDesktop/7.0.20/windowsdesktop-runtime-7.0.20-win-arm64.exe'), Dependency_String('58d32d9857bda5da99afc217669aedacdffb20aed61f15315718eeb3a455b273', '57e7c16e7226c9a29dbc3faedd9e5876cec494c7660528052f52160521e7b714', '93df5c5d93d3dec06b49b555909a751122edbb3f121d52577578cb9b24ffe4f2')); end;
 procedure Dependency_AddDotNet80; begin Dependency_AddDotNetRuntime('Microsoft.NETCore.App', 'dotnet80', '.NET Runtime', 8, 0, 31, Dependency_String('https://download.microsoft.com/download/0487b495-7b7e-41cc-a798-c70779af69f7/7755e0c8-8484-4c50-b299-5279db224eaa/dotnet-runtime-8.0.31-win-x86.exe', 'https://download.microsoft.com/download/0487b495-7b7e-41cc-a798-c70779af69f7/78fdbd4d-f97c-4573-968b-891787a3c5d6/dotnet-runtime-8.0.31-win-x64.exe', 'https://download.microsoft.com/download/0487b495-7b7e-41cc-a798-c70779af69f7/42d5b598-92e7-4c88-99bd-436cb5c46367/dotnet-runtime-8.0.31-win-arm64.exe'), Dependency_String('2c1691932f72d166dc4d5a9cf6accf94d94566feecd3cfed205ed85baeacf44c', '249b0d10d4bfa8ec8ded5e6e220e871e71cca89290f1a2fdb93ca59abb8ff97b', 'd9ffc3112033b32cdde58804a8019d48c224357ea9db7062df377b1641f8d15d')); end;
 procedure Dependency_AddDotNet80Asp; begin Dependency_AddDotNetRuntime('Microsoft.AspNetCore.App', 'dotnet80asp', 'ASP.NET Core Runtime', 8, 0, 31, Dependency_String('https://download.microsoft.com/download/920c8ea2-97e9-4fdf-abc8-9e144ba33fbf/040a6ba7-8102-4c04-abcf-8995f283ca40/aspnetcore-runtime-8.0.31-win-x86.exe', 'https://download.microsoft.com/download/920c8ea2-97e9-4fdf-abc8-9e144ba33fbf/40db729f-585b-4875-b521-176dcc331628/aspnetcore-runtime-8.0.31-win-x64.exe', 'https://download.microsoft.com/download/920c8ea2-97e9-4fdf-abc8-9e144ba33fbf/90a1613f-f455-4901-83b3-f937b41b4a06/aspnetcore-runtime-8.0.31-win-arm64.exe'), Dependency_String('91c2beff5bf7109f004cec1bce51ce6e6d4d23af5a6761e24b64501f09329a9f', '6b9d183e26df9bd33bd50c2ce5e7bfacb44eb4d65b99553ec431b166d1e10b40', '10648083fe78ae7a05997067f45d340e69e5f710f35dfc8491ea740039da535b')); end;
@@ -555,7 +588,7 @@ procedure Dependency_AddDotNet100Hosting; begin Dependency_AddDotNetHosting(10, 
 
 procedure Dependency_AddVCMsi(const Year, Title, UpgradeCode: String; Major, Minor, Build, Revision: Word; const Parameters, URL, Checksum: String);
 begin
-  Dependency_AddIfMissing(not Dependency_IsMsiProductInstalled(UpgradeCode, PackVersionComponents(Major, Minor, Build, Revision)), 'vcredist' + Year + Dependency_ArchSuffix + '.exe', Parameters, Title + Dependency_ArchTitle, URL, Checksum, False, False);
+  Dependency_AddIfMissing(not Dependency_IsMsiProductInstalled(UpgradeCode, PackVersionComponents(Major, Minor, Build, Revision)), 'vcredist' + Year + Dependency_ArchSuffix + '.exe', Parameters, Title + Dependency_StringX64(' (x86)', ' (x64)'), URL, Checksum, False, False);
 end;
 
 procedure Dependency_AddVC2005; begin Dependency_AddVCMsi('2005', 'Visual C++ 2005 Service Pack 1 Redistributable', Dependency_StringX64('{86C9D5AA-F00C-4921-B3F2-C60AF92E2844}', '{A8D19029-8E5C-4E22-8011-48070F9E796E}'), 8, 0, 61000, 0, '/q', Dependency_StringX64('https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x86.EXE', 'https://download.microsoft.com/download/8/B/4/8B42259F-5D70-43F4-AC2E-4B208FD8D66A/vcredist_x64.EXE'), Dependency_StringX64('8648c5fc29c44b9112fe52f9a33f80e7fc42d10f3b5b42b2121542a13e44adfd', '4487570bd86e2e1aac29db2a1d0a91eb63361fcaac570808eb327cd4e0e2240d')); end;
@@ -598,30 +631,36 @@ end;
 
 procedure Dependency_AddSqlExpress(const Year, Instance, Title: String; Major, Minor, Build, Revision: Word; const URL, Checksum: String);
 var
-  Version: String;
+  Key, Version: String;
   PackedVersion: Int64;
 begin
-  Dependency_AddIfMissing(not RegQueryStringValue(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server\' + Instance + '\MSSQLServer\CurrentVersion', 'CurrentVersion', Version) or not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(Major, Minor, Build, Revision)) < 0), 'sql' + Year + 'express' + Dependency_ArchSuffix + '.exe', Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER', Title, URL, Checksum, False, False);
+  // also finds a 32-bit instance
+  Key := 'SOFTWARE\Microsoft\Microsoft SQL Server\' + Instance + '\MSSQLServer\CurrentVersion';
+  if not RegQueryStringValue(HKLM32, Key, 'CurrentVersion', Version) and IsWin64 then begin
+    RegQueryStringValue(HKLM64, Key, 'CurrentVersion', Version);
+  end;
+
+  Dependency_AddIfMissing(not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(Major, Minor, Build, Revision)) < 0), 'sql' + Year + 'express.exe', Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER', Title, URL, Checksum, False, False);
 end;
 
-procedure Dependency_AddSql2008Express; begin Dependency_AddSqlExpress('2008', 'MSSQL10_50.MSSQLSERVER', 'SQL Server 2008 R2 Service Pack 2 Express', 10, 50, 4000, 0, Dependency_StringX64('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe'), Dependency_StringX64('8096bea8ed1559cb39a2b42c0c680d1251e8ddbab6d09be1e0a4263623183086', '4372dec5a5f4b2e48c60da7b09b5368214fddbc8cd0c4a0be5af2d74522b67f8')); end;
-procedure Dependency_AddSql2012Express; begin Dependency_AddSqlExpress('2012', 'MSSQL11.MSSQLSERVER', 'SQL Server 2012 Service Pack 4 Express', 11, 0, 7001, 0, Dependency_StringX64('https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe'), Dependency_StringX64('c380d4f4aa61a150885dda6f39ce135c0960c5ce4f04d5c96a5357e9417bc474', 'bae6000b3ecef827fb4371a7aaccf0278de8cb84da1a510d56e3588b20230582')); end;
-procedure Dependency_AddSql2014Express; begin Dependency_AddSqlExpress('2014', 'MSSQL12.MSSQLSERVER', 'SQL Server 2014 Service Pack 3 Express', 12, 0, 6024, 0, Dependency_StringX64('https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe'), Dependency_StringX64('5771644bc02221268c5e14fdea7068c6311e8bff4182b2d359b4d8d4b22bec3d', 'e8d8330e3e7d6f9242e658315b99aace4aabb71ed14f3ec465e4450d66d255b6')); end;
-procedure Dependency_AddSql2016Express; begin Dependency_AddSqlExpress('2016', 'MSSQL13.MSSQLSERVER', 'SQL Server 2016 Service Pack 3 Express', 13, 0, 6404, 1, 'https://download.microsoft.com/download/f7e95fb9-9a5a-4039-be84-631043b6a310/SQLServer2016-SSEI-Expr.exe', 'a9f71d85bfbba0d2090c4afbc85df5931339e5cced19c8f9ba4c7a9a63b95892'); end;
-procedure Dependency_AddSql2017Express; begin Dependency_AddSqlExpress('2017', 'MSSQL14.MSSQLSERVER', 'SQL Server 2017 Express', 14, 0, 1000, 169, 'https://download.microsoft.com/download/6c9ea8c2-2512-4368-a9a3-3c6901a6e78c/SQLServer2017-SSEI-Expr.exe', 'b92b45f0113062e1045cadcc6f739ef51d61d887903ef9dc290bc37b300df7b1'); end;
-procedure Dependency_AddSql2019Express; begin Dependency_AddSqlExpress('2019', 'MSSQL15.MSSQLSERVER', 'SQL Server 2019 Express', 15, 0, 2000, 5, 'https://download.microsoft.com/download/926a8db2-3ad9-444c-8b37-8376e9256e9d/SQL2019-SSEI-Expr.exe', '37cc32717aba3b6633071ec176c6728e05570cfa5cf4c67f54421a0a2b4493c2'); end;
-procedure Dependency_AddSql2022Express; begin Dependency_AddSqlExpress('2022', 'MSSQL16.MSSQLSERVER', 'SQL Server 2022 Express', 16, 0, 1000, 6, 'https://download.microsoft.com/download/29654887-7cde-4397-bba3-d7f087970845/SQL2022-SSEI-Expr.exe', 'e2b8e8aad30d8b1a1922c6c0976c806f0a2e08d04b2de100a9d70b9f94750bb1'); end;
-procedure Dependency_AddSql2025Express; begin Dependency_AddSqlExpress('2025', 'MSSQL17.MSSQLSERVER', 'SQL Server 2025 Express', 17, 0, 1000, 7, 'https://download.microsoft.com/download/ffd82b4c-9955-47c0-8efe-6290f7795cf6/SQL2025-SSEI-Expr.exe', 'fa7e1fabc9a2e9c9cdab0d1512bcb30d2949133147db057ac530f510e5270680'); end;
+procedure Dependency_AddSql2008Express; begin Dependency_AddSqlExpress('2008', 'MSSQL10_50.MSSQLSERVER', 'SQL Server 2008 R2 Service Pack 2 Express', 10, 50, 4000, 0, Dependency_StringWin('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe', ''), Dependency_StringWin('8096bea8ed1559cb39a2b42c0c680d1251e8ddbab6d09be1e0a4263623183086', '4372dec5a5f4b2e48c60da7b09b5368214fddbc8cd0c4a0be5af2d74522b67f8', '')); end;
+procedure Dependency_AddSql2012Express; begin Dependency_AddSqlExpress('2012', 'MSSQL11.MSSQLSERVER', 'SQL Server 2012 Service Pack 4 Express', 11, 0, 7001, 0, Dependency_StringWin('https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe', ''), Dependency_StringWin('c380d4f4aa61a150885dda6f39ce135c0960c5ce4f04d5c96a5357e9417bc474', 'bae6000b3ecef827fb4371a7aaccf0278de8cb84da1a510d56e3588b20230582', '')); end;
+procedure Dependency_AddSql2014Express; begin Dependency_AddSqlExpress('2014', 'MSSQL12.MSSQLSERVER', 'SQL Server 2014 Service Pack 3 Express', 12, 0, 6024, 0, Dependency_StringWin('https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe', ''), Dependency_StringWin('5771644bc02221268c5e14fdea7068c6311e8bff4182b2d359b4d8d4b22bec3d', 'e8d8330e3e7d6f9242e658315b99aace4aabb71ed14f3ec465e4450d66d255b6', '')); end;
+procedure Dependency_AddSql2016Express; begin Dependency_AddSqlExpress('2016', 'MSSQL13.MSSQLSERVER', 'SQL Server 2016 Service Pack 3 Express', 13, 0, 6404, 1, Dependency_StringWin('', 'https://download.microsoft.com/download/f7e95fb9-9a5a-4039-be84-631043b6a310/SQLServer2016-SSEI-Expr.exe', ''), Dependency_StringWin('', 'a9f71d85bfbba0d2090c4afbc85df5931339e5cced19c8f9ba4c7a9a63b95892', '')); end;
+procedure Dependency_AddSql2017Express; begin Dependency_AddSqlExpress('2017', 'MSSQL14.MSSQLSERVER', 'SQL Server 2017 Express', 14, 0, 1000, 169, Dependency_StringWin('', 'https://download.microsoft.com/download/6c9ea8c2-2512-4368-a9a3-3c6901a6e78c/SQLServer2017-SSEI-Expr.exe', ''), Dependency_StringWin('', 'b92b45f0113062e1045cadcc6f739ef51d61d887903ef9dc290bc37b300df7b1', '')); end;
+procedure Dependency_AddSql2019Express; begin Dependency_AddSqlExpress('2019', 'MSSQL15.MSSQLSERVER', 'SQL Server 2019 Express', 15, 0, 2000, 5, Dependency_StringWin('', 'https://download.microsoft.com/download/926a8db2-3ad9-444c-8b37-8376e9256e9d/SQL2019-SSEI-Expr.exe', ''), Dependency_StringWin('', '37cc32717aba3b6633071ec176c6728e05570cfa5cf4c67f54421a0a2b4493c2', '')); end;
+procedure Dependency_AddSql2022Express; begin Dependency_AddSqlExpress('2022', 'MSSQL16.MSSQLSERVER', 'SQL Server 2022 Express', 16, 0, 1000, 6, Dependency_StringWin('', 'https://download.microsoft.com/download/29654887-7cde-4397-bba3-d7f087970845/SQL2022-SSEI-Expr.exe', ''), Dependency_StringWin('', 'e2b8e8aad30d8b1a1922c6c0976c806f0a2e08d04b2de100a9d70b9f94750bb1', '')); end;
+procedure Dependency_AddSql2025Express; begin Dependency_AddSqlExpress('2025', 'MSSQL17.MSSQLSERVER', 'SQL Server 2025 Express', 17, 0, 1000, 7, Dependency_StringWin('', 'https://download.microsoft.com/download/ffd82b4c-9955-47c0-8efe-6290f7795cf6/SQL2025-SSEI-Expr.exe', ''), Dependency_StringWin('', 'fa7e1fabc9a2e9c9cdab0d1512bcb30d2949133147db057ac530f510e5270680', '')); end;
 
 procedure Dependency_AddSqlOleDb19;
 begin
   // https://learn.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server
   Dependency_AddIfMissing(not RegValueExists(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\MSOLEDBSQL19', 'InstalledVersion'),
-    'msoledbsql' + Dependency_ArchSuffix + '.msi',
+    'msoledbsql.msi',
     '/qn /norestart IACCEPTMSOLEDBSQLLICENSETERMS=YES',
-    'Microsoft OLE DB Driver 19 for SQL Server' + Dependency_ArchTitle,
-    Dependency_StringX64('https://download.microsoft.com/download/0a09a9e0-e364-4d01-b102-04ddfcf38a7e/x86/1033/msoledbsql.msi', 'https://download.microsoft.com/download/7bf55274-18ac-4b26-9783-45453a1ab64f/amd64/1033/msoledbsql.msi'),
-    Dependency_StringX64('b86f1ee532e6ea543721747eb03b32e5eff6c292458de3d90391b97908c8e13c', '409adfd93165dd3622b2d7cd0b9c4d96a27b04f9f3fb5599d99acbe90ade0638'),
+    'Microsoft OLE DB Driver 19 for SQL Server',
+    Dependency_StringWin('https://download.microsoft.com/download/0a09a9e0-e364-4d01-b102-04ddfcf38a7e/x86/1033/msoledbsql.msi', 'https://download.microsoft.com/download/7bf55274-18ac-4b26-9783-45453a1ab64f/amd64/1033/msoledbsql.msi', ''),
+    Dependency_StringWin('b86f1ee532e6ea543721747eb03b32e5eff6c292458de3d90391b97908c8e13c', '409adfd93165dd3622b2d7cd0b9c4d96a27b04f9f3fb5599d99acbe90ade0638', ''),
     False, False);
 end;
 
@@ -629,24 +668,31 @@ procedure Dependency_AddSqlOdbc18;
 begin
   // https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server - 18.6.2.1
   Dependency_AddIfMissing(not RegKeyExists(Dependency_ArchHKLM, 'SOFTWARE\ODBC\ODBCINST.INI\ODBC Driver 18 for SQL Server'),
-    'msodbcsql' + Dependency_ArchSuffix + '.msi',
+    'msodbcsql.msi',
     '/qn /norestart IACCEPTMSODBCSQLLICENSETERMS=YES',
-    'Microsoft ODBC Driver 18 for SQL Server' + Dependency_ArchTitle,
-    Dependency_String('https://download.microsoft.com/download/c0d0dcf1-bd9b-46ec-a659-5046ee11d1d1/x86/1033/msodbcsql.msi', 'https://download.microsoft.com/download/7bf9fad4-0f21-486d-a750-fc990ded5624/amd64/1033/msodbcsql.msi', 'https://download.microsoft.com/download/76504d2d-06b3-4262-8bc9-855ffd08d7be/arm64/1033/msodbcsql.msi'),
-    Dependency_String('1c31601e8a5bc49285c0776cfec415d36cef364d6ac7aa52df41eb2e9356508e', '20314529110da3365a252164a657bdc837a18be5839105aa5f5acf0a8d2f4b82', 'ad6e531b7b53b46813f6d41947fe09ecf61828be728a2f8fdde603b9cdf92888'),
+    'Microsoft ODBC Driver 18 for SQL Server',
+    Dependency_StringWin('https://download.microsoft.com/download/c0d0dcf1-bd9b-46ec-a659-5046ee11d1d1/x86/1033/msodbcsql.msi', 'https://download.microsoft.com/download/7bf9fad4-0f21-486d-a750-fc990ded5624/amd64/1033/msodbcsql.msi', 'https://download.microsoft.com/download/76504d2d-06b3-4262-8bc9-855ffd08d7be/arm64/1033/msodbcsql.msi'),
+    Dependency_StringWin('1c31601e8a5bc49285c0776cfec415d36cef364d6ac7aa52df41eb2e9356508e', '20314529110da3365a252164a657bdc837a18be5839105aa5f5acf0a8d2f4b82', 'ad6e531b7b53b46813f6d41947fe09ecf61828be728a2f8fdde603b9cdf92888'),
     False, False);
+end;
+
+// an uninstall can leave 0.0.0.0 behind
+function Dependency_IsWebView2Installed(const RootKey: Integer): Boolean;
+var
+  Version: String;
+begin
+  Result := RegQueryStringValue(RootKey, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv', Version) and (Version <> '') and (Version <> '0.0.0.0');
 end;
 
 procedure Dependency_AddWebView2;
 begin
   // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 153.0.4234.48
-  Dependency_AddIfMissing(not (RegValueExists(HKLM32, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')
-    or RegValueExists(HKCU, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')),
-    'MicrosoftEdgeWebView2RuntimeInstaller' + Dependency_ArchSuffix + '.exe',
+  Dependency_AddIfMissing(not Dependency_IsWebView2Installed(HKLM32) and not Dependency_IsWebView2Installed(HKCU),
+    'MicrosoftEdgeWebView2RuntimeInstaller.exe',
     '/silent /install',
     'WebView2 Runtime',
-    Dependency_String('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/3e1e509e-853f-41ec-9851-d9d10f585cef/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/913236b0-52e1-4dde-943c-2cfdbe153d31/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/08448960-cb06-4164-8a60-d235220bc3ec/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
-    Dependency_String('ac9498b3b69f681d7e4480eea84cc56332d21b6f8c7d5126929b7cf5fffde1cf', 'ad9b350625e132481bc0953eee9e032810134df9fedbd7be364c3f4e0e4dbd64', '00c9179bb0ac30a45a068c6e6716c988be511dca09fb3960a62ee0d86acfa543'),
+    Dependency_StringWin('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/3e1e509e-853f-41ec-9851-d9d10f585cef/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/913236b0-52e1-4dde-943c-2cfdbe153d31/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/08448960-cb06-4164-8a60-d235220bc3ec/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
+    Dependency_StringWin('ac9498b3b69f681d7e4480eea84cc56332d21b6f8c7d5126929b7cf5fffde1cf', 'ad9b350625e132481bc0953eee9e032810134df9fedbd7be364c3f4e0e4dbd64', '00c9179bb0ac30a45a068c6e6716c988be511dca09fb3960a62ee0d86acfa543'),
     False, False);
 end;
 
@@ -656,7 +702,7 @@ begin
   Dependency_AddIfMissing(not RegKeyExists(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\Office\16.0\Access Connectivity Engine\Engines\ACE'),
     'AccessDatabaseEngine2016' + Dependency_ArchSuffix + '.exe',
     '/quiet',
-    'Microsoft Access Database Engine 2016' + Dependency_ArchTitle,
+    'Microsoft Access Database Engine 2016' + Dependency_StringX64(' (x86)', ' (x64)'),
     Dependency_StringX64('https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine.exe', 'https://download.microsoft.com/download/3/5/C/35C84C36-661A-44E6-9324-8786B8DBE231/accessdatabaseengine_X64.exe'),
     Dependency_StringX64('adc0504656f390d225530ac09f1fc2113295c4f9baeffea1e983fecf4ac960f0', '04e96c9f1a1f7d251a88aececf1dc10ff65950392787427c00814a43308003de'),
     False, False);
@@ -821,29 +867,33 @@ begin
   Result := Dependency_JavaMajor;
 end;
 
-procedure Dependency_AddJava(const Major: Integer; const URL, Checksum: String);
+procedure Dependency_AddJava(const Major: Integer; const Vendor, URL, Checksum: String);
+var
+  FindRec: TFindRec;
+  Installed: Boolean;
 begin
   // https://learn.microsoft.com/en-us/java/openjdk/download
-  if URL = '' then begin
-    Log('Dependency not available for this architecture: OpenJDK ' + IntToStr(Major) + Dependency_ArchTitle);
-    exit;
+  // only the JDK installed last is on JAVA_HOME
+  Installed := FindFirst(ExpandConstant(Dependency_StringWin('{commonpf32}', '{commonpf64}', '')) + '\' + Vendor + '\jdk-' + IntToStr(Major) + '.*', FindRec);
+  if Installed then begin
+    FindClose(FindRec);
   end;
 
-  Dependency_AddIfMissing(Dependency_GetJavaMajor < Major,
-    'openjdk-' + IntToStr(Major) + Dependency_ArchSuffix + '.msi',
+  Dependency_AddIfMissing(not Installed and (Dependency_GetJavaMajor <> Major),
+    'openjdk-' + IntToStr(Major) + '.msi',
     '/quiet /norestart ADDLOCAL=FeatureMain,FeatureEnvironment,FeatureJavaHome',
-    'OpenJDK ' + IntToStr(Major) + Dependency_ArchTitle,
+    'OpenJDK ' + IntToStr(Major),
     URL,
     Checksum,
     False, False);
 end;
 
 // Java 8 has no Microsoft build (and is still shipped 32-bit), so it comes from Eclipse Temurin
-procedure Dependency_AddJava8; begin Dependency_AddJava(8, Dependency_StringX64('https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u472-b08/OpenJDK8U-jdk_x86-32_windows_hotspot_8u472b08.msi', 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u492-b09/OpenJDK8U-jdk_x64_windows_hotspot_8u492b09.msi'), Dependency_StringX64('daff0b3a7892ec99635f54554070ede99c175c157f683bc99c6d9008e81dfe4f', 'e931546f0557e0735472e99c5f0a62d34854ab8a2fee9709bfcbc7ea6dcc5172')); end;
-procedure Dependency_AddJava11; begin Dependency_AddJava(11, Dependency_String('', 'https://aka.ms/download-jdk/microsoft-jdk-11.0.32.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-11.0.32.1-windows-aarch64.msi'), Dependency_String('', 'e325d93d63bd194a594724abe34e7c5b8e77da47c7519952396243503347c7df', '416aa8ce2a8c33e009e39d653fb19dfbd40b1397fde083306a356960cd433c93')); end;
-procedure Dependency_AddJava17; begin Dependency_AddJava(17, Dependency_String('', 'https://aka.ms/download-jdk/microsoft-jdk-17.0.20.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-17.0.20.1-windows-aarch64.msi'), Dependency_String('', '38599e2961026250937e114df06fb3334510e84daed55167398935c564eed8a7', '58ba8a25748440de23912c474239dd0f398d4e984cc7e0266122e0fd975c3cf7')); end;
-procedure Dependency_AddJava21; begin Dependency_AddJava(21, Dependency_String('', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-windows-aarch64.msi'), Dependency_String('', '3a3f7e1a9fd9edd1fcc0545ffbe7dc87787a8417dc1bf303e41c7a697c8490c1', '9680ea11e52fea7ce29ccbd4d0559a325e848f95fb1a73c4d5e1bc7e66943890')); end;
-procedure Dependency_AddJava25; begin Dependency_AddJava(25, Dependency_String('', 'https://aka.ms/download-jdk/microsoft-jdk-25.0.4.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-25.0.4.1-windows-aarch64.msi'), Dependency_String('', 'a7c4cee7c626e6947357a0bfb21bf8bf740f063daaea4a15e4775c5b37f87cc6', '381d2e9823f9c313f1df885e448721dddc08fb40ded5ac8d6f8bea34a8a4da18')); end;
+procedure Dependency_AddJava8; begin Dependency_AddJava(8, 'Eclipse Adoptium', Dependency_StringWin('https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u472-b08/OpenJDK8U-jdk_x86-32_windows_hotspot_8u472b08.msi', 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u492-b09/OpenJDK8U-jdk_x64_windows_hotspot_8u492b09.msi', ''), Dependency_StringWin('daff0b3a7892ec99635f54554070ede99c175c157f683bc99c6d9008e81dfe4f', 'e931546f0557e0735472e99c5f0a62d34854ab8a2fee9709bfcbc7ea6dcc5172', '')); end;
+procedure Dependency_AddJava11; begin Dependency_AddJava(11, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-11.0.32.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-11.0.32.1-windows-aarch64.msi'), Dependency_StringWin('', 'e325d93d63bd194a594724abe34e7c5b8e77da47c7519952396243503347c7df', '416aa8ce2a8c33e009e39d653fb19dfbd40b1397fde083306a356960cd433c93')); end;
+procedure Dependency_AddJava17; begin Dependency_AddJava(17, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-17.0.20.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-17.0.20.1-windows-aarch64.msi'), Dependency_StringWin('', '38599e2961026250937e114df06fb3334510e84daed55167398935c564eed8a7', '58ba8a25748440de23912c474239dd0f398d4e984cc7e0266122e0fd975c3cf7')); end;
+procedure Dependency_AddJava21; begin Dependency_AddJava(21, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.12.1-windows-aarch64.msi'), Dependency_StringWin('', '3a3f7e1a9fd9edd1fcc0545ffbe7dc87787a8417dc1bf303e41c7a697c8490c1', '9680ea11e52fea7ce29ccbd4d0559a325e848f95fb1a73c4d5e1bc7e66943890')); end;
+procedure Dependency_AddJava25; begin Dependency_AddJava(25, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-25.0.4.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-25.0.4.1-windows-aarch64.msi'), Dependency_StringWin('', 'a7c4cee7c626e6947357a0bfb21bf8bf740f063daaea4a15e4775c5b37f87cc6', '381d2e9823f9c313f1df885e448721dddc08fb40ded5ac8d6f8bea34a8a4da18')); end;
 
 function Dependency_IsPythonInstalled(const Tag: String): Boolean;
 begin
@@ -868,11 +918,11 @@ procedure Dependency_AddPython314; begin Dependency_AddPython('3.14', Dependency
 procedure Dependency_AddPowerShell7;
 begin
   // https://github.com/PowerShell/PowerShell/releases
-  Dependency_AddIfMissing(not FileExists(ExpandConstant(Dependency_StringX64('{commonpf32}', '{commonpf64}')) + '\PowerShell\7\pwsh.exe'),
-    'powershell7' + Dependency_ArchSuffix + '.msi',
+  Dependency_AddIfMissing(not FileExists(ExpandConstant(Dependency_StringWin('{commonpf32}', '{commonpf64}', '')) + '\PowerShell\7\pwsh.exe'),
+    'powershell7.msi',
     Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
-    'PowerShell 7' + Dependency_ArchTitle,
-    Dependency_String('https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/PowerShell-7.6.6-win-x86.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/PowerShell-7.6.6-win-x64.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/PowerShell-7.6.6-win-arm64.msi'),
-    Dependency_String('34cfd071b83d5bba4f7e913d3545a35e8cce97b5e7b46a3b44d167d48c361dd6', '958838ff55091e1c8705d89efed0cc7e8245a3a6ef6c0ccfae20015227108ad8', '387d0af8e92ba97f73616c91fa8f29a284e8f82ee6c40fe12dade971bb05bac4'),
+    'PowerShell 7',
+    Dependency_StringWin('https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/PowerShell-7.6.6-win-x86.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/PowerShell-7.6.6-win-x64.msi', 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/PowerShell-7.6.6-win-arm64.msi'),
+    Dependency_StringWin('34cfd071b83d5bba4f7e913d3545a35e8cce97b5e7b46a3b44d167d48c361dd6', '958838ff55091e1c8705d89efed0cc7e8245a3a6ef6c0ccfae20015227108ad8', '387d0af8e92ba97f73616c91fa8f29a284e8f82ee6c40fe12dade971bb05bac4'),
     False, False);
 end;
