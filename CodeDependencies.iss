@@ -639,14 +639,14 @@ end;
 
 procedure Dependency_AddWebView2;
 begin
-  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 152.0.4191.66
+  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 153.0.4234.48
   Dependency_AddIfMissing(not (RegValueExists(HKLM32, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')
     or RegValueExists(HKCU, 'SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}', 'pv')),
     'MicrosoftEdgeWebView2RuntimeInstaller' + Dependency_ArchSuffix + '.exe',
     '/silent /install',
     'WebView2 Runtime',
-    Dependency_String('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/75b6df43-32de-4871-a6f2-c5c17a984ca4/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/a8f5ad97-0b01-41e5-9245-e8fc9ba9b311/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/cd9a7565-c383-44e9-9556-f250518ceb23/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
-    Dependency_String('3144f6215b9ced5c83933f9ac3a8035b5ab38edce37cc891549be6121dfd84da', 'e7fa35755196ad9223596ef021a1ce6799509142eaa40ba35f634026be50b831', '078d3792af42ef7d95c5323fd780850fc4d7bca49a754532a4c17bb3d87b690b'),
+    Dependency_String('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/3e1e509e-853f-41ec-9851-d9d10f585cef/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/913236b0-52e1-4dde-943c-2cfdbe153d31/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/08448960-cb06-4164-8a60-d235220bc3ec/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
+    Dependency_String('ac9498b3b69f681d7e4480eea84cc56332d21b6f8c7d5126929b7cf5fffde1cf', 'ad9b350625e132481bc0953eee9e032810134df9fedbd7be364c3f4e0e4dbd64', '00c9179bb0ac30a45a068c6e6716c988be511dca09fb3960a62ee0d86acfa543'),
     False, False);
 end;
 
@@ -771,8 +771,8 @@ begin
     'windowsappruntime2' + Dependency_ArchSuffix + '.exe',
     '--quiet',
     'Windows App Runtime 2' + Dependency_ArchTitle,
-    Dependency_String('https://aka.ms/windowsappsdk/2.4/2.4.0/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.4/2.4.0/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.4/2.4.0/windowsappruntimeinstall-arm64.exe'),
-    Dependency_String('427c490230db95443d74c9b6e86c3272a85e8a5dc86408fb9da4c05050196f8f', '851c35b0b0a59ce4c55f9171f601193322fc3413143b0dc3390ea11e14cfa7fc', '788665585dcbc2844e99483fda27809a91c2f36235b799b104d6649b68eb61b0'),
+    Dependency_String('https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-arm64.exe'),
+    Dependency_String('76dbd7c272cee0bf18f0b7228255b353d669cd55dc530209c45646f47acb89d4', '931a421e8dc3e6e67724806cb67fecdbb88dfe323f0170842eb4a4b4b149f1e2', 'd5e4d34547eb4e31c64bf1532415b3019c0d92b750e72eb18d3d95bd00feacbb'),
     False, False);
 end;
 
