@@ -181,7 +181,7 @@ jobs:
               $updated = $block.Value
               $bumped = $false
               if ($target.UrlOnly) {
-                Write-Host "$($target.Name) [$id]: downloads only"
+                Write-Host "$($target.Name) [$id]: version not tracked, checking downloads"
               } else {
                 $versionPattern = if ($target.Version) { $target.Version } else { $commentVersion }
                 $versionMatch = [regex]::Match($block.Value, $versionPattern)
@@ -232,13 +232,13 @@ jobs:
               if ($updated -eq $block.Value) { continue }
               $oldUrls = @([regex]::Matches($block.Value, "'(https://[^']+)'") | ForEach-Object { $_.Groups[1].Value })
               $newUrls = @([regex]::Matches($updated, "'(https://[^']+)'") | ForEach-Object { $_.Groups[1].Value })
+              # without a new version, WinGet only replaces downloads that are gone
+              if (-not $bumped -and -not ($oldUrls | Where-Object { $_ -notin $newUrls -and -not (Test-Url $_) })) { continue }
               $deadUrls = @($newUrls | Where-Object { $_ -notin $oldUrls -and -not (Test-Url $_) })
               if ($bumped) {
                 if ($deadUrls) { throw "unreachable WinGet download: $($deadUrls -join ', ')" }
                 $updates += "$($target.Name) $($latestText -replace '^(\d+\.\d+\.\d+)\.0$', '$1')"
               } else {
-                # without a new version, WinGet only replaces downloads that are gone
-                if (-not ($oldUrls | Where-Object { $_ -notin $newUrls -and -not (Test-Url $_) })) { continue }
                 if ($deadUrls) { Write-Warning "$($target.Name): download is gone and WinGet has no working one"; continue }
                 $updates += "$($target.Name) download"
               }
