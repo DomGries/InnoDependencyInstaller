@@ -19,95 +19,27 @@ jobs:
       - name: Check dependency URLs
         shell: pwsh
         run: |
-          Add-Type -AssemblyName System.Net.Http
-
-          $content = Get-Content -Path "CodeDependencies.iss" -Raw
-          $urls = [regex]::Matches($content, "'(https?://[^']+)'") |
-            ForEach-Object { $_.Groups[1].Value } |
-            Sort-Object -Unique
-          Write-Host "Checking $($urls.Count) unique URLs...`n"
-
-          $noRedirectHandler = [System.Net.Http.HttpClientHandler]::new()
-          $noRedirectHandler.AllowAutoRedirect = $false
-          $noRedirectClient = [System.Net.Http.HttpClient]::new($noRedirectHandler)
-          $noRedirectClient.Timeout = [TimeSpan]::FromSeconds(30)
-
-          function Resolve-AkaMsUrl([string]$Url) {
-            $current = [Uri]$Url
-            for ($hop = 0; $hop -lt 10; $hop++) {
-              $request = [System.Net.Http.HttpRequestMessage]::new([System.Net.Http.HttpMethod]::Head, $current)
-              $response = $noRedirectClient.SendAsync($request).GetAwaiter().GetResult()
-              $status = [int]$response.StatusCode
-              if ($current.Host -eq 'aka.ms' -and $status -ne 301) {
-                return @{ Status = $status; Error = "aka.ms returned $status instead of 301 - the short link does not exist" }
-              }
-              if ($status -lt 300 -or $status -ge 400) {
-                return @{ Status = $status; Error = $null }
-              }
-              $location = $response.Headers.Location
-              if (-not $location) {
-                return @{ Status = $status; Error = 'redirect without Location header' }
-              }
-              if (-not $location.IsAbsoluteUri) { $location = [Uri]::new($current, $location) }
-              $current = $location
+          function Get-UrlError([string] $Url) {
+            foreach ($request in @{ Method = 'Head' }, @{ Headers = @{ Range = 'bytes=0-0' } }) {
+              try {
+                $response = Invoke-WebRequest $Url @request -MaximumRedirection 10 -TimeoutSec 30
+                if ($response.BaseResponse.RequestMessage.RequestUri.Host -eq 'www.bing.com') { return 'short link does not exist' }
+                return
+              } catch { $message = $_.Exception.Message }
             }
-            return @{ Status = $null; Error = 'more than 10 redirects' }
+            $message
           }
 
-          $failures = @()
-          foreach ($url in $urls) {
-            $status = $null
-            $err = $null
-            $method = 'HEAD'
-            if (([Uri]$url).Host -eq 'aka.ms') {
-              $method = 'aka.ms walk'
-              try {
-                $result = Resolve-AkaMsUrl $url
-                $status = $result.Status
-                $err = $result.Error
-              } catch {
-                $err = $_.Exception.Message
-              }
-            } else {
-              try {
-                $resp = Invoke-WebRequest -Uri $url -Method Head -MaximumRedirection 10 `
-                  -TimeoutSec 30 -UseBasicParsing -ErrorAction Stop
-                $status = [int]$resp.StatusCode
-              } catch {
-                $code = $_.Exception.Response.StatusCode.value__
-                if ($code -eq 405) {
-                  $method = 'GET (range)'
-                  try {
-                    $resp = Invoke-WebRequest -Uri $url -Method Get -Headers @{ Range = 'bytes=0-0' } `
-                      -MaximumRedirection 10 -TimeoutSec 30 -UseBasicParsing -ErrorAction Stop
-                    $status = [int]$resp.StatusCode
-                  } catch {
-                    $err = $_.Exception.Message
-                    if ($_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode.value__ }
-                  }
-                } else {
-                  $err = $_.Exception.Message
-                  if ($_.Exception.Response) { $status = $code }
-                }
-              }
-            }
+          $urls = [regex]::Matches((Get-Content CodeDependencies.iss -Raw), "'(https?://[^']+)'") | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
+          $failures = @(foreach ($url in $urls) {
+            $message = Get-UrlError $url
+            Write-Host "$($message ? 'FAIL' : 'OK  ') $url"
+            if ($message) { "$url - $message" }
+          })
 
-            $ok = $status -and $status -ge 200 -and $status -lt 400 -and -not $err
-            $tag = if ($ok) { 'OK  ' } else { 'FAIL' }
-            $statusDisplay = if ($status) { $status } else { '---' }
-            Write-Host ("{0} [{1,3}] {2,-11} {3}" -f $tag, $statusDisplay, $method, $url)
-            if (-not $ok) {
-              $detail = if ($err) { "$status $url - $err" } else { "$status $url" }
-              $failures += $detail
-            }
-          }
-
-          if ($failures.Count -gt 0) {
-            Write-Host "`n=== $($failures.Count) broken URL(s) ==="
-            $failures | ForEach-Object { Write-Host "  $_" }
-            "## Broken dependency URLs ($($failures.Count))`n" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
-            $failures | ForEach-Object { "- $_" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append }
+          if ($failures) {
+            "## Broken dependency URLs ($($failures.Count))", ($failures | ForEach-Object { "- $_" }) >> $env:GITHUB_STEP_SUMMARY
+            $failures | ForEach-Object { Write-Host "::error::$_" }
             exit 1
           }
-
-          Write-Host "`nAll $($urls.Count) URLs reachable."
+          Write-Host "All $($urls.Count) URLs reachable"
