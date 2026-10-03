@@ -5,13 +5,13 @@
 
 ![Inno Setup Dependency Installer](https://user-images.githubusercontent.com/341158/122873592-3e2e9d80-d332-11eb-8055-8a4c6064ac4e.gif)
 
-**Inno Setup Dependency Installer** automatically downloads and installs any dependency such as .NET, Visual C++, SQL Server, and more during your application's installation. One line per dependency is all it takes — missing ones are installed before your application, anything already present is skipped. More than 60 dependencies are [built in](#supported-dependencies) and you can [add your own](#adding-your-own-dependency).
+**Inno Setup Dependency Installer** downloads and installs the dependencies of your application, such as .NET, Visual C++ or SQL Server, before your application is installed. You only need to add one code line per dependency. Dependencies that are already installed are skipped. More than 60 dependencies are [built in](#supported-dependencies), and you can [add your own](#adding-your-own-dependency).
 
 Requires [Inno Setup 6.7 or newer](https://www.jrsoftware.org/isinfo.php).
 
 ## Getting started
 
-1. [Download this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) (or clone it) and copy _CodeDependencies.iss_ next to your setup script.
+1. [Download this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) and copy _CodeDependencies.iss_ next to your setup script.
 
 2. Include it at the top of your script:
 
@@ -19,43 +19,42 @@ Requires [Inno Setup 6.7 or newer](https://www.jrsoftware.org/isinfo.php).
    #include "CodeDependencies.iss"
    ```
 
-3. Add Inno's standard `InitializeSetup` event function to your `[Code]` section (or extend your existing one) and call one function per dependency your application needs — pick them from the [table below](#supported-dependencies):
+3. In the `[Code]` section, add the dependencies in the `InitializeSetup` event function. If your script already has this function, add the calls there. Choose the dependencies from the [table below](#supported-dependencies):
 
    ```iss
    [Code]
    function InitializeSetup: Boolean;
    begin
-     // add the dependencies your application needs, for example:
-     Dependency_AddVC14;             // Visual C++ Redistributable, needed by most C++ apps
-     Dependency_AddDotNet100Desktop; // .NET Desktop Runtime, needed by WPF/WinForms apps
+     Dependency_AddVC14;             // Visual C++ Redistributable
+     Dependency_AddDotNet100Desktop; // .NET Desktop Runtime for WPF and Windows Forms apps
 
      Result := True;
    end;
    ```
 
-4. Check your `[Setup]` section:
+4. Set these values in the `[Setup]` section:
 
    ```iss
    [Setup]
-   ; dependencies are installed for all users, which requires administrative rights
+   ; dependencies are installed for all users, which needs administrative rights
    PrivilegesRequired=admin
-   ; enables 64-bit install mode on x64 and Windows on ARM
-   ; remove this line if you only deploy 32-bit binaries and dependencies
+   ; installs 64-bit dependencies on x64 and ARM64 Windows
+   ; remove this line if your application and its dependencies are 32-bit only
    ArchitecturesInstallIn64BitMode=x64compatible or arm64
    ```
 
-5. Build your setup with the Inno Setup compiler — that's it. On machines where a dependency is missing, it is downloaded and installed first, as shown in the animation above.
+5. Compile your setup.
 
-Prefer starting from a working example instead? _ExampleSetup.iss_ in this repository is a complete setup script that uses every dependency. Open it in the Inno Setup compiler, keep the calls for the dependencies you need and comment out the rest, then build:
+_ExampleSetup.iss_ is a complete example that uses every dependency. Remove or comment out the ones you do not need:
 
 ```iss
-Dependency_AddVC2013;   // installed in example setup
-//Dependency_AddVC2013; // commented out and not installed in example setup
+Dependency_AddVC2013;   // installed
+//Dependency_AddVC2013; // not installed
 ```
 
 ## Supported dependencies
 
-Call any of these functions inside `InitializeSetup`. Every function first checks whether the dependency is already installed and does nothing if so. The matching x86, x64 or ARM64 variant is selected automatically based on the target system.
+Call these functions in `InitializeSetup`. Each function adds the dependency only if it is not installed yet. The x86, x64 or ARM64 version is selected automatically.
 
 | Dependency | Function |
 | --- | --- |
@@ -125,31 +124,32 @@ Call any of these functions inside `InitializeSetup`. Every function first check
 
 ## What happens during the setup
 
-1. When the setup starts, every added dependency is checked and only the missing ones are kept.
-2. The user sees the pending dependencies listed on the _Ready to Install_ page.
-3. After clicking _Install_, the missing installers are downloaded from their official sources, with a progress bar. A failed download is retried automatically a few times before the user is asked whether to retry, ignore or abort. Every built-in download is verified against a pinned SHA-256 checksum, so a corrupted or tampered file is rejected before it runs.
-4. Each dependency installs unattended, one after another, and then your application is installed as usual. When another installation is already running on the machine — Windows Update, for example — the setup waits for it instead of failing.
-5. If a dependency requires a Windows restart, the setup takes care of it: it prompts for the restart at the end — or, when other dependencies are still pending, offers to restart right away and resumes the setup after the reboot.
-6. If an installer fails, the user can retry, ignore or abort. Setups running with `/SILENT` or `/VERYSILENT` install all dependencies fully silently; with `/SUPPRESSMSGBOXES` there is nobody to ask, so a dependency that still fails after the automatic retries aborts the setup.
+1. `InitializeSetup` checks each dependency and keeps only the missing ones. The _Ready to Install_ page lists them.
+2. After the user clicks _Install_, each installer is downloaded from its official source. Every built-in download is checked against a SHA-256 checksum, so a changed or broken file is never run. A failed download is retried a few times. Then the user can retry, ignore or abort.
+3. The installers run one after another without user input. If another installation is already running, for example Windows Update, the setup waits for it. If an installer fails, the user can retry, ignore or abort.
+4. Your application is installed.
+5. If a dependency needs a restart, the setup asks for it at the end. If the restart is needed before the next dependency can be installed, the setup asks to restart Windows at once and continues after the restart.
+
+With `/SILENT` or `/VERYSILENT` the installers run silently. With `/SUPPRESSMSGBOXES` no questions are asked, so a download or installer that still fails after the automatic retries aborts the setup.
 
 ## Adding your own dependency
 
-Any installer that supports unattended command-line arguments works. Describe it with `Dependency_AddIfMissing`, whose first argument is your own check for whether the dependency is missing:
+You can use any installer that can run without user input. Add it with `Dependency_AddIfMissing`. The first argument is your own check whether the dependency is missing:
 
 ```iss
 Dependency_AddIfMissing(not RegKeyExists(HKLM, 'SOFTWARE\MyRuntime'),
-  'myruntime.exe',                     // file name in the setup's temporary directory
-  '/quiet /norestart',                 // arguments for an unattended installation
+  'myruntime.exe',                     // file name in the temporary directory of the setup
+  '/quiet /norestart',                 // arguments for an installation without user input
   'My Runtime 1.0',                    // name shown to the user
   'https://example.com/myruntime.exe', // download URL
-  '',                                  // optional SHA-256 checksum the download must match
-  False,                               // ForceSuccess: treat any exit code as success
-  False);                              // RestartAfter: request a Windows restart afterwards
+  '',                                  // SHA-256 checksum of the download, optional
+  False,                               // ForceSuccess: treat every exit code as success
+  False);                              // RestartAfter: restart Windows after the installation
 ```
 
-Both decisions end up in the setup log, which is what you want when a user reports that a dependency was or was not installed. `Dependency_Add` with the same arguments minus the first one is still available if you prefer to write the `if` yourself.
+The result of the check is written to the setup log. `Dependency_Add` takes the same arguments without the first one and always adds the dependency.
 
-Instead of a file name you can pass a path to a program that is already on the machine, which is how the built-in .NET Framework 3.5 dependency enables the corresponding Windows feature:
+Instead of a file name you can pass the full path of a program that is already on the computer. Nothing is downloaded then. For example, the built-in .NET Framework 3.5 dependency enables a Windows feature:
 
 ```iss
 Dependency_AddIfMissing(not IsDotNetInstalled(net35, 1),
@@ -158,15 +158,21 @@ Dependency_AddIfMissing(not IsDotNetInstalled(net35, 1),
   '.NET Framework 3.5', '', '', False, False);
 ```
 
-For architecture-dependent downloads use `Dependency_String(x86Url, x64Url, arm64Url)`, which returns the URL matching the target system, or `Dependency_StringWin` for machine-wide components that match Windows. `Dependency_IsX64` and `Dependency_IsArm64` can likewise be used as `Check:` functions in `[Files]` to install the matching binaries of your own application (see _ExampleSetup.iss_).
+If the download depends on the architecture, use `Dependency_String(x86Url, x64Url, arm64Url)`. It returns the value for the architecture of the setup. An empty URL means that the dependency is not available for this architecture. `Dependency_StringWin` returns the value for the architecture of Windows instead. Use it for components that are shared by the whole system. On ARM64 Windows it returns the x64 value if the ARM64 value is empty.
 
-Pass a SHA-256 checksum to have the download verified; leaving it empty (as above) leaves the download unverified. The built-in dependencies keep the checksum right next to the URL — for multi-architecture downloads use a matching `Dependency_String(x86Hash, x64Hash, arm64Hash)`. To calculate one for a custom or new installer, run `pwsh ./tools/Get-UrlSha256.ps1 'https://example.com/installer.exe'`. The dependency update workflow refreshes built-in checksums whenever it bumps a download.
+`Dependency_IsX64` and `Dependency_IsArm64` can also be used as `Check:` functions in `[Files]` to install the matching files of your own application. See _ExampleSetup.iss_.
+
+If you pass a SHA-256 checksum, the download is checked against it. If you pass an empty string, the download is not checked. Use `Dependency_String(x86Hash, x64Hash, arm64Hash)` for downloads that depend on the architecture. To get the checksum of a download, run:
+
+```powershell
+pwsh ./tools/Get-UrlSha256.ps1 'https://example.com/installer.exe'
+```
 
 ## Bundling installers instead of downloading
 
-By default, missing dependencies are downloaded while the setup runs. You can also pack a dependency installer into your setup — to support offline installations or just to avoid downloads. A file that already exists in the setup's temporary directory is used directly and never downloaded.
+By default, missing dependencies are downloaded during the setup. You can also put an installer into your setup, for example to install without internet access. If the file is already in the temporary directory of the setup, it is used and not downloaded. A bundled file is not checked against the checksum.
 
-For example, a game setup can carry the small DirectX web setup with it:
+For example, to bundle the DirectX web setup:
 
 ```iss
 [Files]
@@ -177,69 +183,78 @@ Source: "dependencies\dxwebsetup.exe"; Flags: dontcopy noencryption
 [Code]
 function InitializeSetup: Boolean;
 begin
-  ExtractTemporaryFile('dxwebsetup.exe'); // now already present, so not downloaded
+  ExtractTemporaryFile('dxwebsetup.exe'); // must come before Dependency_AddDirectX
   Dependency_AddDirectX;
 
   Result := True;
 end;
 ```
 
-This works the same way for every dependency, including [your own](#adding-your-own-dependency). Keep in mind that some installers — like the DirectX web setup — download further components themselves, so bundling them alone does not make the installation fully offline.
+This works the same way for every dependency, including [your own](#adding-your-own-dependency). Some installers, like the DirectX web setup, download more files themselves, so they still need internet access.
 
 ## Options
 
-**32-bit dependencies on a 64-bit system** — for example when your application itself is 32-bit:
+**32-bit dependencies on 64-bit Windows**, for example when your application is 32-bit:
 
 ```iss
-Dependency_ForceX86 := True; // force 32-bit install of next dependencies
+Dependency_ForceX86 := True;  // the next dependencies are 32-bit
 Dependency_AddVC2013;
-Dependency_ForceX86 := False; // disable forced 32-bit install again
+Dependency_ForceX86 := False; // back to the default
 ```
 
-`Dependency_ForceX64` works the same way to force x64 dependencies on ARM64 systems. Machine-wide components (SQL Server, OLE DB, ODBC, WebView2, OpenJDK, PowerShell) always match Windows.
+`Dependency_ForceX64` works the same way. It selects x64 dependencies on ARM64 Windows, or in a setup that runs in 32-bit mode on 64-bit Windows. These options do not change dependencies that follow the architecture of Windows: SQL Server, OLE DB, ODBC, WebView2, OpenJDK and PowerShell.
 
-**Dependencies of optional [components](https://jrsoftware.org/ishelp/index.php?topic=componentssection)** — only downloaded and installed when the user selects a matching component:
+**Dependencies of optional [components](https://jrsoftware.org/ishelp/index.php?topic=componentssection)** are only downloaded and installed if the user selects the component:
 
 ```iss
-Dependency_Components := 'advanced'; // only install next dependencies if the 'advanced' component is selected
+Dependency_Components := 'advanced'; // the next dependencies need the 'advanced' component
 Dependency_AddDotNet100;
-Dependency_Components := ''; // disable component gating again
+Dependency_Components := '';         // back to the default
 ```
 
-`Dependency_Components` accepts the same expression syntax as Inno's [Components](https://jrsoftware.org/ishelp/index.php?topic=scriptfunctions) parameter (e.g. `'feature1 or feature2'`).
+`Dependency_Components` accepts the same expressions as the [Components](https://jrsoftware.org/ishelp/index.php?topic=scriptfunctions) parameter, for example `'feature1 or feature2'`.
 
-**Defines** — set before the `#include` to change how the library integrates:
+**Defines** change how the library works. Set them before the `#include`:
 
 | Define | Effect |
 | --- | --- |
-| `Dependency_NoUpdateReadyMemo` | Don't attach the `UpdateReadyMemo` event — for scripts implementing their own (call `Dependency_UpdateReadyMemo` from it to keep the dependency listing) |
-| `Dependency_CustomExecute` | Name of your own function `function MyExecute(const File, Parameters: String; var ResultCode: Integer): Boolean;` used to run the installers instead of `ShellExec` |
-| `Dependency_DownloadRetryCount` | How often a failed download is retried automatically before the user is asked (default `3`, set to `0` to ask immediately) |
-| `Dependency_DownloadRetryBackoffMs` | Base delay in milliseconds between automatic download retries; the delay grows with each attempt (default `2000`) |
-| `Dependency_InstallBusyRetryCount` | How often an installer that reports "another installation is in progress" is retried (default `30`) |
-| `Dependency_InstallBusyRetryDelayMs` | Delay in milliseconds between "another installation is in progress" retries (default `10000`) |
+| `Dependency_NoUpdateReadyMemo` | Do not handle the `UpdateReadyMemo` event. Use it if your script has its own `UpdateReadyMemo` function. Call `Dependency_UpdateReadyMemo` from it to still list the dependencies. |
+| `Dependency_CustomExecute` | Name of your own function that runs the installers instead of `ShellExec`: `function MyExecute(const Filename, Parameters: String; var ResultCode: Integer): Boolean;`. Declare it before the `#include`. |
+| `Dependency_DownloadRetryCount` | How often a failed download is retried before the user is asked. Default `3`. Use `0` to ask at once. |
+| `Dependency_DownloadRetryBackoffMs` | Delay in milliseconds before the first download retry. Retry _n_ waits _n_ times this delay. Default `2000`. |
+| `Dependency_InstallBusyRetryCount` | How often an installer is retried if another installation is running. Default `30`. |
+| `Dependency_InstallBusyRetryDelayMs` | Delay in milliseconds between these retries. Default `10000`. |
 
 ## Troubleshooting
 
-Run your setup with `/LOG="C:\setup.log"` (or find the log Inno writes to `%TEMP%` when started with `/LOG`) — every decision this library makes is recorded there:
+Run your setup with `/LOG="C:\setup.log"`. With `/LOG` only, the log is written to `%TEMP%`. The library writes each decision to the log:
 
 | Log entry | Meaning |
 | --- | --- |
-| `Dependency already installed: X` | The check for _X_ found it on the machine, so nothing was downloaded or installed |
-| `Dependency queued for download: X` | _X_ is missing and will be downloaded |
-| `Dependency queued (already present): X` | _X_ is missing, but its installer is already in the temporary directory (or is a program on the machine), so it is not downloaded |
-| `Dependency skipped after failed download: X` | The user ignored a download failure, so _X_ will not be executed |
-| `Dependency skipped (component not selected): X` | _X_ belongs to a component the user did not select |
-| `Dependency not available for this architecture: X` | _X_ has no installer for the target system |
-| `Dependency exit code N: X` | The installer of _X_ finished with exit code _N_ |
+| `Dependency already installed: X` | _X_ is installed, so nothing is done. |
+| `Dependency queued for download: X` | _X_ is missing and will be downloaded. |
+| `Dependency queued (already present): X` | _X_ is missing. Its installer is already in the temporary directory or is a program on the computer, so it is not downloaded. |
+| `Dependency not available for this architecture: X` | _X_ has no installer for this architecture. |
+| `Dependency skipped (component not selected): X` | _X_ belongs to a component that the user did not select. |
+| `Dependency skipped after failed download: X` | The download of _X_ failed and the user chose to ignore it. |
+| `Dependency exit code N: X` | The installer of _X_ ended with exit code _N_. |
 
-Exit codes `0` (success), `1638` (a newer version is already installed), `3010` (restart required) and `1641` (installer started a restart) count as success. `1618` means another installation is already running, which the setup waits out. Everything else is an error.
+These exit codes count as success:
 
-A dependency that requires a restart resumes the setup after the reboot through a `RunOnce` registry entry. The resumed setup is started with the wizard selections, the standard silent/restart/log switches and `/restart=1`, which your script can check with `ParamStr` if it needs to behave differently on the second run. A `/LOG="setup.log"` continues in `setup-2.log`.
+| Exit code | Meaning |
+| --- | --- |
+| `0` | Success. |
+| `1638` | A newer version is already installed. |
+| `3010` | Success. Windows must restart. The setup asks for the restart at the end. |
+| `1641` | Success. The installer started a restart. The setup continues after the restart. |
+
+Exit code `1618` means that another installation is running. The setup waits and tries again. Every other exit code is an error, unless `ForceSuccess` is set.
+
+To continue after a restart, the setup adds itself to the `RunOnce` registry key. It is started again with the choices of the wizard, the original silent, restart and log switches, and `/restart=1`. Your script can check `/restart=1` with `ParamStr` if it must work differently after the restart. A log set with `/LOG="setup.log"` continues in `setup-2.log`.
 
 ## Credits
 
-Thanks to the community for sharing many fixes and improvements. To contribute please [create a pull request](https://github.com/DomGries/InnoDependencyInstaller/pulls).
+Thanks to the community for many fixes and improvements. To contribute, [create a pull request](https://github.com/DomGries/InnoDependencyInstaller/pulls).
 
 ## License
 

@@ -14,7 +14,6 @@
 [Code]
 // https://github.com/DomGries/InnoDependencyInstaller
 
-// types and variables
 type
   TDependency_Entry = record
     Filename: String;
@@ -106,170 +105,183 @@ begin
   end;
 end;
 
-<event('PrepareToInstall')>
-function Dependency_PrepareToInstall(var NeedsRestart: Boolean): String;
+function Dependency_Download(const Index: Integer): Boolean;
 var
-  DependencyCount, DependencyIndex, ActiveCount, ActiveIndex, ResultCode, ParameterIndex, Attempt: Integer;
-  Parameter, TempValue: String;
+  Attempt: Integer;
   Retry: Boolean;
 begin
-  DependencyCount := GetArrayLength(Dependency_List);
+  Result := True;
+  Dependency_DownloadPage.Clear;
+  Dependency_DownloadPage.Add(Dependency_List[Index].URL, Dependency_List[Index].Filename, Dependency_List[Index].Checksum);
+  Dependency_DownloadPage.SetText(Dependency_List[Index].Title, '');
 
-  if DependencyCount > 0 then begin
-    Dependency_DownloadPage.Show;
+  // break inside try does not leave the loop in Pascal Script, so loop on a flag
+  Attempt := 0;
+  Retry := True;
+  while Retry do begin
+    Retry := False;
     try
-      for DependencyIndex := 0 to DependencyCount - 1 do begin
-        if not Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
+      Dependency_DownloadPage.Download;
+    except
+      if Dependency_DownloadPage.AbortedByUser then begin
+        Log('Download aborted by user: ' + Dependency_List[Index].Title);
+        Result := False;
+      end else begin
+        Log('Download failed: ' + Dependency_List[Index].Title + ': ' + GetExceptionMessage);
+        Attempt := Attempt + 1;
+        if Attempt <= {#Dependency_DownloadRetryCount} then begin
+          Log('Retrying download (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_DownloadRetryCount}) + '): ' + Dependency_List[Index].Title);
+          Dependency_Wait(Dependency_List[Index].Title, GetExceptionMessage, Attempt * {#Dependency_DownloadRetryBackoffMs});
+          Retry := True;
+        end else begin
+          case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
+            IDABORT: begin
+              Result := False;
+            end;
+            IDRETRY: begin
+              Attempt := 0;
+              Retry := True;
+            end;
+            IDIGNORE: begin
+              Dependency_List[Index].SkipInstall := True;
+              Log('Dependency skipped after failed download: ' + Dependency_List[Index].Title);
+            end;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+function Dependency_Install(const Index: Integer; const IsLast: Boolean; var NeedsRestart: Boolean): Boolean;
+var
+  ResultCode, Attempt: Integer;
+begin
+  Result := True;
+  Attempt := 0;
+  while True do begin
+    Dependency_DownloadPage.SetText(Dependency_List[Index].Title, '');
+    ResultCode := 0;
+#ifdef Dependency_CustomExecute
+    if {#Dependency_CustomExecute}(Dependency_FilePath(Dependency_List[Index].Filename), Dependency_List[Index].Parameters, ResultCode) then begin
+#else
+    if ShellExec('', Dependency_FilePath(Dependency_List[Index].Filename), Dependency_List[Index].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+#endif
+      Log('Dependency exit code ' + IntToStr(ResultCode) + ': ' + Dependency_List[Index].Title);
+      if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED
+        NeedsRestart := True;
+        Result := False;
+        exit;
+      end else if ResultCode = 3010 then begin // ERROR_SUCCESS_REBOOT_REQUIRED
+        Dependency_NeedToRestart := True;
+        exit;
+      end else if ResultCode = 1638 then begin // ERROR_PRODUCT_VERSION
+        exit;
+      end else if ResultCode = 1618 then begin // ERROR_INSTALL_ALREADY_RUNNING
+        Attempt := Attempt + 1;
+        if Attempt <= {#Dependency_InstallBusyRetryCount} then begin
+          Log('Another installation is in progress, waiting (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_InstallBusyRetryCount}) + '): ' + Dependency_List[Index].Title);
+          Dependency_Wait(Dependency_List[Index].Title, SysErrorMessage(ResultCode), {#Dependency_InstallBusyRetryDelayMs});
           continue;
         end;
-        if Dependency_List[DependencyIndex].URL <> '' then begin
-          Dependency_DownloadPage.Clear;
-          Dependency_DownloadPage.Add(Dependency_List[DependencyIndex].URL, Dependency_List[DependencyIndex].Filename, Dependency_List[DependencyIndex].Checksum);
-          Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
-
-          Attempt := 0;
-          Retry := True;
-          while Retry do begin
-            Retry := False;
-            try
-              Dependency_DownloadPage.Download;
-            except
-              if Dependency_DownloadPage.AbortedByUser then begin
-                Log('Download aborted by user: ' + Dependency_List[DependencyIndex].Title);
-                Result := Dependency_List[DependencyIndex].Title;
-              end else begin
-                Log('Download failed: ' + Dependency_List[DependencyIndex].Title + ': ' + GetExceptionMessage);
-                Attempt := Attempt + 1;
-                // a transient network error must not fail an unattended setup on the first try
-                if Attempt <= {#Dependency_DownloadRetryCount} then begin
-                  Log('Retrying download (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_DownloadRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
-                  Dependency_Wait(Dependency_List[DependencyIndex].Title, GetExceptionMessage, Attempt * {#Dependency_DownloadRetryBackoffMs});
-                  Retry := True;
-                end else begin
-                  case SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
-                    IDABORT: begin
-                      Result := Dependency_List[DependencyIndex].Title;
-                    end;
-                    IDRETRY: begin
-                      Attempt := 0;
-                      Retry := True;
-                    end;
-                    IDIGNORE: begin
-                      Dependency_List[DependencyIndex].SkipInstall := True;
-                      Log('Dependency skipped after failed download: ' + Dependency_List[DependencyIndex].Title);
-                    end;
-                  end;
-                end;
-              end;
-            end;
-          end;
-          if Result <> '' then begin
-            break;
+      end else if (ResultCode = 0) or Dependency_List[Index].ForceSuccess then begin // ERROR_SUCCESS
+        if Dependency_List[Index].RestartAfter then begin
+          if IsLast then begin
+            Dependency_NeedToRestart := True;
+          end else begin
+            NeedsRestart := True;
+            Result := False;
           end;
         end;
+        exit;
       end;
+    end;
 
-      if Result = '' then begin
-        ActiveCount := 0;
-        for DependencyIndex := 0 to DependencyCount - 1 do begin
-          if Dependency_IsEntryActive(Dependency_List[DependencyIndex]) and not Dependency_List[DependencyIndex].SkipInstall then begin
-            ActiveCount := ActiveCount + 1;
-          end;
-        end;
-
-        ActiveIndex := 0;
-        for DependencyIndex := 0 to DependencyCount - 1 do begin
-          if not Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
-            Log('Dependency skipped (component not selected): ' + Dependency_List[DependencyIndex].Title);
-            continue;
-          end;
-          if Dependency_List[DependencyIndex].SkipInstall then begin
-            continue;
-          end;
-          ActiveIndex := ActiveIndex + 1;
-          Dependency_DownloadPage.SetProgress(ActiveIndex, ActiveCount + 1);
-
-          Attempt := 0;
-          while True do begin
-            Dependency_DownloadPage.SetText(Dependency_List[DependencyIndex].Title, '');
-            ResultCode := 0;
-#ifdef Dependency_CustomExecute
-            if {#Dependency_CustomExecute}(Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, ResultCode) then begin
-#else
-            if ShellExec('', Dependency_FilePath(Dependency_List[DependencyIndex].Filename), Dependency_List[DependencyIndex].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
-#endif
-              Log('Dependency exit code ' + IntToStr(ResultCode) + ': ' + Dependency_List[DependencyIndex].Title);
-              if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED (1641)
-                NeedsRestart := True;
-                Result := Dependency_List[DependencyIndex].Title;
-                break;
-              end else if ResultCode = 3010 then begin // ERROR_SUCCESS_REBOOT_REQUIRED (3010)
-                Dependency_NeedToRestart := True;
-                break;
-              end else if ResultCode = 1638 then begin // ERROR_PRODUCT_VERSION (1638)
-                break;
-              end else if ResultCode = 1618 then begin // ERROR_INSTALL_ALREADY_RUNNING (1618)
-                Attempt := Attempt + 1;
-                // another installer (often Windows Update) holds the install mutex, so wait instead of failing
-                if Attempt <= {#Dependency_InstallBusyRetryCount} then begin
-                  Log('Another installation is in progress, waiting (attempt ' + IntToStr(Attempt) + ' of ' + IntToStr({#Dependency_InstallBusyRetryCount}) + '): ' + Dependency_List[DependencyIndex].Title);
-                  Dependency_Wait(Dependency_List[DependencyIndex].Title, SysErrorMessage(ResultCode), {#Dependency_InstallBusyRetryDelayMs});
-                  continue;
-                end;
-              end else if (ResultCode = 0) or Dependency_List[DependencyIndex].ForceSuccess then begin // ERROR_SUCCESS (0)
-                if Dependency_List[DependencyIndex].RestartAfter then begin
-                  if ActiveIndex = ActiveCount then begin
-                    Dependency_NeedToRestart := True;
-                  end else begin
-                    NeedsRestart := True;
-                    Result := Dependency_List[DependencyIndex].Title;
-                  end;
-                end;
-                break;
-              end;
-            end;
-
-            case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[DependencyIndex].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
-              IDABORT: begin
-                Result := Dependency_List[DependencyIndex].Title;
-                break;
-              end;
-              IDRETRY: begin
-                Attempt := 0;
-              end;
-              IDIGNORE: begin
-                break;
-              end;
-            end;
-          end;
-
-          if Result <> '' then begin
-            break;
-          end;
-        end;
-
+    case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[Index].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
+      IDABORT: begin
+        Result := False;
+        exit;
       end;
+      IDRETRY: begin
+        Attempt := 0;
+      end;
+      IDIGNORE: begin
+        exit;
+      end;
+    end;
+  end;
+end;
+
+function Dependency_DownloadAndInstall(var NeedsRestart: Boolean): String;
+var
+  DependencyIndex, InstallCount, InstallIndex: Integer;
+begin
+  InstallCount := 0;
+  for DependencyIndex := 0 to GetArrayLength(Dependency_List) - 1 do begin
+    if not Dependency_IsEntryActive(Dependency_List[DependencyIndex]) then begin
+      Log('Dependency skipped (component not selected): ' + Dependency_List[DependencyIndex].Title);
+      continue;
+    end;
+    if Dependency_List[DependencyIndex].URL <> '' then begin
+      if not Dependency_Download(DependencyIndex) then begin
+        Result := Dependency_List[DependencyIndex].Title;
+        exit;
+      end;
+    end;
+    if not Dependency_List[DependencyIndex].SkipInstall then begin
+      InstallCount := InstallCount + 1;
+    end;
+  end;
+
+  InstallIndex := 0;
+  for DependencyIndex := 0 to GetArrayLength(Dependency_List) - 1 do begin
+    if Dependency_IsEntryActive(Dependency_List[DependencyIndex]) and not Dependency_List[DependencyIndex].SkipInstall then begin
+      InstallIndex := InstallIndex + 1;
+      Dependency_DownloadPage.SetProgress(InstallIndex, InstallCount + 1);
+      if not Dependency_Install(DependencyIndex, InstallIndex = InstallCount, NeedsRestart) then begin
+        Result := Dependency_List[DependencyIndex].Title;
+        exit;
+      end;
+    end;
+  end;
+end;
+
+procedure Dependency_RegisterResume;
+var
+  ParameterIndex: Integer;
+  Parameter, CommandLine: String;
+begin
+  Log('Dependency requires restart: registering RunOnce to resume setup');
+  CommandLine := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + RemoveBackslashUnlessRoot(WizardDirValue) + '" /GROUP="' + RemoveBackslashUnlessRoot(WizardGroupValue) + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
+  for ParameterIndex := 1 to ParamCount do begin
+    Parameter := Uppercase(ParamStr(ParameterIndex));
+    if (Parameter = '/SP-') or (Parameter = '/SILENT') or (Parameter = '/VERYSILENT') or (Parameter = '/SUPPRESSMSGBOXES') or (Parameter = '/NOCANCEL') or (Parameter = '/NORESTART') or (Parameter = '/ALLUSERS') or (Parameter = '/CURRENTUSER') or (Parameter = '/LOG') then begin
+      CommandLine := CommandLine + ' ' + Parameter;
+    end else if Copy(Parameter, 1, 5) = '/LOG=' then begin
+      // a fixed log file would be overwritten
+      Parameter := RemoveQuotes(Copy(ParamStr(ParameterIndex), 6, Length(Parameter)));
+      CommandLine := CommandLine + ' /LOG="' + ChangeFileExt(Parameter, '') + '-2' + ExtractFileExt(Parameter) + '"';
+    end;
+  end;
+  if WizardNoIcons then begin
+    CommandLine := CommandLine + ' /NOICONS';
+  end;
+  RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', ExpandConstant('{srcexe}'), CommandLine);
+end;
+
+<event('PrepareToInstall')>
+function Dependency_PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  if GetArrayLength(Dependency_List) > 0 then begin
+    Dependency_DownloadPage.Show;
+    try
+      Result := Dependency_DownloadAndInstall(NeedsRestart);
     finally
       Dependency_DownloadPage.Hide;
     end;
 
     if NeedsRestart then begin
-      Log('Dependency requires restart: registering RunOnce to resume setup');
-      TempValue := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + RemoveBackslashUnlessRoot(WizardDirValue) + '" /GROUP="' + RemoveBackslashUnlessRoot(WizardGroupValue) + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
-      for ParameterIndex := 1 to ParamCount do begin
-        Parameter := Uppercase(ParamStr(ParameterIndex));
-        if (Parameter = '/SP-') or (Parameter = '/SILENT') or (Parameter = '/VERYSILENT') or (Parameter = '/SUPPRESSMSGBOXES') or (Parameter = '/NOCANCEL') or (Parameter = '/NORESTART') or (Parameter = '/ALLUSERS') or (Parameter = '/CURRENTUSER') or (Parameter = '/LOG') then begin
-          TempValue := TempValue + ' ' + Parameter;
-        end else if Copy(Parameter, 1, 5) = '/LOG=' then begin
-          // a fixed log file would be overwritten
-          Parameter := RemoveQuotes(Copy(ParamStr(ParameterIndex), 6, Length(Parameter)));
-          TempValue := TempValue + ' /LOG="' + ChangeFileExt(Parameter, '') + '-2' + ExtractFileExt(Parameter) + '"';
-        end;
-      end;
-      if WizardNoIcons then begin
-        TempValue := TempValue + ' /NOICONS';
-      end;
-      RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', ExpandConstant('{srcexe}'), TempValue);
+      Dependency_RegisterResume;
     end;
   end;
 end;
@@ -284,19 +296,19 @@ var
 begin
   Result := '';
   if MemoUserInfoInfo <> '' then begin
-    Result := Result + MemoUserInfoInfo + Newline + NewLine;
+    Result := Result + MemoUserInfoInfo + NewLine + NewLine;
   end;
   if MemoDirInfo <> '' then begin
-    Result := Result + MemoDirInfo + Newline + NewLine;
+    Result := Result + MemoDirInfo + NewLine + NewLine;
   end;
   if MemoTypeInfo <> '' then begin
-    Result := Result + MemoTypeInfo + Newline + NewLine;
+    Result := Result + MemoTypeInfo + NewLine + NewLine;
   end;
   if MemoComponentsInfo <> '' then begin
-    Result := Result + MemoComponentsInfo + Newline + NewLine;
+    Result := Result + MemoComponentsInfo + NewLine + NewLine;
   end;
   if MemoGroupInfo <> '' then begin
-    Result := Result + MemoGroupInfo + Newline + NewLine;
+    Result := Result + MemoGroupInfo + NewLine + NewLine;
   end;
   if MemoTasksInfo <> '' then begin
     Result := Result + MemoTasksInfo;
@@ -467,77 +479,24 @@ begin
     False, False);
 end;
 
-procedure Dependency_AddDotNet40;
+procedure Dependency_AddDotNetFramework(const Version: TDotNetVersion; const Filename, Title, URL, Checksum: String);
 begin
-  // https://dotnet.microsoft.com/download/dotnet-framework/net40
-  Dependency_AddIfMissing(not IsDotNetInstalled(net4full, 0),
-    'dotNetFx40_Full_setup.exe',
+  // https://dotnet.microsoft.com/download/dotnet-framework
+  Dependency_AddIfMissing(not IsDotNetInstalled(Version, 0),
+    Filename,
     '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart',
-    '.NET Framework 4.0',
-    'https://download.microsoft.com/download/1/B/E/1BE39E79-7E39-46A3-96FF-047F95396215/dotNetFx40_Full_setup.exe',
-    'fa1afff978325f8818ce3a559d67a58297d9154674de7fd8eb03656d93104425',
+    '.NET Framework ' + Title,
+    URL,
+    Checksum,
     False, False);
 end;
 
-procedure Dependency_AddDotNet45;
-begin
-  // https://dotnet.microsoft.com/download/dotnet-framework/net452
-  Dependency_AddIfMissing(not IsDotNetInstalled(net452, 0),
-    'dotnetfx45.exe',
-    '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart',
-    '.NET Framework 4.5.2',
-    'https://download.microsoft.com/download/9/A/7/9A78F13F-FD62-4F6D-AB6B-1803508A9F56/51209.34209.03/web/NDP452-KB2901954-Web.exe',
-    'bd173d14a371e6786c4ae90be1f2c560458d672ba4cbeb3cf55bebfef2e2778a',
-    False, False);
-end;
-
-procedure Dependency_AddDotNet46;
-begin
-  // https://dotnet.microsoft.com/download/dotnet-framework/net462
-  Dependency_AddIfMissing(not IsDotNetInstalled(net462, 0),
-    'dotnetfx46.exe',
-    '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart',
-    '.NET Framework 4.6.2',
-    'https://download.visualstudio.microsoft.com/download/pr/8e396c75-4d0d-41d3-aea8-848babc2736a/570f7c7e1975df353a4652ae70b3e0ac/ndp462-kb3151802-web.exe',
-    '67242c8fe953d454edb4171023343f33740e3d16e8469a4b0c11bd42eb85f3fa',
-    False, False);
-end;
-
-procedure Dependency_AddDotNet47;
-begin
-  // https://dotnet.microsoft.com/download/dotnet-framework/net472
-  Dependency_AddIfMissing(not IsDotNetInstalled(net472, 0),
-    'dotnetfx47.exe',
-    '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart',
-    '.NET Framework 4.7.2',
-    'https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/124d2afe5c8f67dfa910da5f9e3db9c1/ndp472-kb4054531-web.exe',
-    '151b1c11f625e7122d517b6a1778841df8ff168d931c41730f59b9e4b8bcbe36',
-    False, False);
-end;
-
-procedure Dependency_AddDotNet48;
-begin
-  // https://dotnet.microsoft.com/download/dotnet-framework/net48
-  Dependency_AddIfMissing(not IsDotNetInstalled(net48, 0),
-    'dotnetfx48.exe',
-    '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart',
-    '.NET Framework 4.8',
-    'https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/9b7b8746971ed51a1770ae4293618187/ndp48-web.exe',
-    '0bba3094588c4bfec301939985222a20b340bf03431563dec8b2b4478b06fffa',
-    False, False);
-end;
-
-procedure Dependency_AddDotNet481;
-begin
-  // https://dotnet.microsoft.com/download/dotnet-framework/net481
-  Dependency_AddIfMissing(not IsDotNetInstalled(net481, 0),
-    'dotnetfx481.exe',
-    '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/q') + ' /norestart',
-    '.NET Framework 4.8.1',
-    'https://download.microsoft.com/download/4/b/2/cd00d4ed-ebdd-49ee-8a33-eabc3d1030e3/NDP481-Web.exe',
-    '05e9ada305fd0013a6844e7657f06ed330887093e3df59c11cb528b86efa3fbf',
-    False, False);
-end;
+procedure Dependency_AddDotNet40; begin Dependency_AddDotNetFramework(net4full, 'dotNetFx40_Full_setup.exe', '4.0', 'https://download.microsoft.com/download/1/B/E/1BE39E79-7E39-46A3-96FF-047F95396215/dotNetFx40_Full_setup.exe', 'fa1afff978325f8818ce3a559d67a58297d9154674de7fd8eb03656d93104425'); end;
+procedure Dependency_AddDotNet45; begin Dependency_AddDotNetFramework(net452, 'dotnetfx45.exe', '4.5.2', 'https://download.microsoft.com/download/9/A/7/9A78F13F-FD62-4F6D-AB6B-1803508A9F56/51209.34209.03/web/NDP452-KB2901954-Web.exe', 'bd173d14a371e6786c4ae90be1f2c560458d672ba4cbeb3cf55bebfef2e2778a'); end;
+procedure Dependency_AddDotNet46; begin Dependency_AddDotNetFramework(net462, 'dotnetfx46.exe', '4.6.2', 'https://download.visualstudio.microsoft.com/download/pr/8e396c75-4d0d-41d3-aea8-848babc2736a/570f7c7e1975df353a4652ae70b3e0ac/ndp462-kb3151802-web.exe', '67242c8fe953d454edb4171023343f33740e3d16e8469a4b0c11bd42eb85f3fa'); end;
+procedure Dependency_AddDotNet47; begin Dependency_AddDotNetFramework(net472, 'dotnetfx47.exe', '4.7.2', 'https://download.visualstudio.microsoft.com/download/pr/1f5af042-d0e4-4002-9c59-9ba66bcf15f6/124d2afe5c8f67dfa910da5f9e3db9c1/ndp472-kb4054531-web.exe', '151b1c11f625e7122d517b6a1778841df8ff168d931c41730f59b9e4b8bcbe36'); end;
+procedure Dependency_AddDotNet48; begin Dependency_AddDotNetFramework(net48, 'dotnetfx48.exe', '4.8', 'https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/9b7b8746971ed51a1770ae4293618187/ndp48-web.exe', '0bba3094588c4bfec301939985222a20b340bf03431563dec8b2b4478b06fffa'); end;
+procedure Dependency_AddDotNet481; begin Dependency_AddDotNetFramework(net481, 'dotnetfx481.exe', '4.8.1', 'https://download.microsoft.com/download/4/b/2/cd00d4ed-ebdd-49ee-8a33-eabc3d1030e3/NDP481-Web.exe', '05e9ada305fd0013a6844e7657f06ed330887093e3df59c11cb528b86efa3fbf'); end;
 
 procedure Dependency_AddDotNetRuntime(const Runtime, Prefix, Title: String; Major, Minor, Revision: Word; const URL, Checksum: String);
 begin
@@ -621,6 +580,7 @@ end;
 procedure Dependency_AddVC2015To2019; begin Dependency_AddVC14; end;
 procedure Dependency_AddVC2015To2022; begin Dependency_AddVC14; end;
 
+// always added: the web setup itself only installs what is missing
 procedure Dependency_AddDirectX;
 begin
   // https://www.microsoft.com/en-us/download/details.aspx?id=35 - 9.29.1974.0
