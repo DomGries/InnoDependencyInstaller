@@ -20,99 +20,57 @@ jobs:
         id: check-updates
         shell: pwsh
         run: |
-          $issPath = 'CodeDependencies.iss'
-          $content = Get-Content -Path $issPath -Raw
-          $updates = @()
-          $failures = @()
-          $manifestCache = @{}
-
-          function Invoke-WithRetry {
-            param([scriptblock] $Action, [string] $Description)
-            $delay = 10
+          function Invoke-WithRetry([scriptblock] $Action) {
             for ($attempt = 1; ; $attempt++) {
-              try {
-                return & $Action
-              } catch {
-                $response = $_.Exception.Response
-                $status = if ($response) { [int] $response.StatusCode } else { 0 }
-                if (-not ($status -eq 0 -or $status -in 408, 429 -or $status -ge 500) -or $attempt -ge 6) { throw }
-                Write-Host "$Description failed with status $status (attempt $attempt), retrying in $delay s"
-                Start-Sleep -Seconds $delay
-                $delay = [Math]::Min($delay * 2, 120)
+              try { return & $Action } catch {
+                $status = [int] $_.Exception.Response.StatusCode
+                if ($attempt -ge 6 -or ($status -and $status -notin 408, 429 -and $status -lt 500)) { throw }
+                Write-Host "Retrying after attempt $attempt failed: $_"
+                Start-Sleep ([Math]::Min(10 * [Math]::Pow(2, $attempt - 1), 120))
               }
             }
           }
 
-          $indexUri = 'https://cdn.winget.microsoft.com/cache/source2.msix'
-          $temporaryDirectory = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { [System.IO.Path]::GetTempPath() }
-          $indexPackage = Join-Path $temporaryDirectory 'winget-source.msix'
-          $indexDatabase = Join-Path $temporaryDirectory 'winget-index.db'
-          Invoke-WithRetry { Invoke-WebRequest $indexUri -OutFile $indexPackage -UseBasicParsing -ErrorAction Stop } $indexUri
-          Add-Type -AssemblyName System.IO.Compression.FileSystem
-          $archive = [System.IO.Compression.ZipFile]::OpenRead($indexPackage)
-          try {
-            $entry = $archive.GetEntry('Public/index.db')
-            if (-not $entry) { throw "Public/index.db not found in $indexUri" }
-            [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $indexDatabase, $true)
-          } finally {
-            $archive.Dispose()
-          }
-
+          $index = "$env:RUNNER_TEMP/winget"
+          Invoke-WithRetry { Invoke-WebRequest https://cdn.winget.microsoft.com/cache/source2.msix -OutFile "$index.msix" }
+          $archive = [IO.Compression.ZipFile]::OpenRead("$index.msix")
+          [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry('Public/index.db'), "$index.db", $true)
+          $archive.Dispose()
           $wingetVersions = @{}
-          foreach ($row in (sqlite3 -separator "`t" $indexDatabase 'select id, latest_version from packages')) {
-            $fields = $row -split "`t", 2
-            if ($fields.Count -eq 2) { $wingetVersions[$fields[0]] = $fields[1] }
-          }
-          if ($LASTEXITCODE -ne 0 -or $wingetVersions.Count -eq 0) { throw 'Failed to read the WinGet source index' }
-          Write-Host "Loaded $($wingetVersions.Count) packages from the WinGet source index"
+          sqlite3 -separator ' ' "$index.db" 'select id, latest_version from packages' | ForEach-Object { $id, $version = $_ -split ' '; $wingetVersions[$id] = $version }
+          if (-not $wingetVersions.Count) { throw 'Failed to read the WinGet source index' }
 
-          function ConvertTo-Version([string] $Text) {
-            $parts = @($Text.Split('.') | ForEach-Object { [int] $_ }) + @(0, 0, 0)
-            [Version]::new($parts[0], $parts[1], $parts[2], $parts[3])
-          }
+          function ConvertTo-Version([string] $Text) { [Version] (("$Text.0.0.0" -split '\.')[0..3] -join '.') }
 
-          # English installers of the latest manifest, without the WinGet-only URL fragment
-          function Get-WingetInstallers([string] $Id) {
-            if (-not $manifestCache.ContainsKey($Id)) {
-              $version = $wingetVersions[$Id]
-              if (-not $version) { throw "$Id not found in the WinGet source index" }
-              $path = $Id.Substring(0, 1).ToLowerInvariant() + '/' + $Id.Replace('.', '/')
-              $uri = "https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/$path/$version/$Id.installer.yaml"
-              $manifest = Invoke-WithRetry { (Invoke-WebRequest $uri -UseBasicParsing -ErrorAction Stop).Content } $uri
-              $manifestCache[$Id] = @([regex]::Matches($manifest, '(?ms)^- .*?(?=^- |\z)') | ForEach-Object {
-                $arch = [regex]::Match($_.Value, '(?m)^\s*(?:-\s*)?Architecture:\s*(\S+)')
-                $url = [regex]::Match($_.Value, '(?m)^\s*InstallerUrl:\s*(\S+)')
-                $hash = [regex]::Match($_.Value, '(?m)^\s*InstallerSha256:\s*([0-9A-Fa-f]{64})\s*$')
-                $locale = [regex]::Match($_.Value, '(?m)^\s*(?:-\s*)?InstallerLocale:\s*(\S+)')
-                if ($arch.Success -and $url.Success -and $hash.Success -and (-not $locale.Success -or $locale.Groups[1].Value -eq 'en-US')) {
-                  [pscustomobject]@{
-                    Architecture = $arch.Groups[1].Value
-                    Url          = $url.Groups[1].Value -replace '#.*$'
-                    Checksum     = $hash.Groups[1].Value.ToLowerInvariant()
-                  }
+          $manifests = @{}
+          function Get-Installers([string] $Id) {
+            if (-not $wingetVersions[$Id]) { throw "$Id not found in WinGet" }
+            if (-not $manifests[$Id]) {
+              $uri = "https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/$($Id.Substring(0, 1).ToLower())/$($Id.Replace('.', '/'))/$($wingetVersions[$Id])/$Id.installer.yaml"
+              $manifest = Invoke-WithRetry { Invoke-RestMethod $uri }
+              $manifests[$Id] = @([regex]::Matches($manifest, '(?ms)^- .*?(?=^- |\z)') | ForEach-Object {
+                $field = @{}
+                foreach ($match in [regex]::Matches($_.Value, '(?m)^[ -]*(Architecture|InstallerLocale|InstallerUrl|InstallerSha256):\s*(\S+)')) { $field[$match.Groups[1].Value] ??= $match.Groups[2].Value }
+                if ($field.InstallerSha256 -match '^[0-9a-f]{64}$' -and $field.InstallerLocale -in $null, 'en-US') {
+                  [pscustomobject] @{ Architecture = $field.Architecture; Url = $field.InstallerUrl -replace '#.*'; Checksum = $field.InstallerSha256.ToLower() }
                 }
               })
             }
-            $manifestCache[$Id]
+            $manifests[$Id]
           }
 
-          # the URL pattern doubles as host allowlist, so only trusted installers are ever picked
           function Select-Installer($Target, [string] $Arch) {
             $id = $Target.Id -replace '\{arch\}', $Arch
-            $urlPattern = if ($Target.Url) { $Target.Url } else { '^https://(aka\.ms|([\w-]+\.)*microsoft\.com)/' }
-            $found = @(Get-WingetInstallers $id |
-              Where-Object { $_.Url -match $urlPattern -and (-not $Arch -or $_.Architecture -eq $Arch) } |
+            $found = @(Get-Installers $id |
+              Where-Object { $_.Url -match ($Target.Url ?? '^https://(aka\.ms|([\w-]+\.)*microsoft\.com)/') -and (-not $Arch -or $_.Architecture -eq $Arch) } |
               Sort-Object Url, Checksum -Unique)
             if ($found.Count -ne 1) { throw "Expected one trusted $Arch installer in $id, found $($found.Count)" }
             $found[0]
           }
 
           function Test-Url([string] $Url) {
-            foreach ($request in @{ Method = 'Head' }, @{ Method = 'Get'; Headers = @{ Range = 'bytes=0-0' } }) {
-              try {
-                Invoke-WebRequest $Url @request -MaximumRedirection 10 -TimeoutSec 60 -UseBasicParsing -ErrorAction Stop | Out-Null
-                return $true
-              } catch {}
+            foreach ($request in @{ Method = 'Head' }, @{ Headers = @{ Range = 'bytes=0-0' } }) {
+              try { return (Invoke-WebRequest $Url @request -MaximumRedirection 10 -TimeoutSec 60).BaseResponse.RequestMessage.RequestUri.Host -ne 'www.bing.com' } catch {}
             }
             $false
           }
@@ -121,8 +79,6 @@ jobs:
             "(?m)^procedure Dependency_Add$Name;(?:.*end;$|(?s:.*?)^end;)"
           }
 
-          # a dependency without Version keeps it in its "// <url> - <version>" comment
-          $commentVersion = '(?m)^\s*// \S+ - (?<version>\d+(?:\.\d+)+)\s*$'
           $targets = @(
             foreach ($year in 2005, 2008, 2010, 2012, 2013) {
               @{ Name = "VC++ $year"; Id = "Microsoft.VCRedist.$year.{arch}"; Block = Get-ProcedurePattern "VC$year"; Version = "'\),\s*(?<major>\d+),\s*(?<minor>\d+),\s*(?<build>\d+),\s*(?<revision>\d+)," }
@@ -140,11 +96,10 @@ jobs:
             foreach ($channel in '1.6', '1.7', '1.8', '2') {
               @{ Name = 'Windows App Runtime'; Id = "Microsoft.WindowsAppRuntime.$channel"; Block = Get-ProcedurePattern "WinAppRuntime$($channel.Replace('.', ''))" }
             }
-            # the WinGet version of SQL Server Express is its setup bootstrapper's, so the minimum engine version stays as is
             foreach ($year in 2017, 2019, 2022, 2025) {
               @{ Name = "SQL Server $year Express"; Id = "Microsoft.SQLServer.$year.Express"; Block = Get-ProcedurePattern "Sql$($year)Express"; UrlOnly = $true }
             }
-            @{ Name = 'WebView2 Runtime'; Id = 'Microsoft.EdgeWebView2Runtime'; Block = Get-ProcedurePattern 'WebView2' }
+            @{ Name = 'WebView2 Runtime'; Id = 'Microsoft.EdgeWebView2Runtime'; Block = Get-ProcedurePattern 'WebView2'; Evergreen = $true }
             @{ Name = 'DirectX Runtime'; Id = 'Microsoft.DirectX'; Block = Get-ProcedurePattern 'DirectX'; Url = '^https://download\.microsoft\.com/.*/dxwebsetup\.exe$' }
             @{ Name = 'ODBC Driver 18'; Id = 'Microsoft.msodbcsql.18'; Block = Get-ProcedurePattern 'SqlOdbc18' }
             @{ Name = 'Access Database Engine 2016'; Id = 'Microsoft.AccessDatabaseEngine2016'; Block = Get-ProcedurePattern 'AccessDatabaseEngine2016' }
@@ -158,114 +113,81 @@ jobs:
             @{ Name = 'PowerShell'; Id = 'Microsoft.PowerShell'; Block = Get-ProcedurePattern 'PowerShell7'; Version = '/download/v(?<version>[\d.]+)/'; Url = '^https://github\.com/PowerShell/PowerShell/releases/download/v[\d.]+/PowerShell-[^/]+\.msi$' }
           )
 
-          # a new channel needs its own procedure, so only report it
+          $updates = @()
+          $failures = @()
+
           function Get-LatestChannel([string] $Prefix, $Ids) {
-            ($Ids | ForEach-Object { if ($_ -match "^$([regex]::Escape($Prefix))(\d+)$") { [int] $Matches[1] } } | Measure-Object -Maximum).Maximum
+            (@($Ids) -match "^$([regex]::Escape($Prefix))\d+$" | ForEach-Object { [int] $_.Substring($Prefix.Length) } | Measure-Object -Maximum).Maximum
           }
           foreach ($family in @{ '.NET ' = 'Microsoft.DotNet.Runtime.'; 'Microsoft OpenJDK ' = 'Microsoft.OpenJDK.'; 'Python 3.' = 'Python.Python.3.' }.GetEnumerator()) {
             $available = Get-LatestChannel $family.Value $wingetVersions.Keys
-            if ($available -gt (Get-LatestChannel $family.Value ($targets | ForEach-Object { $_.Id }))) {
-              $failures += "$($family.Key)$available is available but not supported in CodeDependencies.iss"
-            }
+            if ($available -gt (Get-LatestChannel $family.Value $targets.Id)) { $failures += "$($family.Key)$available is available but not supported in CodeDependencies.iss" }
           }
 
+          $content = Get-Content CodeDependencies.iss -Raw
           foreach ($target in $targets) {
             $id = $target.Id -replace '\{arch\}', 'x64'
             try {
-              $latestText = $wingetVersions[$id]
-              if (-not $latestText) { throw 'not found in the WinGet source index' }
-              $latest = ConvertTo-Version $latestText
-
               $block = [regex]::Match($content, $target.Block)
               if (-not $block.Success) { throw 'dependency not found in CodeDependencies.iss' }
+              $latestText = $wingetVersions[$id]
+              if (-not $latestText) { throw 'not found in WinGet' }
               $updated = $block.Value
               $bumped = $false
+
               if ($target.UrlOnly) {
                 Write-Host "$($target.Name) [$id]: version not tracked, checking downloads"
               } else {
-                $versionPattern = if ($target.Version) { $target.Version } else { $commentVersion }
-                $versionMatch = [regex]::Match($block.Value, $versionPattern)
-                if (-not $versionMatch.Success) { throw 'current version not found in CodeDependencies.iss' }
-                $currentText = if ($versionMatch.Groups['version'].Success) { $versionMatch.Groups['version'].Value } else {
-                  (@('major', 'minor', 'build', 'revision') | ForEach-Object { if ($versionMatch.Groups[$_].Success) { $versionMatch.Groups[$_].Value } else { 0 } }) -join '.'
-                }
+                $version = [regex]::Match($updated, $target.Version ?? '(?m)^\s*// \S+ - (?<version>\d+(?:\.\d+)+)\s*$')
+                if (-not $version.Success) { throw 'current version not found in CodeDependencies.iss' }
+                $currentText = $version.Groups['version'].Value
+                if (-not $currentText) { $currentText = ('major', 'minor', 'build', 'revision' | ForEach-Object { [int] $version.Groups[$_].Value }) -join '.' }
                 $current = ConvertTo-Version $currentText
+                $latest = ConvertTo-Version $latestText
                 Write-Host "$($target.Name) [$id]: $current -> $latest"
+                if ($latest -lt $current) { continue }
                 if ($latest -gt $current) {
-                  if ($latest.Major -ne $current.Major) { throw "$latestText is outside the $($current.Major).x channel" }
-                  $components = @{ major = $latest.Major; minor = $latest.Minor; build = $latest.Build; revision = $latest.Revision; version = $latestText }
-                  foreach ($group in @($versionMatch.Groups | Where-Object { $_.Success -and $components.ContainsKey($_.Name) } | Sort-Object Index -Descending)) {
-                    $updated = $updated.Remove($group.Index, $group.Length).Insert($group.Index, [string] $components[$group.Name])
+                  if ($latest.Major -ne $current.Major -and -not $target.Evergreen) { throw "$latestText is outside the $($current.Major).x channel" }
+                  $values = @{ major = $latest.Major; minor = $latest.Minor; build = $latest.Build; revision = $latest.Revision; version = $latestText }
+                  foreach ($group in $version.Groups | Where-Object { $_.Success -and $values.ContainsKey($_.Name) } | Sort-Object Index -Descending) {
+                    $updated = $updated.Remove($group.Index, $group.Length).Insert($group.Index, $values[$group.Name])
                   }
                   $bumped = $true
                 }
               }
 
-              $urlCalls = [regex]::Matches($updated, "Dependency_String\w*\('(?:https://[^']*)?'(?:,\s*'(?:https://[^']*)?')+\)")
-              $hashCalls = [regex]::Matches($updated, "Dependency_String\w*\('(?:[0-9a-f]{64})?'(?:,\s*'(?:[0-9a-f]{64})?')+\)")
-              if ($urlCalls.Count -eq 1 -and $hashCalls.Count -eq 1) {
-                $urls = @([regex]::Matches($urlCalls[0].Value, "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
-                $newUrls = @()
-                $newHashes = @()
-                for ($i = 0; $i -lt $urls.Count; $i++) {
-                  # an empty slot stays unavailable
-                  if (-not $urls[$i]) { $newUrls += ''; $newHashes += ''; continue }
-                  $arch = @('x86', 'x64', 'arm64')[$i]
-                  $installer = Select-Installer $target $arch
-                  $newUrls += $installer.Url
-                  $newHashes += $installer.Checksum
-                }
-                foreach ($call in @{ Match = $urlCalls[0]; Values = $newUrls }, @{ Match = $hashCalls[0]; Values = $newHashes }) {
-                  $arguments = ($call.Values | ForEach-Object { "'$_'" }) -join ', '
-                  $updated = $updated.Replace($call.Match.Value, $call.Match.Value.Split('(')[0] + "($arguments)")
-                }
-              } else {
-                $url = @([regex]::Matches($updated, "'(https://[^']*)'"))
-                $hash = @([regex]::Matches($updated, "'([0-9a-f]{64})'"))
-                if ($url.Count -ne 1 -or $hash.Count -ne 1) { throw 'expected one URL/checksum pair' }
-                $installer = Select-Installer $target ''
-                $updated = $updated.Replace($url[0].Value, "'$($installer.Url)'").Replace($hash[0].Value, "'$($installer.Checksum)'")
-              }
+              $urlRef = @([regex]::Matches($updated, "Dependency_String\w*\((?:'(?:https://[^']*)?',?\s*){2,}\)|'https://[^']*'"))
+              $hashRef = @([regex]::Matches($updated, "Dependency_String\w*\((?:'(?:[0-9a-f]{64})?',?\s*){2,}\)|'[0-9a-f]{64}'"))
+              if ($urlRef.Count -ne 1 -or $hashRef.Count -ne 1) { throw 'expected one URL/checksum pair' }
+              $slots = @([regex]::Matches($urlRef[0].Value, "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
+              $installers = @(for ($i = 0; $i -lt $slots.Count; $i++) {
+                if (-not $slots[$i]) { @{ Url = ''; Checksum = '' } }
+                else { Select-Installer $target ($slots.Count -gt 1 ? ('x86', 'x64', 'arm64')[$i] : '') }
+              })
+              $updated = $updated.Replace($urlRef[0].Value, ($urlRef[0].Value -replace "'.*'", { "'$($installers.Url -join "', '")'" }))
+              $updated = $updated.Replace($hashRef[0].Value, ($hashRef[0].Value -replace "'.*'", { "'$($installers.Checksum -join "', '")'" }))
 
-              # case-insensitive, as WinGet often differs only in URL casing
               if ($updated -eq $block.Value) { continue }
-              $oldUrls = @([regex]::Matches($block.Value, "'(https://[^']+)'") | ForEach-Object { $_.Groups[1].Value })
-              $newUrls = @([regex]::Matches($updated, "'(https://[^']+)'") | ForEach-Object { $_.Groups[1].Value })
-              # without a new version, WinGet only replaces downloads that are gone
+              $oldUrls = @([regex]::Matches($block.Value, "'(https://[^']*)'") | ForEach-Object { $_.Groups[1].Value })
+              $newUrls = @($installers.Url) -ne ''
               if (-not $bumped -and -not ($oldUrls | Where-Object { $_ -notin $newUrls -and -not (Test-Url $_) })) { continue }
               $deadUrls = @($newUrls | Where-Object { $_ -notin $oldUrls -and -not (Test-Url $_) })
-              if ($bumped) {
-                if ($deadUrls) { throw "unreachable WinGet download: $($deadUrls -join ', ')" }
-                $updates += "$($target.Name) $($latestText -replace '^(\d+\.\d+\.\d+)\.0$', '$1')"
-              } else {
-                if ($deadUrls) { Write-Warning "$($target.Name): download is gone and WinGet has no working one"; continue }
-                $updates += "$($target.Name) download"
-              }
+              if ($deadUrls -and $bumped) { throw "unreachable WinGet download: $deadUrls" }
+              if ($deadUrls) { Write-Warning "$($target.Name): download is gone and WinGet has no working one"; continue }
+              $updates += $bumped ? "$($target.Name) $($latestText -replace '^(\d+\.\d+\.\d+)\.0$', '$1')" : "$($target.Name) download"
               $content = $content.Remove($block.Index, $block.Length).Insert($block.Index, $updated)
             } catch {
               $failures += "$($target.Name) [$id]: $_"
             }
           }
 
-          if ($failures.Count -gt 0) {
-            $failures | ForEach-Object { Write-Error $_ }
-            exit 1
-          }
-
-          if ($updates.Count -gt 0) {
-            [System.IO.File]::WriteAllText($issPath, $content)
-            $summary = ($updates | Sort-Object -Unique) -join ', '
-            "updates_found=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-            "summary=$summary"   | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-            Write-Host "`nUpdates found: $summary"
-          } else {
-            "updates_found=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-            Write-Host "`nNo updates found"
-          }
+          if ($updates) { Set-Content CodeDependencies.iss $content -NoNewline }
+          "summary=$(($updates | Sort-Object -Unique) -join ', ')" >> $env:GITHUB_OUTPUT
+          if ($failures) { 'failures<<EOF', ($failures -join "`n"), 'EOF' >> $env:GITHUB_OUTPUT }
 
       - name: Generate app token
         id: app-token
-        if: steps.check-updates.outputs.updates_found == 'true'
+        if: steps.check-updates.outputs.summary
         uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.APP_ID }}
@@ -273,7 +195,7 @@ jobs:
 
       - name: Create Pull Request
         id: create-pr
-        if: steps.check-updates.outputs.updates_found == 'true'
+        if: steps.check-updates.outputs.summary
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.app-token.outputs.token }}
@@ -293,3 +215,11 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: gh pr merge --auto --squash --body "" ${{ steps.create-pr.outputs.pull-request-number }} --repo ${{ github.repository }}
+
+      - name: Report failures
+        if: ${{ !cancelled() && steps.check-updates.outputs.failures }}
+        env:
+          FAILURES: ${{ steps.check-updates.outputs.failures }}
+        run: |
+          echo "$FAILURES" | sed 's/^/::error::/'
+          exit 1
