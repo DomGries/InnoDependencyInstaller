@@ -39,12 +39,7 @@ jobs:
 
       - name: Compile test setup
         shell: pwsh
-        run: |
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Qp "/O$env:RUNNER_TEMP" ".github\TestSetup.iss"
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "ISCC failed with exit code $LASTEXITCODE"
-            exit $LASTEXITCODE
-          }
+        run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Qp "/O$env:RUNNER_TEMP" .github\TestSetup.iss'
 
       - name: First run - installs missing dependencies
         shell: pwsh
