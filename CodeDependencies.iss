@@ -689,13 +689,13 @@ end;
 
 procedure Dependency_AddWebView2;
 begin
-  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 153.0.4234.48
+  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 154.0.4258.53
   Dependency_AddIfMissing(not Dependency_IsWebView2Installed(HKLM32) and not Dependency_IsWebView2Installed(HKCU),
     'MicrosoftEdgeWebView2RuntimeInstaller.exe',
     '/silent /install',
     'WebView2 Runtime',
-    Dependency_StringWin('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/3e1e509e-853f-41ec-9851-d9d10f585cef/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/913236b0-52e1-4dde-943c-2cfdbe153d31/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/08448960-cb06-4164-8a60-d235220bc3ec/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
-    Dependency_StringWin('ac9498b3b69f681d7e4480eea84cc56332d21b6f8c7d5126929b7cf5fffde1cf', 'ad9b350625e132481bc0953eee9e032810134df9fedbd7be364c3f4e0e4dbd64', '00c9179bb0ac30a45a068c6e6716c988be511dca09fb3960a62ee0d86acfa543'),
+    Dependency_StringWin('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/47deeb38-8c1d-48b2-96b2-3082ba304c99/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/d7548c8b-0dc9-4e81-87dd-a346cc9b73a5/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/09e5b06e-22cf-4329-b00a-da460dfa2a81/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
+    Dependency_StringWin('1d984adfc3a90d2434ddadf2fc70762420c92e93787c6e79330be4d7078f3023', 'f6df8e4bc857786ff641cd01da1449169eaf8236c936ced485ea61685ba4da40', '680790734bfd3fb541848a10abff39a47b327efe9d2c67568d8c860533c63d5f'),
     False, False);
 end;
 
