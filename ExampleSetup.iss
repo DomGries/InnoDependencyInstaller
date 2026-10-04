@@ -1,7 +1,5 @@
 ; https://github.com/DomGries/InnoDependencyInstaller
 
-#include "CodeDependencies.iss"
-
 [Setup]
 #define MyAppSetupName 'MyProgram'
 #define MyAppVersion '1.0'
@@ -58,6 +56,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"
 Filename: "{app}\MyProg.exe"; Description: "{cm:LaunchProgram,{#MyAppSetupName}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
+#include "CodeDependencies.iss"
+
 function InitializeSetup: Boolean;
 begin
   // comment out functions to disable installing them

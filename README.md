@@ -13,16 +13,12 @@ Requires [Inno Setup 6.7 or newer](https://www.jrsoftware.org/isinfo.php).
 
 1. [Download this repository](https://github.com/DomGries/InnoDependencyInstaller/archive/master.zip) and copy _CodeDependencies.iss_ next to your setup script.
 
-2. Include it at the top of your script:
-
-   ```iss
-   #include "CodeDependencies.iss"
-   ```
-
-3. In the `[Code]` section, add the dependencies in the `InitializeSetup` event function. If your script already has this function, add the calls there. Choose the dependencies from the [table below](#supported-dependencies):
+2. Include it at the start of your `[Code]` section and add the dependencies in the `InitializeSetup` event function. If your script already has this function, add the calls there. Choose the dependencies from the [table below](#supported-dependencies):
 
    ```iss
    [Code]
+   #include "CodeDependencies.iss"
+
    function InitializeSetup: Boolean;
    begin
      Dependency_AddVC14;             // Visual C++ Redistributable
@@ -32,7 +28,7 @@ Requires [Inno Setup 6.7 or newer](https://www.jrsoftware.org/isinfo.php).
    end;
    ```
 
-4. Set these values in the `[Setup]` section:
+3. Set these values in the `[Setup]` section:
 
    ```iss
    [Setup]
@@ -43,7 +39,7 @@ Requires [Inno Setup 6.7 or newer](https://www.jrsoftware.org/isinfo.php).
    ArchitecturesInstallIn64BitMode=x64compatible or arm64
    ```
 
-5. Compile your setup.
+4. Compile your setup.
 
 _ExampleSetup.iss_ is a complete example that uses every dependency. Remove or comment out the ones you do not need:
 
@@ -214,12 +210,19 @@ Dependency_Components := '';         // back to the default
 
 `Dependency_Components` accepts the same expressions as the [Components](https://jrsoftware.org/ishelp/index.php?topic=scriptfunctions) parameter, for example `'feature1 or feature2'`.
 
-**Defines** change how the library works. Set them before the `#include`:
+**Defines** change how the library works. All defines, and functions they name, must come before the `#include`:
+
+```iss
+[Code]
+#define Dependency_DownloadRetryCount 5
+
+#include "CodeDependencies.iss"
+```
 
 | Define | Effect |
 | --- | --- |
 | `Dependency_NoUpdateReadyMemo` | Do not handle the `UpdateReadyMemo` event. Use it if your script has its own `UpdateReadyMemo` function. Call `Dependency_UpdateReadyMemo` from it to still list the dependencies. |
-| `Dependency_CustomExecute` | Name of your own function that runs the installers instead of `ShellExec`: `function MyExecute(const Filename, Parameters: String; var ResultCode: Integer): Boolean;`. Declare it before the `#include`. |
+| `Dependency_CustomExecute` | Name of your own function that runs the installers instead of `ShellExec`: `function MyExecute(const Filename, Parameters: String; var ResultCode: Integer): Boolean;`. |
 | `Dependency_DownloadRetryCount` | How often a failed download is retried before the user is asked. Default `3`. Use `0` to ask at once. |
 | `Dependency_DownloadRetryBackoffMs` | Delay in milliseconds before the first download retry. Retry _n_ waits _n_ times this delay. Default `2000`. |
 | `Dependency_InstallBusyRetryCount` | How often an installer is retried if another installation is running. Default `30`. |
@@ -239,16 +242,16 @@ Run your setup with `/LOG="C:\setup.log"`. With `/LOG` only, the log is written 
 | `Dependency skipped after failed download: X` | The download of _X_ failed and the user chose to ignore it. |
 | `Dependency exit code N: X` | The installer of _X_ ended with exit code _N_. |
 
-These exit codes count as success:
+The setup handles the exit codes like this:
 
 | Exit code | Meaning |
 | --- | --- |
 | `0` | Success. |
-| `1638` | A newer version is already installed. |
+| `1638` | Success. A newer version is already installed. |
 | `3010` | Success. Windows must restart. The setup asks for the restart at the end. |
 | `1641` | Success. The installer started a restart. The setup continues after the restart. |
-
-Exit code `1618` means that another installation is running. The setup waits and tries again. Every other exit code is an error, unless `ForceSuccess` is set.
+| `1618` | Another installation is running. The setup waits and tries again `Dependency_InstallBusyRetryCount` times, then treats it as an error. |
+| Any other | Error. The user can abort the setup, retry the installer or ignore the error. Counts as success if `ForceSuccess` is set. |
 
 To continue after a restart, the setup adds itself to the `RunOnce` registry key. It is started again with the choices of the wizard, the original silent, restart and log switches, and `/restart=1`. Your script can check `/restart=1` with `ParamStr` if it must work differently after the restart. A log set with `/LOG="setup.log"` continues in `setup-2.log`.
 
