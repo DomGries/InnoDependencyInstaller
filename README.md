@@ -121,7 +121,7 @@ Call these functions in `InitializeSetup`. Each function adds the dependency onl
 ## What happens during the setup
 
 1. `InitializeSetup` checks each dependency and keeps only the missing ones. The _Ready to Install_ page lists them.
-2. After the user clicks _Install_, each installer is downloaded from its official source. Every built-in download is checked against a SHA-256 checksum, so a changed or broken file is never run. A failed download is retried a few times. Then the user can retry, ignore or abort.
+2. After the user clicks _Install_, each installer is downloaded from its official source. Every built-in download is checked against a SHA-256 checksum (except with `Dependency_Evergreen`), so a changed or broken file is never run. A failed download is retried a few times. Then the user can retry, ignore or abort.
 3. The installers run one after another without user input. If another installation is already running, for example Windows Update, the setup waits for it. If an installer fails, the user can retry, ignore or abort.
 4. Your application is installed.
 5. If a dependency needs a restart, the setup asks for it at the end. If the restart is needed before the next dependency can be installed, the setup asks to restart Windows at once and continues after the restart.
@@ -222,6 +222,7 @@ Dependency_Components := '';         // back to the default
 | Define | Effect |
 | --- | --- |
 | `Dependency_NoUpdateReadyMemo` | Do not handle the `UpdateReadyMemo` event. Use it if your script has its own `UpdateReadyMemo` function. Call `Dependency_UpdateReadyMemo` from it to still list the dependencies. |
+| `Dependency_Evergreen` | Download the latest release instead of the pinned one, if the vendor has a link for it: .NET 5 and later, the .NET Hosting Bundle, Visual C++ v14, WebView2 and OpenJDK. These downloads are not checked against a checksum. |
 | `Dependency_CustomExecute` | Name of your own function that runs the installers instead of `ShellExec`: `function MyExecute(const Filename, Parameters: String; var ResultCode: Integer): Boolean;`. |
 | `Dependency_DownloadRetryCount` | How often a failed download is retried before the user is asked. Default `3`. Use `0` to ask at once. |
 | `Dependency_DownloadRetryBackoffMs` | Delay in milliseconds before the first download retry. Retry _n_ waits _n_ times this delay. Default `2000`. |
