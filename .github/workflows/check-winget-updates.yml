@@ -92,6 +92,10 @@ jobs:
             "(?m)^procedure Dependency_Add$Name;(?:.*end;$|(?s:.*?)^end;)"
           }
 
+          function Hide-Latest([string] $Text) {
+            [regex]::Replace($Text, 'Dependency_Latest\((?:[^()]|\([^()]*\))*\)', { ' ' * $args[0].Length })
+          }
+
           $targets = @(
             foreach ($year in 2005, 2008, 2010, 2012, 2013) {
               @{ Name = "VC++ $year"; Id = "Microsoft.VCRedist.$year.{arch}"; Block = Get-ProcedurePattern "VC$year"; Version = "'\),\s*(?<major>\d+),\s*(?<minor>\d+),\s*(?<build>\d+),\s*(?<revision>\d+)," }
@@ -151,7 +155,7 @@ jobs:
               if ($target.UrlOnly) {
                 Write-Host "$($target.Name) [$id]: version not tracked, checking downloads"
               } else {
-                $version = [regex]::Match($updated, $target.Version ?? '(?m)^\s*// \S+ - (?<version>\d+(?:\.\d+)+)\s*$')
+                $version = [regex]::Match((Hide-Latest $updated), $target.Version ?? '(?m)^\s*// \S+ - (?<version>\d+(?:\.\d+)+)\s*$')
                 if (-not $version.Success) { throw 'current version not found in CodeDependencies.iss' }
                 $currentText = $version.Groups['version'].Value
                 if (-not $currentText) { $currentText = ('major', 'minor', 'build', 'revision' | ForEach-Object { [int] $version.Groups[$_].Value }) -join '.' }
@@ -169,7 +173,7 @@ jobs:
                 }
               }
 
-              $urlRef = @([regex]::Matches($updated, "Dependency_String\w*\((?:'(?:https://[^']*)?',?\s*){2,}\)|'https://[^']*'"))
+              $urlRef = @([regex]::Matches((Hide-Latest $updated), "Dependency_String\w*\((?:'(?:https://[^']*)?',?\s*){2,}\)|'https://[^']*'"))
               $hashRef = @([regex]::Matches($updated, "Dependency_String\w*\((?:'(?:[0-9a-f]{64})?',?\s*){2,}\)|'[0-9a-f]{64}'"))
               if ($urlRef.Count -ne 1 -or $hashRef.Count -ne 1) { throw 'expected one URL/checksum pair' }
               $slots = @([regex]::Matches($urlRef[0].Value, "'([^']*)'") | ForEach-Object { $_.Groups[1].Value })
@@ -181,7 +185,7 @@ jobs:
               $updated = $updated.Replace($hashRef[0].Value, ($hashRef[0].Value -replace "'.*'", { "'$($installers.Checksum -join "', '")'" }))
 
               if ($updated -eq $block.Value) { continue }
-              $oldUrls = @([regex]::Matches($block.Value, "'(https://[^']*)'") | ForEach-Object { $_.Groups[1].Value })
+              $oldUrls = @([regex]::Matches((Hide-Latest $block.Value), "'(https://[^']*)'") | ForEach-Object { $_.Groups[1].Value })
               $newUrls = @($installers.Url) -ne ''
               if (-not $bumped -and -not ($oldUrls | Where-Object { $_ -notin $newUrls -and -not (Test-Url $_) })) { continue }
               $deadUrls = @($newUrls | Where-Object { $_ -notin $oldUrls -and -not (Test-Url $_) })
