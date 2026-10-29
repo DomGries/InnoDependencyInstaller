@@ -31,14 +31,25 @@ jobs:
             }
           }
 
+          $cdn = 'https://cdn.winget.microsoft.com/cache'
           $index = "$env:RUNNER_TEMP/winget"
-          Invoke-WithRetry { Invoke-WebRequest https://cdn.winget.microsoft.com/cache/source2.msix -OutFile "$index.msix" }
+          Invoke-WithRetry { Invoke-WebRequest "$cdn/source2.msix" -OutFile "$index.msix" }
           $archive = [IO.Compression.ZipFile]::OpenRead("$index.msix")
           [IO.Compression.ZipFileExtensions]::ExtractToFile($archive.GetEntry('Public/index.db'), "$index.db", $true)
           $archive.Dispose()
           $wingetVersions = @{}
-          sqlite3 -separator ' ' "$index.db" 'select id, latest_version from packages' | ForEach-Object { $id, $version = $_ -split ' '; $wingetVersions[$id] = $version }
+          $wingetHashes = @{}
+          sqlite3 -separator ' ' "$index.db" 'select id, latest_version, lower(substr(hex(hash), 1, 8)) from packages' | ForEach-Object { $id, $version, $hash = $_ -split ' '; $wingetVersions[$id] = $version; $wingetHashes[$id] = $hash }
           if (-not $wingetVersions.Count) { throw 'Failed to read the WinGet source index' }
+
+          function Get-CdnText([string] $Path) {
+            [byte[]] $data = Invoke-WithRetry { (Invoke-WebRequest "$cdn/$Path").Content }
+            if ([BitConverter]::ToUInt32($data, 0) -ne 0xC0E5510Au) { return [Text.Encoding]::UTF8.GetString($data) }
+            $output = [IO.MemoryStream]::new()
+            [IO.Compression.DeflateStream]::new([IO.MemoryStream]::new($data, 30, $data.Length - 30), [IO.Compression.CompressionMode]::Decompress).CopyTo($output)
+            if ($output.Length -ne [BitConverter]::ToInt64($data, 8)) { throw "Unsupported multi-block MSZIP data in $Path" }
+            [Text.Encoding]::UTF8.GetString($output.ToArray())
+          }
 
           function ConvertTo-Version([string] $Text) { [Version] (("$Text.0.0.0" -split '\.')[0..3] -join '.') }
 
@@ -46,8 +57,10 @@ jobs:
           function Get-Installers([string] $Id) {
             if (-not $wingetVersions[$Id]) { throw "$Id not found in WinGet" }
             if (-not $manifests[$Id]) {
-              $uri = "https://raw.githubusercontent.com/microsoft/winget-pkgs/master/manifests/$($Id.Substring(0, 1).ToLower())/$($Id.Replace('.', '/'))/$($wingetVersions[$Id])/$Id.installer.yaml"
-              $manifest = Invoke-WithRetry { Invoke-RestMethod $uri }
+              $versionData = Get-CdnText "packages/$Id/$($wingetHashes[$Id])/versionData.mszyml"
+              $path = [regex]::Match($versionData, "(?m)^- v: $([regex]::Escape($wingetVersions[$Id]))\r?\n(?:  .*\n)*?  rP: (\S+)").Groups[1].Value
+              if (-not $path) { throw "$Id $($wingetVersions[$Id]) not found in WinGet version data" }
+              $manifest = Get-CdnText $path
               $manifests[$Id] = @([regex]::Matches($manifest, '(?ms)^- .*?(?=^- |\z)') | ForEach-Object {
                 $field = @{}
                 foreach ($match in [regex]::Matches($_.Value, '(?m)^[ -]*(Architecture|InstallerLocale|InstallerUrl|InstallerSha256):\s*(\S+)')) { $field[$match.Groups[1].Value] ??= $match.Groups[2].Value }
