@@ -28,5 +28,8 @@ begin
     Dependency_AddVSTORuntime;
   end;
 
+  Dependency_AddWinAppRuntime16;
+  Dependency_AddWinAppRuntime2;
+
   Result := True;
 end;
