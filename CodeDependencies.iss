@@ -670,13 +670,13 @@ end;
 
 procedure Dependency_AddWebView2;
 begin
-  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 156.0.4314.50
+  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 156.0.4314.58
   Dependency_AddLatestIfMissing(not Dependency_IsWebView2Installed(HKLM32) and not Dependency_IsWebView2Installed(HKCU),
     'MicrosoftEdgeWebView2RuntimeInstaller.exe',
     '/silent /install',
     'WebView2 Runtime',
-    Dependency_StringWin('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/9c9b9ccf-d63c-44ca-85f1-18a828b9f06b/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/f699d81e-69ce-4b09-aa07-23ff2713045b/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/85727cbd-5724-4e56-ac20-767de3cd6962/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
-    Dependency_StringWin('71828bbca131b8dff215f3b6b0ecc220043600e1717bfaa210422fd97297bf47', '1c401b327fbc7bb9731b4e350a2194f083cbc3ede46508d52e1cae6610a39bea', '7da2013d5ccac856beb5317680d99fc2b9e484cd1b516e74dbcc226b25d3faa4'),
+    Dependency_StringWin('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/56d0c05b-841c-4c6e-85cb-56e953ed01ce/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/d5cc3c1c-bb59-4158-aedc-db0035e44466/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/7da04b46-7e81-4f30-9852-6af198acc279/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
+    Dependency_StringWin('2fe479d0bb6411ebf683a5656a4213329e1af48694d779c4fc7194172010f191', '62863f0f0611a16ccf124b4f15650c3b66624504eba74d7cde1e2ae5d951249b', '9e095f5ad0b42338823c2de143a0b7a97934a9bcec07c0400bb1f149709b3e64'),
     Dependency_Latest('https://go.microsoft.com/fwlink/p/?LinkId=2124703'),
     False, False);
 end;
@@ -920,8 +920,8 @@ begin
     False, False);
 end;
 
-procedure Dependency_AddPython313; begin Dependency_AddPython('3.13', Dependency_String('https://www.python.org/ftp/python/3.13.15/python-3.13.15.exe', 'https://www.python.org/ftp/python/3.13.15/python-3.13.15-amd64.exe', 'https://www.python.org/ftp/python/3.13.15/python-3.13.15-arm64.exe'), Dependency_String('741c07276eb2d57e7ee012d643f021c58cb38d11c5389be46c15d41d1a10b447', 'edec09c4853aeae9ac36efb8c9f95b6b8e2fee65eee56d9767a8b7c69c574403', 'c252c676087c49e6b94e95a273536b78921c28a5fc9f86d15d25392328247249')); end;
-procedure Dependency_AddPython314; begin Dependency_AddPython('3.14', Dependency_String('https://www.python.org/ftp/python/3.14.7/python-3.14.7.exe', 'https://www.python.org/ftp/python/3.14.7/python-3.14.7-amd64.exe', 'https://www.python.org/ftp/python/3.14.7/python-3.14.7-arm64.exe'), Dependency_String('097fc03d4ac2de66ee1d73a0c5d2d323b5c0f14923f7207686ce93149a80f0a6', '9d9eb2709ef81bf5cd30db3c2096bdbc4ea10087c22e62f27d356b36f6ae9649', '9a3fe120cc81bc2cb099550f794d8356811f96a86c7f438519243c3485db928d')); end;
+procedure Dependency_AddPython313; begin Dependency_AddPython('3.13', Dependency_String('https://www.python.org/ftp/python/3.13.17/python-3.13.17.exe', 'https://www.python.org/ftp/python/3.13.17/python-3.13.17-amd64.exe', 'https://www.python.org/ftp/python/3.13.17/python-3.13.17-arm64.exe'), Dependency_String('91cd5b0293162e11c5599f80dc5bd14658cf086c8234a3117b58cfcb93c4eff3', '5da012101ba2e17113a9a1cd901e9ce1441086f2b7ecb5de06ec94163899a190', '3089a1977c32b26f5078e5a7d0285b7a861b8c96250c5dac3b6af59fbe9e9a75')); end;
+procedure Dependency_AddPython314; begin Dependency_AddPython('3.14', Dependency_String('https://www.python.org/ftp/python/3.14.10/python-3.14.10.exe', 'https://www.python.org/ftp/python/3.14.10/python-3.14.10-amd64.exe', 'https://www.python.org/ftp/python/3.14.10/python-3.14.10-arm64.exe'), Dependency_String('c8f1a16db9afd76ca74b5f8e28eeaad408bca10894c9d080443bde83def3ed09', '92480239264744fe0386a1bd8275786fefa126e3129e56a68e22b52c73329965', '5b9547e4edae2f6fb2fbfec5e26cf91b4ea191e3b07f7727d5a2c5c2cca93ed3')); end;
 
 procedure Dependency_AddPowerShell7;
 begin
