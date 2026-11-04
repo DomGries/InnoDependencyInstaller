@@ -705,21 +705,42 @@ begin
     False, False);
 end;
 
-var
-  Dependency_WinAppRuntimePackages: TArrayOfString;
-  Dependency_WinAppRuntimePackagesListed: Boolean;
+// delayload because the API needs Windows 8
+function Dependency_GetPackagesByPackageFamily(PackageFamilyName: String; var Count: Cardinal; PackageFullNames: String; var BufferLength: Cardinal; Buffer: String): Integer;
+external 'GetPackagesByPackageFamily@kernel32.dll stdcall delayload';
 
-function Dependency_HasWinAppRuntimePackage(const PackageName, Architecture: String; const PrefixMatch: Boolean): Boolean;
+// the packages of a family that are registered for the current user
+function Dependency_GetPackageFullNames(const PackageName: String): TArrayOfString;
 var
-  LineIndex: Integer;
-  PackageFields: TArrayOfString;
+  Count, BufferLength: Cardinal;
+  PackageFamilyName, Pointers, Buffer: String;
 begin
-  for LineIndex := 0 to Length(Dependency_WinAppRuntimePackages) - 1 do begin
-    PackageFields := StringSplit(Trim(Dependency_WinAppRuntimePackages[LineIndex]), ['|'], stExcludeEmpty);
-    if (Length(PackageFields) = 2)
-      and ((not PrefixMatch and SameText(PackageFields[0], PackageName))
-        or (PrefixMatch and SameText(Copy(PackageFields[0], 1, Length(PackageName)), PackageName)))
-      and SameText(PackageFields[1], Architecture) then begin
+  SetArrayLength(Result, 0);
+  PackageFamilyName := PackageName + '_8wekyb3d8bbwe';
+  try
+    Count := 0;
+    BufferLength := 0;
+    if Dependency_GetPackagesByPackageFamily(PackageFamilyName, Count, '', BufferLength, '') = 122 then begin // ERROR_INSUFFICIENT_BUFFER
+      // the API requires an array of pointers into the buffer, 4 characters fit a pointer
+      SetLength(Pointers, Count * 4);
+      SetLength(Buffer, BufferLength);
+      if Dependency_GetPackagesByPackageFamily(PackageFamilyName, Count, Pointers, BufferLength, Buffer) = 0 then begin
+        Result := StringSplit(Buffer, [#0], stExcludeEmpty);
+      end;
+    end;
+  except
+    Log('Failed to query package ' + PackageName + ': ' + GetExceptionMessage);
+  end;
+end;
+
+function Dependency_HasWinAppRuntimePackage(const PackageName, Architecture: String): Boolean;
+var
+  PackageIndex: Integer;
+  PackageFullNames: TArrayOfString;
+begin
+  PackageFullNames := Dependency_GetPackageFullNames(PackageName);
+  for PackageIndex := 0 to GetArrayLength(PackageFullNames) - 1 do begin
+    if Pos('_' + Architecture + '_', PackageFullNames[PackageIndex]) > 0 then begin
       Result := True;
       exit;
     end;
@@ -727,36 +748,37 @@ begin
   Result := False;
 end;
 
-// a usable runtime needs all four package types registered for the current user
-function Dependency_IsWinAppRuntimeInstalled(const Channel: String): Boolean;
+// a DDLM package is named after its framework version, so it only counts next to that framework
+function Dependency_HasWinAppRuntimeFramework(const Channel: String; const NeedsLifetimeManager: Boolean): Boolean;
 var
-  PackageArchitecture, SystemArchitecture: String;
-  ResultCode: Integer;
-  Output: TExecOutput;
+  PackageIndex: Integer;
+  Architecture: String;
+  PackageFullNames, PackageFields: TArrayOfString;
 begin
-  if not Dependency_WinAppRuntimePackagesListed then begin
-    Dependency_WinAppRuntimePackagesListed := True;
-    if ExecAndCaptureOutput(GetSysNativeDir + '\WindowsPowerShell\v1.0\powershell.exe',
-      '-NoProfile -ExecutionPolicy Bypass -Command "$pattern = ''^(Microsoft\.WindowsAppRuntime\.|MicrosoftCorporationII\.WinAppRuntime\.|Microsoft\.WinAppRuntime\.DDLM\.)''; Get-AppxPackage | Where-Object { $_.Name -match $pattern } | ForEach-Object { ''{0}|{1}'' -f $_.Name, $_.Architecture }"',
-      '', SW_HIDE, ewWaitUntilTerminated, ResultCode, Output) and (ResultCode = 0) then begin
-      Dependency_WinAppRuntimePackages := Output.StdOut;
+  Architecture := Dependency_String('x86', 'x64', 'arm64');
+  PackageFullNames := Dependency_GetPackageFullNames('Microsoft.WindowsAppRuntime.' + Channel);
+  for PackageIndex := 0 to GetArrayLength(PackageFullNames) - 1 do begin
+    PackageFields := StringSplit(PackageFullNames[PackageIndex], ['_'], stExcludeEmpty); // name, version, architecture, publisher id
+    if (GetArrayLength(PackageFields) > 2) and (PackageFields[2] = Architecture)
+      and (not NeedsLifetimeManager or Dependency_HasWinAppRuntimePackage('Microsoft.WinAppRuntime.DDLM.' + PackageFields[1] + '-' + Dependency_String('x8', 'x6', 'a6'), Architecture)) then begin
+      Result := True;
+      exit;
     end;
   end;
+  Result := False;
+end;
 
-  PackageArchitecture := Dependency_String('X86', 'X64', 'Arm64');
-  if IsArm64 then begin
-    SystemArchitecture := 'Arm64';
-  end else if IsX64Compatible then begin
-    SystemArchitecture := 'X64';
-  end else begin
-    SystemArchitecture := 'X86';
-  end;
-
+// a usable runtime needs the framework, main and singleton packages registered for the current user
+// the bootstrapper of unpackaged apps also needs the DDLM package for 1.6, and for any channel below Windows 11 24H2 (build 26100)
+function Dependency_IsWinAppRuntimeInstalled(const Channel: String): Boolean;
+var
+  SystemArchitecture: String;
+begin
+  SystemArchitecture := Dependency_StringWin('x86', 'x64', 'arm64');
   Result :=
-    Dependency_HasWinAppRuntimePackage('Microsoft.WindowsAppRuntime.' + Channel, PackageArchitecture, False)
-    and Dependency_HasWinAppRuntimePackage('MicrosoftCorporationII.WinAppRuntime.Main.' + Channel, SystemArchitecture, False)
-    and Dependency_HasWinAppRuntimePackage('MicrosoftCorporationII.WinAppRuntime.Singleton', SystemArchitecture, False)
-    and Dependency_HasWinAppRuntimePackage('Microsoft.WinAppRuntime.DDLM.', PackageArchitecture, True);
+    Dependency_HasWinAppRuntimeFramework(Channel, (Channel = '1.6') or (GetWindowsVersion < $0A0065F4))
+    and Dependency_HasWinAppRuntimePackage('MicrosoftCorporationII.WinAppRuntime.Main.' + Channel, SystemArchitecture)
+    and Dependency_HasWinAppRuntimePackage('MicrosoftCorporationII.WinAppRuntime.Singleton', SystemArchitecture);
 end;
 
 procedure Dependency_AddWinAppRuntime16;
