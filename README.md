@@ -85,6 +85,10 @@ Call these functions in `InitializeSetup`. Each function adds the dependency onl
 | ASP.NET Core Runtime 10.0 | `Dependency_AddDotNet100Asp` |
 | ASP.NET Core Hosting Bundle 10.0 | `Dependency_AddDotNet100Hosting` |
 | .NET Desktop Runtime 10.0 | `Dependency_AddDotNet100Desktop` |
+| .NET Runtime 11.0 | `Dependency_AddDotNet110` |
+| ASP.NET Core Runtime 11.0 | `Dependency_AddDotNet110Asp` |
+| ASP.NET Core Hosting Bundle 11.0 | `Dependency_AddDotNet110Hosting` |
+| .NET Desktop Runtime 11.0 | `Dependency_AddDotNet110Desktop` |
 | Visual C++ 2005 Service Pack 1 Redistributable | `Dependency_AddVC2005` |
 | Visual C++ 2008 Service Pack 1 Redistributable | `Dependency_AddVC2008` |
 | Visual C++ 2010 Service Pack 1 Redistributable | `Dependency_AddVC2010` |
