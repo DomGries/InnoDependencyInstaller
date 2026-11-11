@@ -681,15 +681,20 @@ procedure Dependency_AddSql2019Express; begin Dependency_AddSqlExpress('2019', '
 procedure Dependency_AddSql2022Express; begin Dependency_AddSqlExpress('2022', 'MSSQL16.', 'SQL Server 2022 Express', 16, 0, 1000, 6, Dependency_StringWin('', 'https://download.microsoft.com/download/29654887-7cde-4397-bba3-d7f087970845/SQL2022-SSEI-Expr.exe', ''), Dependency_StringWin('', 'e2b8e8aad30d8b1a1922c6c0976c806f0a2e08d04b2de100a9d70b9f94750bb1', '')); end;
 procedure Dependency_AddSql2025Express; begin Dependency_AddSqlExpress('2025', 'MSSQL17.', 'SQL Server 2025 Express', 17, 0, 1000, 7, Dependency_StringWin('', 'https://download.microsoft.com/download/ffd82b4c-9955-47c0-8efe-6290f7795cf6/SQL2025-SSEI-Expr.exe', ''), Dependency_StringWin('', 'fa7e1fabc9a2e9c9cdab0d1512bcb30d2949133147db057ac530f510e5270680', '')); end;
 
+const
+  // not on WinGet, updated by hand
+  Dependency_SqlOleDb19X86URL = 'https://download.microsoft.com/download/0a09a9e0-e364-4d01-b102-04ddfcf38a7e/x86/1033/msoledbsql.msi';
+  Dependency_SqlOleDb19X86Checksum = 'b86f1ee532e6ea543721747eb03b32e5eff6c292458de3d90391b97908c8e13c';
+
 procedure Dependency_AddSqlOleDb19;
 begin
-  // https://learn.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server
+  // https://learn.microsoft.com/en-us/sql/connect/oledb/download-oledb-driver-for-sql-server - 19.4.2.0
   Dependency_AddIfMissing(not RegValueExists(Dependency_ArchHKLM, 'SOFTWARE\Microsoft\MSOLEDBSQL19', 'InstalledVersion'),
     'msoledbsql.msi',
     '/qn /norestart IACCEPTMSOLEDBSQLLICENSETERMS=YES',
     'Microsoft OLE DB Driver 19 for SQL Server',
-    Dependency_StringWin('https://download.microsoft.com/download/0a09a9e0-e364-4d01-b102-04ddfcf38a7e/x86/1033/msoledbsql.msi', 'https://download.microsoft.com/download/7bf55274-18ac-4b26-9783-45453a1ab64f/amd64/1033/msoledbsql.msi', ''),
-    Dependency_StringWin('b86f1ee532e6ea543721747eb03b32e5eff6c292458de3d90391b97908c8e13c', '409adfd93165dd3622b2d7cd0b9c4d96a27b04f9f3fb5599d99acbe90ade0638', ''),
+    Dependency_StringWin(Dependency_SqlOleDb19X86URL, 'https://download.microsoft.com/download/7bf55274-18ac-4b26-9783-45453a1ab64f/amd64/1033/msoledbsql.msi', ''),
+    Dependency_StringWin(Dependency_SqlOleDb19X86Checksum, '409adfd93165dd3622b2d7cd0b9c4d96a27b04f9f3fb5599d99acbe90ade0638', ''),
     False, False);
 end;
 
@@ -941,8 +946,13 @@ begin
     False, False);
 end;
 
-// Java 8 has no Microsoft build (and is still shipped 32-bit), so it comes from Eclipse Temurin
-procedure Dependency_AddJava8; begin Dependency_AddJava(8, 'Eclipse Adoptium', Dependency_StringWin('https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u472-b08/OpenJDK8U-jdk_x86-32_windows_hotspot_8u472b08.msi', 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u492-b09/OpenJDK8U-jdk_x64_windows_hotspot_8u492b09.msi', ''), Dependency_StringWin('daff0b3a7892ec99635f54554070ede99c175c157f683bc99c6d9008e81dfe4f', 'e931546f0557e0735472e99c5f0a62d34854ab8a2fee9709bfcbc7ea6dcc5172', ''), Dependency_Latest(Dependency_StringWin('https://api.adoptium.net/v3/installer/latest/8/ga/windows/x86/jdk/hotspot/normal/eclipse', 'https://api.adoptium.net/v3/installer/latest/8/ga/windows/x64/jdk/hotspot/normal/eclipse', ''))); end;
+const
+  // last 32-bit build
+  Dependency_Java8X86URL = 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u472-b08/OpenJDK8U-jdk_x86-32_windows_hotspot_8u472b08.msi';
+  Dependency_Java8X86Checksum = 'daff0b3a7892ec99635f54554070ede99c175c157f683bc99c6d9008e81dfe4f';
+
+// Java 8 has no Microsoft build, so it comes from Eclipse Temurin
+procedure Dependency_AddJava8; begin Dependency_AddJava(8, 'Eclipse Adoptium', Dependency_StringWin(Dependency_Java8X86URL, 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u492-b09/OpenJDK8U-jdk_x64_windows_hotspot_8u492b09.msi', ''), Dependency_StringWin(Dependency_Java8X86Checksum, 'e931546f0557e0735472e99c5f0a62d34854ab8a2fee9709bfcbc7ea6dcc5172', ''), Dependency_Latest(Dependency_StringWin('https://api.adoptium.net/v3/installer/latest/8/ga/windows/x86/jdk/hotspot/normal/eclipse', 'https://api.adoptium.net/v3/installer/latest/8/ga/windows/x64/jdk/hotspot/normal/eclipse', ''))); end;
 procedure Dependency_AddJava11; begin Dependency_AddJava(11, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-11.0.32.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-11.0.32.1-windows-aarch64.msi'), Dependency_StringWin('', 'e325d93d63bd194a594724abe34e7c5b8e77da47c7519952396243503347c7df', '416aa8ce2a8c33e009e39d653fb19dfbd40b1397fde083306a356960cd433c93'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-11-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-11-windows-aarch64.msi'))); end;
 procedure Dependency_AddJava17; begin Dependency_AddJava(17, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-17.0.21.0.2-windows-aarch64.msi'), Dependency_StringWin('', '303ff40a72a88fab605b8e846968b369c52de6f17ab262afe50f4afcf1c6d3d4', '71643fba8211ef4106176bdd68cc2614843f0b6d0eb294533058bd91a3002ac6'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-17-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-17-windows-aarch64.msi'))); end;
 procedure Dependency_AddJava21; begin Dependency_AddJava(21, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.13.0.2-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.13.0.2-windows-aarch64.msi'), Dependency_StringWin('', '7a6700302e6079708a4596f8f84ff9d73516cda6ae6da91024063ac7c2a196e8', 'ef0ba3a0e10a0abf2e8f072e9c741b4c9331067f351f27a1360df0b77ead11ec'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-21-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21-windows-aarch64.msi'))); end;
