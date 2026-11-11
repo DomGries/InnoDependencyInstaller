@@ -190,7 +190,7 @@ begin
 end;
 ```
 
-This works the same way for every dependency, including [your own](#adding-your-own-dependency). Some installers, like the DirectX web setup, download more files themselves, so they still need internet access.
+This works the same way for every dependency, including [your own](#adding-your-own-dependency). The file name to use is in the [setup log](#troubleshooting): `Dependency queued for download: DirectX Runtime (dxwebsetup.exe)`. Some installers, like the DirectX web setup, download more files themselves, so they still need internet access.
 
 ## Options
 
@@ -240,12 +240,13 @@ Run your setup with `/LOG="C:\setup.log"`. With `/LOG` only, the log is written 
 | Log entry | Meaning |
 | --- | --- |
 | `Dependency already installed: X` | _X_ is installed, so nothing is done. |
-| `Dependency queued for download: X` | _X_ is missing and will be downloaded. |
+| `Dependency queued for download: X (file)` | _X_ is missing and will be downloaded as _file_. |
 | `Dependency queued (already present): X` | _X_ is missing. Its installer is already in the temporary directory or is a program on the computer, so it is not downloaded. |
 | `Dependency not available for this architecture: X` | _X_ has no installer for this architecture. |
 | `Dependency skipped (component not selected): X` | _X_ belongs to a component that the user did not select. |
 | `Dependency skipped after failed download: X` | The download of _X_ failed and the user chose to ignore it. |
 | `Dependency exit code N: X` | The installer of _X_ ended with exit code _N_. |
+| `Dependency failed to start with error N: X` | The installer of _X_ could not be started. _N_ is the Windows error code. |
 
 The setup handles the exit codes like this:
 

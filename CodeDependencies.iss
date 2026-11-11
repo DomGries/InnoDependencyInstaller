@@ -68,7 +68,7 @@ begin
     exit;
   end else begin
     Dependency.URL := URL;
-    Log('Dependency queued for download: ' + Title);
+    Log('Dependency queued for download: ' + Title + ' (' + Filename + ')');
   end;
 
   Dependency.Checksum := Checksum;
@@ -198,6 +198,8 @@ begin
         end;
         exit;
       end;
+    end else begin
+      Log('Dependency failed to start with error ' + IntToStr(ResultCode) + ': ' + Dependency_List[Index].Title);
     end;
 
     case SuppressibleMsgBox(FmtMessage(SetupMessage(msgErrorFunctionFailed), [Dependency_List[Index].Title, IntToStr(ResultCode)]), mbError, MB_ABORTRETRYIGNORE, IDABORT) of
