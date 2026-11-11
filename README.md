@@ -130,7 +130,7 @@ Call these functions in `InitializeSetup`. Each function adds the dependency onl
 4. Your application is installed.
 5. If a dependency needs a restart, the setup asks for it at the end. If the restart is needed before the next dependency can be installed, the setup asks to restart Windows at once and continues after the restart.
 
-With `/SILENT` or `/VERYSILENT` the installers run silently. With `/SUPPRESSMSGBOXES` no questions are asked, so a download or installer that still fails after the automatic retries aborts the setup.
+With `/SILENT` or `/VERYSILENT` the installers run silently and are started hidden, so they must not need any input. With `/SUPPRESSMSGBOXES` no questions are asked, so a download or installer that still fails after the automatic retries aborts the setup.
 
 ## Adding your own dependency
 

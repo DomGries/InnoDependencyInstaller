@@ -158,17 +158,22 @@ end;
 
 function Dependency_Install(const Index: Integer; const IsLast: Boolean; var NeedsRestart: Boolean): Boolean;
 var
-  ResultCode, Attempt: Integer;
+  ResultCode, Attempt, ShowCmd: Integer;
 begin
   Result := True;
   Attempt := 0;
+  if WizardSilent then begin
+    ShowCmd := SW_HIDE;
+  end else begin
+    ShowCmd := SW_SHOWNORMAL;
+  end;
   while True do begin
     Dependency_DownloadPage.SetText(Dependency_List[Index].Title, '');
     ResultCode := 0;
 #ifdef Dependency_CustomExecute
     if {#Dependency_CustomExecute}(Dependency_FilePath(Dependency_List[Index].Filename), Dependency_List[Index].Parameters, ResultCode) then begin
 #else
-    if ShellExec('', Dependency_FilePath(Dependency_List[Index].Filename), Dependency_List[Index].Parameters, '', SW_SHOWNORMAL, ewWaitUntilTerminated, ResultCode) then begin
+    if ShellExec('', Dependency_FilePath(Dependency_List[Index].Filename), Dependency_List[Index].Parameters, '', ShowCmd, ewWaitUntilTerminated, ResultCode) then begin
 #endif
       Log('Dependency exit code ' + IntToStr(ResultCode) + ': ' + Dependency_List[Index].Title);
       if ResultCode = 1641 then begin // ERROR_SUCCESS_REBOOT_INITIATED
