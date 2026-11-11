@@ -258,7 +258,7 @@ The setup handles the exit codes like this:
 | `1618` | Another installation is running. The setup waits and tries again `Dependency_InstallBusyRetryCount` times, then treats it as an error. |
 | Any other | Error. The user can abort the setup, retry the installer or ignore the error. Counts as success if `ForceSuccess` is set. |
 
-To continue after a restart, the setup adds itself to the `RunOnce` registry key. It is started again with the choices of the wizard, the original silent, restart and log switches, and `/restart=1`. Your script can check `/restart=1` with `ParamStr` if it must work differently after the restart. A log set with `/LOG="setup.log"` continues in `setup-2.log`.
+To continue after a restart, the setup adds itself to the `RunOnce` registry key. It is started again with the choices of the wizard, the original command-line parameters including your own, and `/restart=1`. Only `/PASSWORD=` and `/LOADINF=` are left out. Your script can check `/restart=1` with `ParamStr` if it must work differently after the restart. A log set with `/LOG="setup.log"` continues in `setup-2.log`. Windows documents a limit of 260 characters for this command. A longer one is reported in the log.
 
 ## Credits
 

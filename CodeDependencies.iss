@@ -252,22 +252,31 @@ end;
 procedure Dependency_RegisterResume;
 var
   ParameterIndex: Integer;
-  Parameter, CommandLine: String;
+  Parameter, ParameterName, CommandLine: String;
 begin
   Log('Dependency requires restart: registering RunOnce to resume setup');
   CommandLine := '"' + ExpandConstant('{srcexe}') + '" /restart=1 /LANG="' + ExpandConstant('{language}') + '" /DIR="' + RemoveBackslashUnlessRoot(WizardDirValue) + '" /GROUP="' + RemoveBackslashUnlessRoot(WizardGroupValue) + '" /TYPE="' + WizardSetupType(False) + '" /COMPONENTS="' + WizardSelectedComponents(False) + '" /TASKS="' + WizardSelectedTasks(False) + '"';
   for ParameterIndex := 1 to ParamCount do begin
-    Parameter := Uppercase(ParamStr(ParameterIndex));
-    if (Parameter = '/SP-') or (Parameter = '/SILENT') or (Parameter = '/VERYSILENT') or (Parameter = '/SUPPRESSMSGBOXES') or (Parameter = '/NOCANCEL') or (Parameter = '/NORESTART') or (Parameter = '/ALLUSERS') or (Parameter = '/CURRENTUSER') or (Parameter = '/LOG') then begin
-      CommandLine := CommandLine + ' ' + Parameter;
-    end else if Copy(Parameter, 1, 5) = '/LOG=' then begin
+    Parameter := ParamStr(ParameterIndex);
+    ParameterName := Uppercase(Copy(Parameter, 1, Pos('=', Parameter + '=')));
+    if ParameterName = '/LOG=' then begin
       // a fixed log file would be overwritten
-      Parameter := RemoveQuotes(Copy(ParamStr(ParameterIndex), 6, Length(Parameter)));
-      CommandLine := CommandLine + ' /LOG="' + ChangeFileExt(Parameter, '') + '-2' + ExtractFileExt(Parameter) + '"';
+      Parameter := Copy(Parameter, 6, Length(Parameter));
+      Parameter := '/LOG=' + ChangeFileExt(Parameter, '') + '-2' + ExtractFileExt(Parameter);
+    end;
+    // set above, or would store a password or override the wizard
+    if Pos(' ' + ParameterName + ' ', ' /RESTART= /LANG= /DIR= /GROUP= /TYPE= /COMPONENTS= /TASKS= /MERGETASKS= /NOICONS /PASSWORD= /LOADINF= ') = 0 then begin
+      if Pos(' ', Parameter) > 0 then begin
+        Parameter := '"' + Parameter + '"';
+      end;
+      CommandLine := CommandLine + ' ' + Parameter;
     end;
   end;
   if WizardNoIcons then begin
     CommandLine := CommandLine + ' /NOICONS';
+  end;
+  if Length(CommandLine) > 260 then begin
+    Log('RunOnce command has ' + IntToStr(Length(CommandLine)) + ' characters, Windows documents a limit of 260: setup may not resume');
   end;
   RegWriteStringValue(HKA, 'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce', ExpandConstant('{srcexe}'), CommandLine);
 end;
