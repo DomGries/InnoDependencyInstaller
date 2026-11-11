@@ -1,3 +1,6 @@
+#if Ver < EncodeVer(6,7,0)
+  #error Inno Setup 6.7 or newer is required
+#endif
 #ifndef Dependency_DownloadRetryCount
   #define Dependency_DownloadRetryCount 3
 #endif
