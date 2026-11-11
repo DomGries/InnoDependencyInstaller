@@ -101,13 +101,13 @@ jobs:
               @{ Name = "VC++ $year"; Id = "Microsoft.VCRedist.$year.{arch}"; Block = Get-ProcedurePattern "VC$year"; Version = "'\),\s*(?<major>\d+),\s*(?<minor>\d+),\s*(?<build>\d+),\s*(?<revision>\d+)," }
             }
             @{ Name = 'VC++ 2015-2022'; Id = 'Microsoft.VCRedist.2015+.{arch}'; Block = Get-ProcedurePattern 'VC14'; Version = 'PackVersionComponents\((?<major>\d+),\s*(?<minor>\d+),\s*(?<build>\d+),\s*(?<revision>\d+)\)' }
-            foreach ($channel in '3_1', '5', '6', '7', '8', '9', '10') {
+            foreach ($channel in '3_1', '5', '6', '7', '8', '9', '10', '11') {
               $procedure = if ($channel -eq '3_1') { 'NetCore31' } else { "DotNet$($channel)0" }
               foreach ($family in @{ Id = 'Runtime'; Suffix = '' }, @{ Id = 'AspNetCore'; Suffix = 'Asp' }, @{ Id = 'DesktopRuntime'; Suffix = 'Desktop' }) {
                 @{ Name = '.NET'; Id = "Microsoft.DotNet.$($family.Id).$channel"; Block = Get-ProcedurePattern "$procedure$($family.Suffix)"; Version = "',\s*(?<major>\d+),\s*(?<minor>\d+),\s*(?<build>\d+)," }
               }
             }
-            foreach ($major in 8, 9, 10) {
+            foreach ($major in 8, 9, 10, 11) {
               @{ Name = '.NET'; Id = "Microsoft.DotNet.HostingBundle.$major"; Block = Get-ProcedurePattern "DotNet$($major)0Hosting"; Version = 'Hosting\((?<major>\d+),\s*(?<build>\d+),' }
             }
             foreach ($channel in '1.6', '1.7', '1.8', '2') {

@@ -93,6 +93,10 @@ begin
   Dependency_AddDotNet100Asp;
   Dependency_AddDotNet100Hosting;
   Dependency_AddDotNet100Desktop;
+  Dependency_AddDotNet110;
+  Dependency_AddDotNet110Asp;
+  Dependency_AddDotNet110Hosting;
+  Dependency_AddDotNet110Desktop;
   //Dependency_Components := ''; // disable component gating again
 
   Dependency_AddVC2005;
