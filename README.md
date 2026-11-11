@@ -122,6 +122,8 @@ Call these functions in `InitializeSetup`. Each function adds the dependency onl
 | Python 3.14 | `Dependency_AddPython314` |
 | PowerShell 7 | `Dependency_AddPowerShell7` |
 
+SQL Server 2008 to 2014 are installed as the default instance `MSSQLSERVER`. SQL Server 2016 and newer are installed by the web installer of Microsoft. It names the instance `SQLEXPRESS`, or chooses a new name if that one is taken. They are skipped if any instance of that version is installed.
+
 ## What happens during the setup
 
 1. `InitializeSetup` checks each dependency and keeps only the missing ones. The _Ready to Install_ page lists them.

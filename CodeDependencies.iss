@@ -636,28 +636,50 @@ begin
     True, False);
 end;
 
-procedure Dependency_AddSqlExpress(const Year, Instance, Title: String; Major, Minor, Build, Revision: Word; const URL, Checksum: String);
+function Dependency_IsSqlInstalled(const RootKey: Integer; const InstanceId: String; const PackedMinVersion: Int64): Boolean;
 var
-  Key, Version: String;
+  NameIndex: Integer;
+  Names: TArrayOfString;
+  Id, Version: String;
   PackedVersion: Int64;
 begin
-  // also finds a 32-bit instance
-  Key := 'SOFTWARE\Microsoft\Microsoft SQL Server\' + Instance + '\MSSQLServer\CurrentVersion';
-  if not RegQueryStringValue(HKLM32, Key, 'CurrentVersion', Version) and IsWin64 then begin
-    RegQueryStringValue(HKLM64, Key, 'CurrentVersion', Version);
+  Result := False;
+  if RegGetValueNames(RootKey, 'SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL', Names) then begin
+    for NameIndex := 0 to GetArrayLength(Names) - 1 do begin
+      if RegQueryStringValue(RootKey, 'SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL', Names[NameIndex], Id) and (Pos(InstanceId, Id) = 1)
+        and RegQueryStringValue(RootKey, 'SOFTWARE\Microsoft\Microsoft SQL Server\' + Id + '\MSSQLServer\CurrentVersion', 'CurrentVersion', Version)
+        and StrToVersion(Version, PackedVersion) and (ComparePackedVersion(PackedVersion, PackedMinVersion) >= 0) then begin
+        Result := True;
+      end;
+    end;
+  end;
+end;
+
+procedure Dependency_AddSqlExpress(const Year, InstanceId, Title: String; Major, Minor, Build, Revision: Word; const URL, Checksum: String);
+var
+  Parameters: String;
+  PackedMinVersion: Int64;
+begin
+  // the web installer of SQL Server 2016 and newer names the instance itself
+  if Major < 13 then begin
+    Parameters := Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER';
+  end else begin
+    Parameters := '/QUIET /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL';
   end;
 
-  Dependency_AddIfMissing(not StrToVersion(Version, PackedVersion) or (ComparePackedVersion(PackedVersion, PackVersionComponents(Major, Minor, Build, Revision)) < 0), 'sql' + Year + 'express.exe', Dependency_PassiveOrQuiet('/QS', '/Q') + ' /IACCEPTSQLSERVERLICENSETERMS /ACTION=INSTALL /FEATURES=SQL /INSTANCENAME=MSSQLSERVER', Title, URL, Checksum, False, False);
+  // also finds a 32-bit instance
+  PackedMinVersion := PackVersionComponents(Major, Minor, Build, Revision);
+  Dependency_AddIfMissing(not Dependency_IsSqlInstalled(HKLM32, InstanceId, PackedMinVersion) and not (IsWin64 and Dependency_IsSqlInstalled(HKLM64, InstanceId, PackedMinVersion)), 'sql' + Year + 'express.exe', Parameters, Title, URL, Checksum, False, False);
 end;
 
 procedure Dependency_AddSql2008Express; begin Dependency_AddSqlExpress('2008', 'MSSQL10_50.MSSQLSERVER', 'SQL Server 2008 R2 Service Pack 2 Express', 10, 50, 4000, 0, Dependency_StringWin('https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/0/4/B/04BE03CD-EAF3-4797-9D8D-2E08E316C998/SQLEXPR_x64_ENU.exe', ''), Dependency_StringWin('8096bea8ed1559cb39a2b42c0c680d1251e8ddbab6d09be1e0a4263623183086', '4372dec5a5f4b2e48c60da7b09b5368214fddbc8cd0c4a0be5af2d74522b67f8', '')); end;
 procedure Dependency_AddSql2012Express; begin Dependency_AddSqlExpress('2012', 'MSSQL11.MSSQLSERVER', 'SQL Server 2012 Service Pack 4 Express', 11, 0, 7001, 0, Dependency_StringWin('https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/B/D/E/BDE8FAD6-33E5-44F6-B714-348F73E602B6/SQLEXPR_x64_ENU.exe', ''), Dependency_StringWin('c380d4f4aa61a150885dda6f39ce135c0960c5ce4f04d5c96a5357e9417bc474', 'bae6000b3ecef827fb4371a7aaccf0278de8cb84da1a510d56e3588b20230582', '')); end;
 procedure Dependency_AddSql2014Express; begin Dependency_AddSqlExpress('2014', 'MSSQL12.MSSQLSERVER', 'SQL Server 2014 Service Pack 3 Express', 12, 0, 6024, 0, Dependency_StringWin('https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR32_x86_ENU.exe', 'https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe', ''), Dependency_StringWin('5771644bc02221268c5e14fdea7068c6311e8bff4182b2d359b4d8d4b22bec3d', 'e8d8330e3e7d6f9242e658315b99aace4aabb71ed14f3ec465e4450d66d255b6', '')); end;
-procedure Dependency_AddSql2016Express; begin Dependency_AddSqlExpress('2016', 'MSSQL13.MSSQLSERVER', 'SQL Server 2016 Service Pack 3 Express', 13, 0, 6404, 1, Dependency_StringWin('', 'https://download.microsoft.com/download/f7e95fb9-9a5a-4039-be84-631043b6a310/SQLServer2016-SSEI-Expr.exe', ''), Dependency_StringWin('', 'a9f71d85bfbba0d2090c4afbc85df5931339e5cced19c8f9ba4c7a9a63b95892', '')); end;
-procedure Dependency_AddSql2017Express; begin Dependency_AddSqlExpress('2017', 'MSSQL14.MSSQLSERVER', 'SQL Server 2017 Express', 14, 0, 1000, 169, Dependency_StringWin('', 'https://download.microsoft.com/download/6c9ea8c2-2512-4368-a9a3-3c6901a6e78c/SQLServer2017-SSEI-Expr.exe', ''), Dependency_StringWin('', 'b92b45f0113062e1045cadcc6f739ef51d61d887903ef9dc290bc37b300df7b1', '')); end;
-procedure Dependency_AddSql2019Express; begin Dependency_AddSqlExpress('2019', 'MSSQL15.MSSQLSERVER', 'SQL Server 2019 Express', 15, 0, 2000, 5, Dependency_StringWin('', 'https://download.microsoft.com/download/926a8db2-3ad9-444c-8b37-8376e9256e9d/SQL2019-SSEI-Expr.exe', ''), Dependency_StringWin('', '37cc32717aba3b6633071ec176c6728e05570cfa5cf4c67f54421a0a2b4493c2', '')); end;
-procedure Dependency_AddSql2022Express; begin Dependency_AddSqlExpress('2022', 'MSSQL16.MSSQLSERVER', 'SQL Server 2022 Express', 16, 0, 1000, 6, Dependency_StringWin('', 'https://download.microsoft.com/download/29654887-7cde-4397-bba3-d7f087970845/SQL2022-SSEI-Expr.exe', ''), Dependency_StringWin('', 'e2b8e8aad30d8b1a1922c6c0976c806f0a2e08d04b2de100a9d70b9f94750bb1', '')); end;
-procedure Dependency_AddSql2025Express; begin Dependency_AddSqlExpress('2025', 'MSSQL17.MSSQLSERVER', 'SQL Server 2025 Express', 17, 0, 1000, 7, Dependency_StringWin('', 'https://download.microsoft.com/download/ffd82b4c-9955-47c0-8efe-6290f7795cf6/SQL2025-SSEI-Expr.exe', ''), Dependency_StringWin('', 'fa7e1fabc9a2e9c9cdab0d1512bcb30d2949133147db057ac530f510e5270680', '')); end;
+procedure Dependency_AddSql2016Express; begin Dependency_AddSqlExpress('2016', 'MSSQL13.', 'SQL Server 2016 Service Pack 3 Express', 13, 0, 6404, 1, Dependency_StringWin('', 'https://download.microsoft.com/download/f7e95fb9-9a5a-4039-be84-631043b6a310/SQLServer2016-SSEI-Expr.exe', ''), Dependency_StringWin('', 'a9f71d85bfbba0d2090c4afbc85df5931339e5cced19c8f9ba4c7a9a63b95892', '')); end;
+procedure Dependency_AddSql2017Express; begin Dependency_AddSqlExpress('2017', 'MSSQL14.', 'SQL Server 2017 Express', 14, 0, 1000, 169, Dependency_StringWin('', 'https://download.microsoft.com/download/6c9ea8c2-2512-4368-a9a3-3c6901a6e78c/SQLServer2017-SSEI-Expr.exe', ''), Dependency_StringWin('', 'b92b45f0113062e1045cadcc6f739ef51d61d887903ef9dc290bc37b300df7b1', '')); end;
+procedure Dependency_AddSql2019Express; begin Dependency_AddSqlExpress('2019', 'MSSQL15.', 'SQL Server 2019 Express', 15, 0, 2000, 5, Dependency_StringWin('', 'https://download.microsoft.com/download/926a8db2-3ad9-444c-8b37-8376e9256e9d/SQL2019-SSEI-Expr.exe', ''), Dependency_StringWin('', '37cc32717aba3b6633071ec176c6728e05570cfa5cf4c67f54421a0a2b4493c2', '')); end;
+procedure Dependency_AddSql2022Express; begin Dependency_AddSqlExpress('2022', 'MSSQL16.', 'SQL Server 2022 Express', 16, 0, 1000, 6, Dependency_StringWin('', 'https://download.microsoft.com/download/29654887-7cde-4397-bba3-d7f087970845/SQL2022-SSEI-Expr.exe', ''), Dependency_StringWin('', 'e2b8e8aad30d8b1a1922c6c0976c806f0a2e08d04b2de100a9d70b9f94750bb1', '')); end;
+procedure Dependency_AddSql2025Express; begin Dependency_AddSqlExpress('2025', 'MSSQL17.', 'SQL Server 2025 Express', 17, 0, 1000, 7, Dependency_StringWin('', 'https://download.microsoft.com/download/ffd82b4c-9955-47c0-8efe-6290f7795cf6/SQL2025-SSEI-Expr.exe', ''), Dependency_StringWin('', 'fa7e1fabc9a2e9c9cdab0d1512bcb30d2949133147db057ac530f510e5270680', '')); end;
 
 procedure Dependency_AddSqlOleDb19;
 begin
