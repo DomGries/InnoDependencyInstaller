@@ -141,6 +141,7 @@ begin
 
   Dependency_AddPython313;
   Dependency_AddPython314;
+  Dependency_AddPython315;
   Dependency_AddPowerShell7;
 
   Result := True;

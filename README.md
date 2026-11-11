@@ -120,6 +120,7 @@ Call these functions in `InitializeSetup`. Each function adds the dependency onl
 | OpenJDK 25 (Microsoft Build of OpenJDK, x64/arm64) | `Dependency_AddJava25` |
 | Python 3.13 | `Dependency_AddPython313` |
 | Python 3.14 | `Dependency_AddPython314` |
+| Python 3.15 | `Dependency_AddPython315` |
 | PowerShell 7 | `Dependency_AddPowerShell7` |
 
 SQL Server 2008 to 2014 are installed as the default instance `MSSQLSERVER`. SQL Server 2016 and newer are installed by the web installer of Microsoft. It names the instance `SQLEXPRESS`, or chooses a new name if that one is taken. They are skipped if any instance of that version is installed.
