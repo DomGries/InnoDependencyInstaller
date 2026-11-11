@@ -118,12 +118,14 @@ jobs:
             }
             @{ Name = 'WebView2 Runtime'; Id = 'Microsoft.EdgeWebView2Runtime'; Block = Get-ProcedurePattern 'WebView2'; Evergreen = $true }
             @{ Name = 'DirectX Runtime'; Id = 'Microsoft.DirectX'; Block = Get-ProcedurePattern 'DirectX'; Url = '^https://download\.microsoft\.com/.*/dxwebsetup\.exe$' }
+            @{ Name = 'OLE DB Driver 19'; Id = 'Microsoft.SQLServer.OLEDBDriver.19'; Block = Get-ProcedurePattern 'SqlOleDb19' }
             @{ Name = 'ODBC Driver 18'; Id = 'Microsoft.msodbcsql.18'; Block = Get-ProcedurePattern 'SqlOdbc18' }
             @{ Name = 'Access Database Engine 2016'; Id = 'Microsoft.AccessDatabaseEngine2016'; Block = Get-ProcedurePattern 'AccessDatabaseEngine2016' }
             @{ Name = 'VSTO Runtime'; Id = 'Microsoft.VSTOR'; Block = Get-ProcedurePattern 'VSTORuntime' }
             foreach ($major in 11, 17, 21, 25) {
               @{ Name = 'Microsoft OpenJDK'; Id = "Microsoft.OpenJDK.$major"; Block = Get-ProcedurePattern "Java$major"; Version = 'microsoft-jdk-(?<version>[\d.]+)-windows' }
             }
+            @{ Name = 'Eclipse Temurin OpenJDK'; Id = 'EclipseAdoptium.Temurin.8.JDK'; Block = Get-ProcedurePattern 'Java8'; Version = 'jdk(?<major>8)u(?<build>\d+)-b(?<revision>\d+)'; Url = '^https://github\.com/adoptium/temurin8-binaries/releases/download/[^/]+/OpenJDK8U-jdk_x64_windows_hotspot_[^/]+\.msi$' }
             foreach ($minor in 13, 14) {
               @{ Name = 'Python'; Id = "Python.Python.3.$minor"; Block = Get-ProcedurePattern "Python3$minor"; Version = '/python/(?<version>[\d.]+)/'; Url = '^https://www\.python\.org/ftp/python/[\d.]+/python-[^/]+\.exe$' }
             }
