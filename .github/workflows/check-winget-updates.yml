@@ -42,8 +42,10 @@ jobs:
           sqlite3 -separator ' ' "$index.db" 'select id, latest_version, lower(substr(hex(hash), 1, 8)) from packages' | ForEach-Object { $id, $version, $hash = $_ -split ' '; $wingetVersions[$id] = $version; $wingetHashes[$id] = $hash }
           if (-not $wingetVersions.Count) { throw 'Failed to read the WinGet source index' }
 
+          $cdnData = @{}
           function Get-CdnText([string] $Path) {
-            [byte[]] $data = Invoke-WithRetry { (Invoke-WebRequest "$cdn/$Path").Content }
+            $cdnData[$Path] ??= Invoke-WithRetry { (Invoke-WebRequest "$cdn/$Path").Content }
+            [byte[]] $data = $cdnData[$Path]
             if ([BitConverter]::ToUInt32($data, 0) -ne 0xC0E5510Au) { return [Text.Encoding]::UTF8.GetString($data) }
             $output = [IO.MemoryStream]::new()
             [IO.Compression.DeflateStream]::new([IO.MemoryStream]::new($data, 30, $data.Length - 30), [IO.Compression.CompressionMode]::Decompress).CopyTo($output)
@@ -126,10 +128,10 @@ jobs:
               @{ Name = 'Microsoft OpenJDK'; Id = "Microsoft.OpenJDK.$major"; Block = Get-ProcedurePattern "Java$major"; Version = 'microsoft-jdk-(?<version>[\d.]+)-windows' }
             }
             @{ Name = 'Eclipse Temurin OpenJDK'; Id = 'EclipseAdoptium.Temurin.8.JDK'; Block = Get-ProcedurePattern 'Java8'; Version = 'jdk(?<major>8)u(?<build>\d+)-b(?<revision>\d+)'; Url = '^https://github\.com/adoptium/temurin8-binaries/releases/download/[^/]+/OpenJDK8U-jdk_x64_windows_hotspot_[^/]+\.msi$' }
-            foreach ($minor in 13, 14) {
+            foreach ($minor in 13, 14, 15) {
               @{ Name = 'Python'; Id = "Python.Python.3.$minor"; Block = Get-ProcedurePattern "Python3$minor"; Version = '/python/(?<version>[\d.]+)/'; Url = '^https://www\.python\.org/ftp/python/[\d.]+/python-[^/]+\.exe$' }
             }
-            @{ Name = 'PowerShell'; Id = 'Microsoft.PowerShell'; Block = Get-ProcedurePattern 'PowerShell7'; Version = '/download/v(?<version>[\d.]+)/'; Url = '^https://github\.com/PowerShell/PowerShell/releases/download/v[\d.]+/PowerShell-[^/]+\.msi$' }
+            @{ Name = 'PowerShell'; Id = 'Microsoft.PowerShell'; Channel = '7.6'; Block = Get-ProcedurePattern 'PowerShell7'; Version = '/download/v(?<version>[\d.]+)/'; Url = '^https://github\.com/PowerShell/PowerShell/releases/download/v[\d.]+/PowerShell-[^/]+\.msi$' }
           )
 
           $updates = @()
@@ -149,6 +151,10 @@ jobs:
             try {
               $block = [regex]::Match($content, $target.Block)
               if (-not $block.Success) { throw 'dependency not found in CodeDependencies.iss' }
+              if ($target.Channel) {
+                $versionData = Get-CdnText "packages/$id/$($wingetHashes[$id])/versionData.mszyml"
+                $wingetVersions[$id] = [regex]::Matches($versionData, "(?m)^- v: ($([regex]::Escape($target.Channel))\.[\d.]+)\r?$") | ForEach-Object { $_.Groups[1].Value } | Sort-Object { ConvertTo-Version $_ } | Select-Object -Last 1
+              }
               $latestText = $wingetVersions[$id]
               if (-not $latestText) { throw 'not found in WinGet' }
               $updated = $block.Value
