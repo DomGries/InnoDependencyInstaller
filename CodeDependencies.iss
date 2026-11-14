@@ -869,13 +869,13 @@ end;
 
 procedure Dependency_AddWinAppRuntime2;
 begin
-  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 2.5.1
+  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 2.6.5
   Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('2'),
     'windowsappruntime2' + Dependency_ArchSuffix + '.exe',
     '--quiet',
     'Windows App Runtime 2' + Dependency_ArchTitle,
-    Dependency_String('https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.5/2.5.1/windowsappruntimeinstall-arm64.exe'),
-    Dependency_String('76dbd7c272cee0bf18f0b7228255b353d669cd55dc530209c45646f47acb89d4', '931a421e8dc3e6e67724806cb67fecdbb88dfe323f0170842eb4a4b4b149f1e2', 'd5e4d34547eb4e31c64bf1532415b3019c0d92b750e72eb18d3d95bd00feacbb'),
+    Dependency_String('https://aka.ms/windowsappsdk/2.6/2.6.5/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.6/2.6.5/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.6/2.6.5/windowsappruntimeinstall-arm64.exe'),
+    Dependency_String('cb4fbfd1f4ebc29fa2003bab5eb32b52ef7fb20424faebc62fa53ba3e20eca31', '908e9a8ed8ad2ac765d6679543b0758812437e3ad6e3223f08d1730635cec8ec', '4cafe57b5e03384a39cca9c6c0dbbbf837cf76ac828e66238cf6160ed2575b13'),
     False, False);
 end;
 
