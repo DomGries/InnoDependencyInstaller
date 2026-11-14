@@ -857,13 +857,13 @@ end;
 
 procedure Dependency_AddWinAppRuntime18;
 begin
-  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 1.8.10
+  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 1.8.12
   Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('1.8'),
     'windowsappruntime18' + Dependency_ArchSuffix + '.exe',
     '--quiet',
     'Windows App Runtime 1.8' + Dependency_ArchTitle,
-    Dependency_String('https://aka.ms/windowsappsdk/1.8/1.8.260710003/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/1.8/1.8.260710003/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/1.8/1.8.260710003/windowsappruntimeinstall-arm64.exe'),
-    Dependency_String('1d478178455f1da703d5f100489507c8e2853bfb6157635dcebb8d2de5acc8ab', 'b8cda840267ab72797f654f801f9a064ab6d9e508cedee3df79f772f104db6d6', '4c019a3f903dbd3b0cbb02201f852c3142d4c22415d7ef8c74cce76fef789657'),
+    Dependency_String('https://aka.ms/windowsappsdk/1.8/1.8.260921001/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/1.8/1.8.260921001/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/1.8/1.8.260921001/windowsappruntimeinstall-arm64.exe'),
+    Dependency_String('cb106f15fed4f8b41f82f2afc22e160b9cc074c3781693811c69b86bcef3e02b', '7c092e85fc1e3e7cb2bd7d549aaab03caf924131f15d9b20b1855457a98205aa', '03f25794a74f0881ddfc4a7c35082db1ba5a5a4d91b1fa755ac916eca880771f'),
     False, False);
 end;
 
