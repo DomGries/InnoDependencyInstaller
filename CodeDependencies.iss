@@ -541,7 +541,7 @@ begin
   Dependency_AddLatestIfMissing(not Dependency_IsNetCoreInstalled(Runtime, Major, Minor, Revision),
     Prefix + Dependency_ArchSuffix + '.exe',
     '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
-    Title + ' ' + IntToStr(Major) + '.' + IntToStr(Minor) + '.' + IntToStr(Revision) + Dependency_ArchTitle,
+    Title + ' ' + IntToStr(Major) + '.' + IntToStr(Minor) + Dependency_ArchTitle,
     URL,
     Checksum,
     LatestURL,
