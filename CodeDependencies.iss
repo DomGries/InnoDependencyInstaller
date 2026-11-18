@@ -541,7 +541,12 @@ begin
   Dependency_AddLatestIfMissing(not Dependency_IsNetCoreInstalled(Runtime, Major, Minor, Revision),
     Prefix + Dependency_ArchSuffix + '.exe',
     '/lcid ' + IntToStr(GetUILanguage) + ' ' + Dependency_PassiveOrQuiet('/passive', '/quiet') + ' /norestart',
+#ifdef Dependency_Evergreen
+    // The installed patch is the newest one at download time, not Revision, so the title names no patch.
+    Title + ' ' + IntToStr(Major) + '.' + IntToStr(Minor) + Dependency_ArchTitle,
+#else
     Title + ' ' + IntToStr(Major) + '.' + IntToStr(Minor) + '.' + IntToStr(Revision) + Dependency_ArchTitle,
+#endif
     URL,
     Checksum,
     LatestURL,
