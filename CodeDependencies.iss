@@ -720,13 +720,13 @@ end;
 
 procedure Dependency_AddWebView2;
 begin
-  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 157.0.4341.42
+  // https://developer.microsoft.com/en-us/microsoft-edge/webview2 - 158.0.4370.33
   Dependency_AddLatestIfMissing(not Dependency_IsWebView2Installed(HKLM32) and not Dependency_IsWebView2Installed(HKCU),
     'MicrosoftEdgeWebView2RuntimeInstaller.exe',
     '/silent /install',
     'WebView2 Runtime',
-    Dependency_StringWin('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/a4d69ace-3ef5-401e-94b5-e85b1dd8de18/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/0126536e-e048-416f-923b-202f7f6fa64b/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/3c3e2a37-c863-4dd0-b614-c3e00e45d598/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
-    Dependency_StringWin('e3ad662552e7b0b5ac9bef473f9009c0278c3929b911f0c523a58e12264c355e', '2688308af55753c62fda4e8140024e230c1ffc16b7c091b25889572f38dff6e8', '950b81de7b4e54d8a2cbc1a4e7f76177547789d89ad144d119021daa96bd5b39'),
+    Dependency_StringWin('https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/253641de-db40-46be-a703-395e0f9b7271/MicrosoftEdgeWebView2RuntimeInstallerX86.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/63f7af19-5d22-43ab-af18-239a7b23b84c/MicrosoftEdgeWebView2RuntimeInstallerX64.exe', 'https://msedge.sf.dl.delivery.mp.microsoft.com/filestreamingservice/files/316cbab7-6ae8-4e78-adc2-3ea328af117b/MicrosoftEdgeWebView2RuntimeInstallerARM64.exe'),
+    Dependency_StringWin('316965c12d39ebac80976c460c3573a8eea734b3d91fed861b69991a5c15c9e7', '47bc51387aff95c1275ce38cfbbb5fbab99b43b33214049877bbcdbcc7a970d5', '466691372c76a980d1803f2360906835443d2a65438d0f7b2f0d4a66cb2375ad'),
     Dependency_Latest('https://go.microsoft.com/fwlink/p/?LinkId=2124703'),
     False, False);
 end;
@@ -869,13 +869,13 @@ end;
 
 procedure Dependency_AddWinAppRuntime2;
 begin
-  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 2.6.5
+  // https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads - 2.7.0
   Dependency_AddIfMissing(not Dependency_IsWinAppRuntimeInstalled('2'),
     'windowsappruntime2' + Dependency_ArchSuffix + '.exe',
     '--quiet',
     'Windows App Runtime 2' + Dependency_ArchTitle,
-    Dependency_String('https://aka.ms/windowsappsdk/2.6/2.6.5/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.6/2.6.5/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.6/2.6.5/windowsappruntimeinstall-arm64.exe'),
-    Dependency_String('cb4fbfd1f4ebc29fa2003bab5eb32b52ef7fb20424faebc62fa53ba3e20eca31', '908e9a8ed8ad2ac765d6679543b0758812437e3ad6e3223f08d1730635cec8ec', '4cafe57b5e03384a39cca9c6c0dbbbf837cf76ac828e66238cf6160ed2575b13'),
+    Dependency_String('https://aka.ms/windowsappsdk/2.7/2.7.0/windowsappruntimeinstall-x86.exe', 'https://aka.ms/windowsappsdk/2.7/2.7.0/windowsappruntimeinstall-x64.exe', 'https://aka.ms/windowsappsdk/2.7/2.7.0/windowsappruntimeinstall-arm64.exe'),
+    Dependency_String('f934a33e530281fe63e5ea21473668f8cbaea03a3f680c8ede9b701a23fae61f', 'ed1ac8aa9497473389a288017c7fc352c382ba8df6c08f36ddb5815bff283b2a', 'a29130adb909c4ca340a30bd184cd96e216797eddf8faa90e16da0be8f74bf00'),
     False, False);
 end;
 
@@ -955,8 +955,8 @@ const
 procedure Dependency_AddJava8; begin Dependency_AddJava(8, 'Eclipse Adoptium', Dependency_StringWin(Dependency_Java8X86URL, 'https://github.com/adoptium/temurin8-binaries/releases/download/jdk8u512-b09/OpenJDK8U-jdk_x64_windows_hotspot_8u512b09.msi', ''), Dependency_StringWin(Dependency_Java8X86Checksum, '77a730e65149c4cc426209672c7bd1b996ba6423e04c563c381ba083278cf165', ''), Dependency_Latest(Dependency_StringWin('https://api.adoptium.net/v3/installer/latest/8/ga/windows/x86/jdk/hotspot/normal/eclipse', 'https://api.adoptium.net/v3/installer/latest/8/ga/windows/x64/jdk/hotspot/normal/eclipse', ''))); end;
 procedure Dependency_AddJava11; begin Dependency_AddJava(11, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-11.0.33.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-11.0.33.1-windows-aarch64.msi'), Dependency_StringWin('', 'fa1d8bd6d005cdc6eec427b1ad5a9e911cabd3b57269b3d0353a938f2e6618ce', '4a0367c24a428873cf5e8dfe5931a98cb6e9f7d35a224c167f0a9747fd510935'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-11-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-11-windows-aarch64.msi'))); end;
 procedure Dependency_AddJava17; begin Dependency_AddJava(17, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-17.0.21.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-17.0.21.1-windows-aarch64.msi'), Dependency_StringWin('', 'c20eb90f55f6f06a8e22ee77dbede95969909e496e4167f133e51efafe22dd5e', 'ef84eead19dc6982547d9e79f4e483450a03cd3687d002adfd5f63d781a8e554'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-17-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-17-windows-aarch64.msi'))); end;
-procedure Dependency_AddJava21; begin Dependency_AddJava(21, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.13.0.2-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.13.0.2-windows-aarch64.msi'), Dependency_StringWin('', '7a6700302e6079708a4596f8f84ff9d73516cda6ae6da91024063ac7c2a196e8', 'ef0ba3a0e10a0abf2e8f072e9c741b4c9331067f351f27a1360df0b77ead11ec'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-21-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21-windows-aarch64.msi'))); end;
-procedure Dependency_AddJava25; begin Dependency_AddJava(25, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-25.0.5.0.2-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-25.0.5.0.2-windows-aarch64.msi'), Dependency_StringWin('', 'cdff1a90c299b74af813ea7353aa36399936dbf75738495c80fcc5e06b764ca8', '5a452ad59c8141e336e8b4a6214a97e6ae523457fbab03e04cfb934ba2006b9d'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-25-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-25-windows-aarch64.msi'))); end;
+procedure Dependency_AddJava21; begin Dependency_AddJava(21, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.13.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21.0.13.1-windows-aarch64.msi'), Dependency_StringWin('', 'b558c8b7e559eeaf195489c2557abd779c72d72d72ce4e120335bdf2ffbd4580', '306f386d683d7e593bc399f9541542d9b7f18a5168d43717777d6528d920bc64'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-21-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-21-windows-aarch64.msi'))); end;
+procedure Dependency_AddJava25; begin Dependency_AddJava(25, 'Microsoft', Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-25.0.5.1-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-25.0.5.1-windows-aarch64.msi'), Dependency_StringWin('', '138be7ddf67d2c8cee75fe3e616f3e9a8289ef2552cbfbf78a7d35de37c440fa', 'eef70e0f49980f3de27bdcea8fb6187417213374e63c3ff332fb3c7a4e94d10c'), Dependency_Latest(Dependency_StringWin('', 'https://aka.ms/download-jdk/microsoft-jdk-25-windows-x64.msi', 'https://aka.ms/download-jdk/microsoft-jdk-25-windows-aarch64.msi'))); end;
 
 function Dependency_IsPythonInstalled(const Tag: String): Boolean;
 begin
